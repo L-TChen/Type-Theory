@@ -1,0 +1,10 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{beamerarticle}
+\usepackage[a4paper]{geometry}
+\usepackage{microtype}
+\usepackage{hyperref}
+
+\newcounter{saveenumi}
+\newcommand{\seti}{\setcounter{saveenumi}{\value{enumi}}}
+\newcommand{\conti}{\setcounter{enumi}{\value{saveenumi}}}
+

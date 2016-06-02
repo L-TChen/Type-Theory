@@ -1,0 +1,57 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[british]{babel}
+\usepackage{mathrsfs,bussproofs}
+\EnableBpAbbreviations
+\usepackage{graphicx}
+\usepackage{todonotes}
+
+\setbeamertemplate{theorems}[numbered]
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem{convention}[theorem]{Convention}
+\newtheorem{remark}{Remark}[section]
+
+\newcommand{\FV}{\mathbf{FV}}
+\newcommand{\BV}{\mathbf{BV}}
+\newcommand{\reason}[1]{\{\text{\,#1\,}\}}
+\renewcommand{\o}{\circ}
+\newcommand{\mnd}[1]{{\overleftarrow{#1}}}
+\newcommand{\cmnd}[1]{{\overrightarrow{#1}}}
+\makeatletter
+\newcommand*{\defeq}{\mathrel{\rlap{%
+                     \raisebox{0.3ex}{$\m@th\cdot$}}%
+                     \raisebox{-0.3ex}{$\m@th\cdot$}}%
+                     =}
+\makeatother
+\newcommand{\subst}[2]{[#1\defeq#2]}
+
+\newcommand{\leftexp}[2]{{\vphantom{#2}}^{#1}{#2}}
+\newcommand{\set}[2]{\{\,#1\mid#2\,\}}
+\newcommand{\id}{\mathit{id}}
+
+\newcommand{\M}{\mathsf{M}}
+\newcommand{\N}{\mathsf{N}}
+\newcommand{\V}{\mathsf{V}}
+
+% Macros for PCF
+\newcommand{\nat}{\mathtt{nat}}
+\newcommand{\bool}{\mathtt{bool}}
+
+\newcommand{\fix}{\mathtt{Y}}
+\newcommand{\natrec}{\mathtt{natrec}}
+\newcommand{\suc}{\mathtt{suc}}
+\newcommand{\pred}{\mathtt{pred}}
+\newcommand{\ifz}{\mathtt{ifz}}
+\newcommand{\zero}{\mathtt{zero}}
+\newcommand{\true}{\mathtt{true}}
+\newcommand{\false}{\mathtt{false}}
+
+\newcommand {\textplus}{\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}}
+
+\author[L.-T. Chen]{Chen, Liang-Ting\\
+  \href{mailto:ltchen@hawaii.edu}{\texttt{ltchen@hawaii.edu}}}
+\institute{Department of Information and Computer Sciences, University of Hawaii
+at Manoa}
+\date[FLOLAC'16]{2016 Formosan Summer School on Logic, Language, and Computation}

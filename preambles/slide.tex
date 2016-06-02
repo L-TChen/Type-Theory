@@ -1,0 +1,11 @@
+\documentclass[t,11pt,compress,ignorenonframetext]{beamer}
+\beamertemplatenavigationsymbolsempty
+
+\useinnertheme{rectangles}
+\usecolortheme{beaver}
+\usecolortheme{rose}
+
+\newcounter{saveenumi}
+\newcommand{\seti}{\setcounter{saveenumi}{\value{enumi}}}
+\newcommand{\conti}{\setcounter{enumi}{\value{saveenumi}}}
+\resetcounteronoverlays{saveenumi}
