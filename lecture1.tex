@@ -1,3 +1,4 @@
+%! TEX root = lecture1_note.tex
 \title{Lambda Calculus and Types}
 \author[L.-T. Chen]{Chen, Liang-Ting\\
   \href{mailto:ltchen@hawaii.edu}{\texttt{ltchen@hawaii.edu}}}
@@ -111,70 +112,145 @@ $\lambda$-terms.
 \begin{convention}
   We do \emph{NOT} distinguish two $\lambda$-terms if they only differ in the
   name of bound variables. For example, $(\lambda x.\, x)$ may be renamed to 
-  $(\lambda y.\, y)$, and we consider them the same.
+  $(\lambda y.\, y)$, and we consider them the same. The name of variable do not
+  affect program behaviours but readability.
 \end{convention}
 \begin{definition}[$\alpha$-equivalence: renaming of bound variables]
   Whenever a variable $y$ does not occur freely in~$M$, we can rename the bound
   variable $x$ in~$\lambda x.\, M$, i.e.\ 
   \[
-    (\lambda x.\, M) \equiv_\alpha (\lambda y.\, M\subst{x}{y})
+    (\lambda x.\, M) \equiv (\lambda y.\, M\subst{x}{y})
   \]
   if $y \not\in \FV(M)$. We also need to carry this identification through every
   subterm, so we add the following congruence rule
   \begin{columns}
     \column{.5\textwidth}
     \begin{prooftree}
-      \AXC{$M \equiv_\alpha M'$}
-      \UIC{$M\,N \equiv_\alpha M'\,N$}
+      \AXC{$M_1 \equiv M_2$}
+      \UIC{$M_1\,N \equiv M_2\,N$}
     \end{prooftree}
     \column{.5\textwidth}
     \begin{prooftree}
-      \AXC{$N \equiv_\alpha N'$}
-      \UIC{$M\,N \equiv_\alpha M\,N'$}
+      \AXC{$N_1 \equiv N_2$}
+      \UIC{$M\,N_1 \equiv M\,N_2$}
     \end{prooftree}
   \end{columns}
-  and also the reflexivity, symmetry and, transitivity.
+  and also the reflexivity, symmetry, and transitivity.
 \end{definition}
-\begin{definition}[$\beta$-conversion: reduction]
+\begin{definition}[$\beta$-conversion: one-step reduction]
   An application of this form $(\lambda x.\, M)\, N$ reduces to a
   $\lambda$-term~$M\subst{x}{N}$. Symbolically, we write 
   \[
-    (\lambda x.\, M)\, N \leadsto_\beta M\subst{x}{N}
+    (\lambda x.\, M)\, N \xrightarrow{\beta} M'\subst{x}{N}
   \]
-  where the conversion $\leadsto_\beta$ is called \emph{$\beta$-conversion} or
-  sometime \emph{$\beta$-reduction}. However, $\beta$-reduction can happen in
-  a subterm inside a $\lambda$-term, so we add the following congruence rules:
+  if $M\equiv M'$ and $M\subst{x}{N}$ is defined.
+  The conversion $\leadsto_\beta$ is called \emph{$\beta$-conversion} or
+  sometime and the term $(\lambda x.\, M)\, N$ is
+  called a \emph{$\beta$-redex}.
+\end{definition}
+\begin{definition}[$\beta$-conversion congruence]
+  A reduction step can happen in a subterm inside a $\lambda$-term, so
+  we add the following congruence rules:
   \begin{columns}
     \column{.5\textwidth}
     \begin{prooftree}
-      \AXC{$M \leadsto_\beta M'$}
-      \UIC{$M N \leadsto_\beta M' N$}
+      \AXC{$M_1 \xrightarrow{\beta} M_2$}
+      \UIC{$M_1 \onereduce M_2$}
     \end{prooftree}
     \column{.5\textwidth}
     \begin{prooftree}
-      \AXC{$N \leadsto_\beta N'$}
-      \UIC{$M N \leadsto_\beta M N'$}
+      \AXC{$M_1 \onereduce M_2$}
+      \UIC{$\lambda x.\, M_1 \onereduce \lambda x.\, M_2$}
     \end{prooftree}
   \end{columns}
+  \begin{columns}
+    \column{.5\textwidth}
+    \begin{prooftree}
+      \AXC{$M_1 \onereduce M_2$}
+      \UIC{$M_1 N \onereduce M_2 N$}
+    \end{prooftree}
+    \column{.5\textwidth}
+    \begin{prooftree}
+      \AXC{$N_1\onereduce  N_2$}
+      \UIC{$M N_1 \onereduce M N_2$}
+    \end{prooftree}
+  \end{columns}
+  so that $\leadsto_{\beta1}$ is the least congruence containing $\leadsto_\beta$.
+\end{definition}
+\begin{definition}[$\beta$-reduction]
+  We say that $M_1$ can be reduced to $M_2$
+  if $M_1 \equiv M_2$ or there exists a finite sequence of $\beta$-conversion:
+  \[
+    M_1 \onereduce M' \onereduce \dots \onereduce M_2
+  \]
+  denoted by $M_1 \reduce M_2$. That is, $\reduce$ is the
+  reflexive and transitive closure of~$\onereduce$.
 \end{definition}
 \subsection{Reduction strategies}
-\subsubsection*{Call-by-name and call-by-value}
+\subsubsection*{Call by what?}
+\todo[inline]{Draw some examples from \cite{Sestoft2002}.}
 \subsubsection*{Church-Rosser Theorem}
 \begin{definition}
+  Suppose that $M$ is a $\lambda$-term. Then, 
+  \begin{enumerate}[(a)]
+    \item $M$ is a \emph{$\beta$-normal form}, if there is no
+      one-step $\beta$-reduction, i.e. $M \not\leadsto_{\beta1} N$ for any
+      $\lambda$-term~$N$.
+    \item $M$ is called \emph{weakly normalising} if there exists
+      a normal term $N$ with $M \leadsto^*_{\beta} N$. 
+    \item $M$ is \emph{strongly normalising} if there is no infinite sequence of
+      (one-step) reductions 
+      \[
+        M \onereduce M_1 \onereduce \dots \onereduce \dots
+      \]
+  \end{enumerate}
 \end{definition}
+\begin{theorem}[Church-Rossser Theorem]
+  \[
+    \xymatrix{
+      & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
+      N_1 \ar@{-->}[rd]_{\beta*} & & N_2 \ar@{-->}[ld]^{\beta*} \\
+      & \exists L
+    }
+  \]
+\end{theorem}
+\begin{corollary}[Uniqueness of normal forms]
+  Suppose that $N_1$ and $N_2$ are normal. Then, 
+  \[
+    \xymatrix{
+      & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
+      N_1 \ar@{-->}[r]_{\equiv} \ar@{}[r]|\equiv & N & N_2 \ar@{}[l]|\equiv \\
+    }
+  \]
+\end{corollary}
 \subsection{Programming in lambda calculus}
 \subsubsection*{Church numerals, Booleans, and pairing}
-
 There is no \emph{built-in} natural number in lambda calculus. However, 
 not only every natural number can be defined as a $\lambda$-term, but also 
 operations, e.g.\ addition, multiplication, and even exponential, on natural
 number can be defined. In fact, every computable function (on natural numbers)
 is definable in lambda calculus. 
+
 \begin{definition}[Church numerals]
-  
+  Define $f^1 \defeq f$ and $f^{n+1} \defeq f\,f^n$. Then, 
+  \[
+    \overline{0} \defeq \lambda f.\, \lambda x.\, x
+    \quad
+    \overline{1} \defeq \lambda f.\, \lambda x.\, f x
+    \quad\text{and}\quad
+    \overline{n} \defeq \lambda f.\, \lambda.\, f^{n} x
+  \] 
 \end{definition}
 
+\begin{definition}[Successor]
+  \[
+    \lambda n.\, \lambda f.\, \lambda x.\, f(n f x)
+  \]
+\end{definition}
 \begin{definition}[Addition]
+  \[
+    \lambda n_1.\,\lambda n_2.\, \lambda f.\,\lambda x.\, (n_1 f)(n_2 fx)
+  \]
 \end{definition}
 
 \begin{definition}[Boolean values]
