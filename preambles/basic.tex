@@ -1,12 +1,28 @@
+\mode<presentation>{\beamertemplatenavigationsymbolsempty}
+\newcounter{saveenumi}
+\newcommand{\seti}{\setcounter{saveenumi}{\value{enumi}}}
+\newcommand{\conti}{\setcounter{enumi}{\value{saveenumi}}}
+\mode<presentation>{\resetcounteronoverlays{saveenumi}}
+
+\useinnertheme{rectangles}
+\usecolortheme{beaver}
+\usecolortheme{rose}
+ 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
 \usepackage[british]{babel}
+\mode<article>{\usepackage{mathptmx}}
+\mode<article>{\usepackage[a4paper]{geometry}}
 \usepackage{mathrsfs,bussproofs}
+\usepackage{paralist}
+
 \EnableBpAbbreviations
 \usepackage{graphicx}
 \usepackage[all]{xy}
 \usepackage{todonotes}
+
+\mode<article>{\usepackage{hyperref}}
+\mode<article>{\usepackage{microtype}}
 
 \setbeamertemplate{theorems}[numbered]
 \newtheorem{proposition}[theorem]{Proposition}
@@ -55,6 +71,7 @@
 
 \author[L.-T. Chen]{Chen, Liang-Ting\\
   \href{mailto:ltchen@hawaii.edu}{\texttt{ltchen@hawaii.edu}}}
-\institute{Department of Information and Computer Sciences, University of Hawaii
-at Manoa}
-\date[FLOLAC'16]{2016 Formosan Summer School on Logic, Language, and Computation}
+\institute{Department of Information and Computer Sciences \\
+  University of Hawaii at Manoa}
+\date[FLOLAC'16]{2016 Formosan Summer School on \\<all>
+  Logic, Language, and Computation}

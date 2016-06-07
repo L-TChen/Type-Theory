@@ -1,9 +1,5 @@
 %! TEX root = lecture1_note.tex
-\title{Lambda Calculus and Types}
-\author[L.-T. Chen]{Chen, Liang-Ting\\
-  \href{mailto:ltchen@hawaii.edu}{\texttt{ltchen@hawaii.edu}}}
-\institute{Department of Information and Computer Sciences, University of Hawaii
-at Manoa}
+\title{Lambda Calculus and Types, I}
 \begin{document}
 \begin{frame}
 \maketitle
@@ -21,6 +17,43 @@ science but it requires a mathematical background.
 For further details about lambda calculus, the reader is referred
 to~\cite{Barendregt1984,Barendregt1992}. 
 
+\section{Preliminary: Relation}
+This section is for self-reading only. Please feel free to ignore this section
+if you know \emph{relation (in mathematics)} and relevant notions.
+
+\begin{definition}[Classical]
+  A (set-theoretic) \emph{relation}~$R$ on a set~$X$ is just a subset~$R
+  \subseteq X \times X$, and the expression ``$x_1 \mathbin{R} x_2$'' indicates
+  $(x_1, x_2) \in R$.
+\end{definition}
+The above definition is conventional and standard in mathematics, but not as
+intuitive as it could be. For programmer, the following is perhaps more
+sensible:
+\begin{definition}[Functional]
+  A \emph{relation}~$R$ on a set~$X$ is a Boolean-valued function 
+  \[
+    R\colon X \times X \to \{T, F\},
+  \]
+  and the expression ``$x_1 \mathbin{R} x_2$'' indicates $R(x_1, x_2) = T$.
+\end{definition}
+As $R$ being a function, it tells whether the given arguments are related in the
+way ``expected''. For example, $R$ can be a comparison operator:
+\[
+  {\tt less\_than}\colon \mathbb{N} \times \mathbb{N} \to \{T, F\}
+\]
+which returns $T$ if $x_1 < x_2$, or otherwise $F$.\footnote{%
+  The relation ${\tt less\_than}$ can be defined inductively without circular
+  reference (how?).}
+Relations are classified by property. For example,
+a relation~$R$ on a set~$X$ is called
+\begin{inparaenum}[(a)]
+  \item \emph{reflexive} if it is always the case that $x\mathbin{R}x$ for
+    any~$x \in X$;
+  \item \emph{transitive} if for any $x_1, x_2, x_3 \in X$ with $x_1 \mathbin{R}
+    x_2$ and $x_2 \mathbin{R} x_3$ we always have $x_1 \mathbin{R} x_3$;
+  \item \emph{symmetric} if whenever $x_1 \mathbin{R} x_2$ we have $x_2
+    \mathbin{R} x_1$. 
+\end{inparaenum}
 \section{Untyped lambda calculus}
 We begin with an informal introduction to lambda calculus. Lambda calculus can
 be viewed as a simplest programming language whose syntax only consists of
@@ -148,7 +181,8 @@ $\lambda$-terms.
   sometime and the term $(\lambda x.\, M)\, N$ is
   called a \emph{$\beta$-redex}.
 \end{definition}
-\begin{definition}[$\beta$-conversion congruence]
+
+\begin{definition}[$\beta$-conversion: structural rules]
   A reduction step can happen in a subterm inside a $\lambda$-term, so
   we add the following congruence rules:
   \begin{columns}
@@ -175,9 +209,9 @@ $\lambda$-terms.
       \UIC{$M N_1 \onereduce M N_2$}
     \end{prooftree}
   \end{columns}
-  so that $\leadsto_{\beta1}$ is the least congruence containing $\leadsto_\beta$.
 \end{definition}
-\begin{definition}[$\beta$-reduction]
+
+\begin{definition}[Full $\beta$-reduction]
   We say that $M_1$ can be reduced to $M_2$
   if $M_1 \equiv M_2$ or there exists a finite sequence of $\beta$-conversion:
   \[
@@ -186,16 +220,16 @@ $\lambda$-terms.
   denoted by $M_1 \reduce M_2$. That is, $\reduce$ is the
   reflexive and transitive closure of~$\onereduce$.
 \end{definition}
-\subsection{Reduction strategies}
+\subsection{Reduction in detail}
 \subsubsection*{Call by what?}
+\begin{definition}
+  A \emph{reduction strategy} 
+\end{definition}
 \todo[inline]{Draw some examples from \cite{Sestoft2002}.}
 \subsubsection*{Church-Rosser Theorem}
 \begin{definition}
   Suppose that $M$ is a $\lambda$-term. Then, 
   \begin{enumerate}[(a)]
-    \item $M$ is a \emph{$\beta$-normal form}, if there is no
-      one-step $\beta$-reduction, i.e. $M \not\leadsto_{\beta1} N$ for any
-      $\lambda$-term~$N$.
     \item $M$ is called \emph{weakly normalising} if there exists
       a normal term $N$ with $M \leadsto^*_{\beta} N$. 
     \item $M$ is \emph{strongly normalising} if there is no infinite sequence of
@@ -219,7 +253,7 @@ $\lambda$-terms.
   \[
     \xymatrix{
       & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-      N_1 \ar@{-->}[r]_{\equiv} \ar@{}[r]|\equiv & N & N_2 \ar@{}[l]|\equiv \\
+      N_1 \ar@{}[r]|\equiv & N & N_2 \ar@{}[l]|\equiv \\
     }
   \]
 \end{corollary}
@@ -270,7 +304,6 @@ is definable in lambda calculus.
     function $\BV\colon \Lambda \to V$ inductively
     such that $\BV(M)$ is exactly the set of bound variable in a
     $\lambda$-term~$M$.
-
 \end{enumerate}
 
 \bibliographystyle{plain}
