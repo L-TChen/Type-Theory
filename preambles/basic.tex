@@ -14,6 +14,7 @@
 \mode<article>{\usepackage{mathptmx}}
 \mode<article>{\usepackage[a4paper]{geometry}}
 \usepackage{mathrsfs,bussproofs}
+\usepackage{multicol}
 \usepackage{paralist}
 
 \EnableBpAbbreviations
@@ -42,7 +43,9 @@
                      \raisebox{-0.3ex}{$\m@th\cdot$}}%
                      =}
 \makeatother
-\newcommand{\subst}[2]{[#1\defeq#2]}
+
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\subst}[2]{[\,#1\mapsto#2\,]}
 
 \newcommand{\leftexp}[2]{{\vphantom{#2}}^{#1}{#2}}
 \newcommand{\set}[2]{\{\,#1\mid#2\,\}}

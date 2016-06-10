@@ -1,0 +1,132 @@
+%! TEX root = lecture0_note.tex
+\title{Lambda Calculus and Types, 0}
+\begin{document}
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{document}
+The aim of this course is to teach the practical part of untyped and typed
+lambda calculus which is the formalisation of functional programming,
+and unfortunately we have to omit the computability aspect due to time
+constraints. Another aspect we will not discuss is the denotational semantic of
+lambda calculus. It is one of the well-studied subject in theoretical computer
+science but it requires a mathematical background.
+
+\todo{historical remark}
+
+For further details about lambda calculus, the reader is referred
+to~\cite{Barendregt1984,Barendregt1992}. 
+
+\section{Preliminary: Relation}
+This section is for self-reading only. Please feel free to ignore this section
+if you know \emph{relation (in mathematics)} and relevant notions.
+
+\begin{definition}[Set-theoretic]
+  A (set-theoretic) \emph{relation}~$R$ (on a set~$X$) is a subset~$R
+  \subseteq X \times X$, and the expression ``$x_1 \mathbin{R} x_2$'' indicates
+  $(x_1, x_2) \in R$.
+\end{definition}
+The above definition is conventional and standard in mathematics, but not as
+intuitive as it could be. Whenever there is no danger of confusion, we may
+suppress the domain, i.e.\ $X$, of a relation. For programmer, the following is
+perhaps more straightforward:
+\begin{definition}[Functional]
+  A \emph{relation}~$R$ on a set~$X$ is a Boolean-valued function 
+  \[
+    R\colon X \times X \to \{T, F\},
+  \]
+  and the expression ``$x_1 \mathbin{R} x_2$'' indicates $R(x_1, x_2) = T$.
+\end{definition}
+
+As $R$ being a function, it tells whether the given arguments are related in the
+way ``expected''. For example, $R$ can be a comparison operator:
+\[
+  {\tt less\_than}\colon \mathbb{N} \times \mathbb{N} \to \{T, F\}
+\]
+which returns $T$ if $x_1 < x_2$, or otherwise $F$.\footnote{%
+  The relation ${\tt less\_than}$ can be defined inductively without circular
+  reference (how?).}
+We also name some special classes of relations. For example,
+a relation~$R$ on a set~$X$ is called
+\begin{inparaenum}[(a)]
+  \item \emph{reflexive} if it is always the case that $x\mathbin{R}x$ for
+    any~$x \in X$;
+  \item \emph{symmetric} if whenever $x_1 \mathbin{R} x_2$ we have $x_2
+    \mathbin{R} x_1$
+  \item \emph{transitive} if for any $x_1, x_2, x_3 \in X$ with $x_1 \mathbin{R}
+    x_2$ and $x_2 \mathbin{R} x_3$ we always have $x_1 \mathbin{R} x_3$;
+  \item an \emph{equivalence relation} if it is reflexive, symmetric, and
+    transitive.
+\end{inparaenum}
+
+Finally, it is also a useful to construct a certain relation out of another
+relation by adding elements. 
+\begin{definition}
+  Given a relation~$R$, 
+  define the following relations inductively:
+  \begin{enumerate}
+    \item the reflexive closure $R^r$ by\\
+      \begin{minipage}[c]{.33\textwidth} 
+      \begin{prooftree}
+        \AXC{\phantom{X}}
+        \UIC{$x \mathbin{R^r} x$}
+      \end{prooftree}
+      \end{minipage}
+      and
+      \begin{minipage}{.33\textwidth}
+        \begin{prooftree}
+          \AXC{$x_1 \mathbin{R} x_2$}
+          \RightLabel{;}
+          \UIC{$x_1 \mathbin{R^r} x_2$}
+        \end{prooftree}
+      \end{minipage}
+    \item the symmetric closure~$R^s$ by\\
+      \begin{minipage}{.33\textwidth}
+        \begin{prooftree}
+          \AXC{$x_1 \mathbin{R} x_2$}
+          \RightLabel{;}
+          \UIC{$x_1 \mathbin{R^s} x_2$}
+        \end{prooftree}
+      \end{minipage}
+        and
+        \begin{minipage}{.33\textwidth}
+          \begin{prooftree}
+            \AXC{$x_1 \mathbin{R} x_2$}
+            \UIC{$x_2 \mathbin{R^s} x_1$}
+          \end{prooftree}
+        \end{minipage}
+    \item the transitive closure~$R^t$ by\\
+      \begin{minipage}{.33\textwidth}
+        \begin{prooftree}
+          \AXC{$x_1 \mathbin{R} x_2$}
+          \RightLabel{;}
+          \UIC{$x_1 \mathbin{R^t} x_2$}
+        \end{prooftree}
+      \end{minipage}
+      and 
+      \begin{minipage}{.33\textwidth}
+        \begin{prooftree}
+          \AXC{$x_1 \mathbin{R} x_2$}
+          \AXC{$x_2 \mathbin{R^t} x_3$}
+          \BIC{$x_1 \mathbin{R^t} x_3$}
+        \end{prooftree}
+      \end{minipage}
+  \end{enumerate}
+  where $x, x_1, x_2$ all denote elements of~$X$.
+\end{definition}
+\begin{proposition}
+  The reflexive (resp.\ symmetric and transitive) closure is the least reflexive
+  (resp.\ symmetric, and transitive) relation containing~$R$, i.e.\ the closure
+  is symmetric and every symmetric relation~$S$ with $R \subseteq S$
+  contains~$R^r$.
+\end{proposition}
+\begin{proof}
+  The proof is left as an exercise to the reader.
+\end{proof}
+\subsubsection*{Exercise}
+\begin{enumerate}
+  \item Given a relation~$R$, define the least equivalence relation 
+    containing~$R$. That is, define the \emph{equivalence closure} of~$R$.
+\end{enumerate}
+\end{document}

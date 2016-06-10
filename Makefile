@@ -1,12 +1,12 @@
 tex = latexmk -pdf -outdir=output
 
-lectures = lecture1 lecture2 lecture3 
+lectures = lecture0 lecture1 lecture2 lecture3 
 
 all: $(lectures)
 
 $(lectures):
-	$(tex) output/$@_note.tex
-	$(tex) output/$@_slide.tex
+	$(tex) $@_note.tex
+	$(tex) $@_slide.tex
 	cp output/$@_note.pdf output/$@_slide.pdf pdf
 	
 
