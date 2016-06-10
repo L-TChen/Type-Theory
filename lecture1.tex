@@ -238,6 +238,7 @@ and write down all possible chains of reductions.
     function $\BV\colon \Lambda \to V$ inductively
     such that $\BV(M)$ is exactly the set of bound variable in a
     $\lambda$-term~$M$.
+  \item \todo{some exercises}
 \end{enumerate}
 
 \section{Reduction}
@@ -427,19 +428,15 @@ is definable in lambda calculus.
   \]
   for any natural number~$n$.
 \end{definition}
-\begin{proof}
-  The proof is left as an exercise to the reader.
-\end{proof}
 \begin{proposition}[Addition]
   Define a $\lambda$-term 
   \[
-    \mathtt{add} \defeq \lambda n_1.\,\lambda n_2.\, \lambda f.\,\lambda x.\,
-    (n_1 f)(n_2 fx)
+    \mathtt{add} \defeq \lambda n.\,\lambda m.\, (m\;\mathtt{succ})\;n
   \]
-  as the addition operation of Church numerals.
+  as the addition operation on Church numerals.
   Then, 
   \[
-    \mathtt{Add}\;\overline{n}\;\overline{m}\;
+    \mathtt{add}\;\overline{n}\;\overline{m}\;
     \reduce\;\overline{n + m}
   \]
 \end{proposition}
@@ -453,26 +450,35 @@ is definable in lambda calculus.
     \item $\mathtt{add}\;(\mathtt{succ}\;\overline{0})\;\overline{1}$.
     \end{enumerate}
 \end{example}
-\begin{proposition}[Boolean values, conditional operator]
-  Define 
+\begin{proposition}[Predecessor]
   \[
-    \mathtt{T} \defeq \lambda x.\,(\lambda y.\, x)
-    \quad\text{and}\quad
-    \mathtt{F} \defeq \lambda x.\,(\lambda y.\, y)
+    \mathtt{pred} \defeq \lambda n.\,\lambda f.\,\lambda x.\,n\,(\lambda g.\,\lambda h.\,h\,(g\,f))\,
+    (\lambda u.\,x)\,(\lambda u.\,u)
   \]
-  and also the pairing of two $\lambda$-terms $M$ and $N$:
-  \[
-    [\,M, N\,] \defeq \lambda z.\, (z\,M)\,N
-  \]
-  Then, 
+  Then,
   \begin{align*}
-    [\,M, N\,]\;\mathtt{T} \reduce M \\
-    [\,M, N\,]\;\mathtt{F} \reduce N
+      \mathtt{pred}\;\overline{0}   & \reduce \overline{0} \\
+    \mathtt{pred}  \;\overline{n+1} & \reduce \overline{n}
   \end{align*}
 \end{proposition}
-\begin{proof}
-  The proof is left as an exercise to the reader.
-\end{proof}
+
+\begin{proposition}[Conditional]
+  Define 
+  \[
+    \mathtt{if}\;n\;\mathtt{then}\;x\;\mathtt{else}\;y\; \defeq 
+    n\,(\lambda v.\,x)\,y 
+  \]
+  where $n$, $x$, and $y$ are variables and 
+  $\mathtt{if\_then\_else\_} \defeq \lambda n.\,(\lambda x.\,(\lambda y.\,
+  n\,(\lambda v.\, x)\, y))$.
+  Then, for any two $\lambda$-terms $M$ and~$N$,
+  \begin{align*}
+    \mathtt{if}\;\overline{0}\;\mathtt{then}\;M\;\mathtt{else}\;N
+    \reduce M \\ 
+    \mathtt{if}\;\overline{n+1}\;\mathtt{then}\;M\;\mathtt{else}\;N
+    \reduce N.
+  \end{align*}
+\end{proposition}
 \subsection{Some combinators and the fixed-point Combinator}
 Here is a list of common combinators:
 \begin{enumerate}
@@ -487,9 +493,35 @@ Here is a list of common combinators:
   \item $\mathbf{S}\defeq\lambda f.\,\lambda g.\,\lambda x.\, 
     (f\,x)\,(g\,y)$.
 \end{enumerate}
-\begin{example}[Factorial, informally]
-
+\begin{example}[Summation, informally]
+  The summation $\sum_{i = 0}^{n} i$ from $0$ to a given natural number~$n$
+  \emph{is} is usually stated recursively:
+  \[
+    \mathtt{sum}(n) =
+      \begin{cases} 
+       0 & \text{if } n = 0 \\
+       n + \mathtt{sum}(n - 1)  & \text{otherwise}.
+      \end{cases}
+  \]
+  Can we avoid the self-reference? Consider the function
+  $G\colon (\mathbb{N} \to \mathbb{N}) \to (\mathbb{N} \to \mathbb{N})$
+  defined by
+  \begin{equation} \label{eq:summation}
+    (Gf)(n) \defeq
+    \begin{cases}
+       0 & \text{if } n = 0 \\
+       n + f(n - 1)  & \text{otherwise}.
+    \end{cases}
+  \end{equation}
+  Now, assume that $\mathtt{sum}'$ is a fixed-point of $G$, i.e.\
+  $G(\mathtt{sum}') =\mathtt{sum}'$, and we can find that $\mathtt{sum}' =
+  \mathtt{sum}$ by induction. 
 \end{example}
+
+As seen in the example, we can avoid a self-referential definition by taking the
+fixed-point of some higher-order function. It is exactly why lambda calculus so
+powerful as it allows us to obtain the fixed-point of \emph{every}
+$\lambda$-term!
 \begin{proposition}[Curry's fixed-point combinator]
   Define
   \[
@@ -503,9 +535,21 @@ Here is a list of common combinators:
     & \onereduce F\,(\underline{(\lambda x.\,F\,(x\,x))\,(\lambda x.\,
       F\,(x\,x))})
   \end{align*}
-  That is, the term $(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))$
+  where the term $(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))$
   reoccur as the argument of~$F$ in the last step.
 \end{proposition}
+\begin{example}[Summation, formally]
+  Using the combinators we known so far, the equation~\eqref{eq:summation}
+  can be defined as $\lambda$-terms:
+  \begin{align*}
+    G \defeq{} &
+    \lambda f.\,\lambda n.\,
+    \mathtt{if}\;n\;\mathtt{then}\;\overline{0}\;\mathtt{else}\;
+    f\,(\mathtt{pred}\;n) \\
+    \mathtt{sum} \defeq{} & \mathbf{Y}G
+  \end{align*}
+  Try to evaluate $\mathtt{sum}$ with some Church numerals.
+\end{example}
 
 \begin{proposition}[Turing's fixed-point combinator]
   Define 
@@ -519,11 +563,6 @@ Here is a list of common combinators:
     \Theta F \reduce F (\Theta F)
   \]
 \end{proposition}
-\begin{proof}
-  The proof is left as an exercise to the reader.
-\end{proof}
-\begin{example}[Factorial, formally]
-\end{example}
 
 In fact, every computable function (equivalently, recursive functions) on
 natural numbers is definable in terms of $\lambda$-terms. Due to the time
@@ -538,9 +577,14 @@ detail.
       ((\mathbf{C}\,M)\,N)\,P
       \reduce (M\,P)\,N
     \]
-  \item Define a $\lambda$-term $\mathtt{sum}$ such that
-    $\mathtt{sum}\;\overline{n} \reduce \overline{0 + 1 + 2 + \dots + n}$.
-  \todo[inline]{give more examples}
+  \item Define the pairing $[\,M, N\,]$ of two $\lambda$-terms $M$ and $N$
+    such that
+    \begin{align*}
+      [\,M, N\,]\;\mathbf{K}_1 \reduce M \\
+      [\,M, N\,]\;\mathbf{K}_2 \reduce N.
+    \end{align*}
+  \item Define the multiplication $m \times n$ on Church numerals.
+  \item Define the factorial $n!$ on Church numerals.
 \end{enumerate}
 \bibliographystyle{plain}
 \bibliography{library} 
