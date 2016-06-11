@@ -1,5 +1,5 @@
 %! TEX root = lecture1_note.tex
-\title{Lambda Calculus and Types:\\<all>
+\title{Lambda Calculus and Types, 1:\\<all>
   Untyped Lambda Calculus}
 \begin{document}
 \begin{frame}
@@ -391,6 +391,10 @@ To answer the previous question, it suffices to prove the following theorem:
   \]
   That is, $N_1$ and $N_2$ are $\alpha$-equivalent.
 \end{corollary}
+\begin{theorem}[See {\cite[Theorem 13.2.2]{Barendregt1984a}}]
+  The leftmost-outermost strategy reduce every weakly
+  normalising $\lambda$-term to its normal form.
+\end{theorem}
 \subsection*{Exercise}
 \todo[inline]{Evaluate some terms}
 \begin{enumerate}
@@ -563,12 +567,21 @@ $\lambda$-term!
     \Theta F \reduce F (\Theta F)
   \]
 \end{proposition}
+\begin{example}[Summation, again!]
+  Now, try Turing's fixed-point combinator with the term $G$ to define
+  $\sum_{i=0}^n i$:
+  \begin{align*}
+    G \defeq{} &
+    \lambda f.\,\lambda n.\,
+    \mathtt{if}\;n\;\mathtt{then}\;\overline{0}\;\mathtt{else}\;
+    f\,(\mathtt{pred}\;n) \\
+    \mathtt{sum} \defeq & \Theta\,G \\
+  \end{align*}
+\end{example}
 
-In fact, every computable function (equivalently, recursive functions) on
-natural numbers is definable in terms of $\lambda$-terms. Due to the time
-constrains, we refer the reader to~\cite[Chapter 3]{Barendregt1984} for further
-detail.
-
+In fact, every computable function on natural numbers is definable in terms of
+$\lambda$-terms. Due to the time constrains, we refer the reader
+to~\cite[Chapter 3]{Barendregt1984} for further detail.
 \subsection*{Exercise}
 \begin{enumerate}
   \item Define the \emph{swap} operation, i.e\ a $\lambda$-term~$\mathbf{C}$

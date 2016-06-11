@@ -5,14 +5,12 @@
 \maketitle
 \end{frame}
 
-The aim of this course is to teach the practical part of untyped and typed
-lambda calculus which is the formalisation of functional programming,
-and unfortunately we have to omit the computability aspect due to time
-constraints. Another aspect we will not discuss is the denotational semantic of
-lambda calculus. It is one of the well-studied subject in theoretical computer
-science but it requires a mathematical background.
-
-\todo{historical remark}
+The aim of this course is to briefly grasp some idea of untyped and typed lambda
+calculus which is the formalisation of functional programming, and unfortunately
+the computability aspect is omitted due to time constraints. Another aspect we
+will not discuss is the semantic of lambda calculus. It is one of the
+long-standing subject in theoretical computer science but it is very deep
+and requires some knowledge of modern mathematics. 
 
 For further details about lambda calculus, the reader is referred
 to~\cite{Barendregt1984,Barendregt1992,Barendregt1984a}. 
@@ -24,14 +22,15 @@ if you know \emph{relation (in mathematics)} and relevant notions.
 \begin{definition}[Set-theoretic]
   A (set-theoretic) \emph{relation}~$R$ (on a set~$X$) is a subset~$R
   \subseteq X \times X$, and the expression ``$x_1 \mathbin{R} x_2$'' indicates
-  $(x_1, x_2) \in R$.
+  $(x_1, x_2) \in R$.  Whenever there is no danger of confusion, we may suppress
+  the domain, i.e.\ $X$, of a relation. 
 \end{definition}
+
 The above definition is conventional and standard in mathematics, but not as
-intuitive as it could be. Whenever there is no danger of confusion, we may
-suppress the domain, i.e.\ $X$, of a relation. For programmer, the following is
-perhaps more straightforward:
+intuitive as it could be. For programmer, the following is perhaps more
+straightforward:
 \begin{definition}[Functional]
-  A \emph{relation}~$R$ on a set~$X$ is a Boolean-valued function 
+  A \emph{relation}~$R$ is a Boolean-valued function 
   \[
     R\colon X \times X \to \{T, F\},
   \]
@@ -46,6 +45,7 @@ way ``expected''. For example, $R$ can be a comparison operator:
 which returns $T$ if $x_1 < x_2$, or otherwise $F$.\footnote{%
   The relation ${\tt less\_than}$ can be defined inductively without circular
   reference (how?).}
+
 We also name some special classes of relations. For example,
 a relation~$R$ on a set~$X$ is called
 \begin{inparaenum}[(a)]
@@ -84,7 +84,6 @@ relation by adding elements.
       \begin{minipage}{.33\textwidth}
         \begin{prooftree}
           \AXC{$x_1 \mathbin{R} x_2$}
-          \RightLabel{;}
           \UIC{$x_1 \mathbin{R^s} x_2$}
         \end{prooftree}
       \end{minipage}
@@ -92,6 +91,7 @@ relation by adding elements.
         \begin{minipage}{.33\textwidth}
           \begin{prooftree}
             \AXC{$x_1 \mathbin{R} x_2$}
+          \RightLabel{;}
             \UIC{$x_2 \mathbin{R^s} x_1$}
           \end{prooftree}
         \end{minipage}
@@ -99,7 +99,6 @@ relation by adding elements.
       \begin{minipage}{.33\textwidth}
         \begin{prooftree}
           \AXC{$x_1 \mathbin{R} x_2$}
-          \RightLabel{;}
           \UIC{$x_1 \mathbin{R^t} x_2$}
         \end{prooftree}
       \end{minipage}
@@ -108,6 +107,7 @@ relation by adding elements.
         \begin{prooftree}
           \AXC{$x_1 \mathbin{R} x_2$}
           \AXC{$x_2 \mathbin{R^t} x_3$}
+          \RightLabel{;}
           \BIC{$x_1 \mathbin{R^t} x_3$}
         \end{prooftree}
       \end{minipage}
@@ -127,6 +127,11 @@ relation by adding elements.
 \begin{enumerate}
   \item Given a relation~$R$, define the least equivalence relation 
     containing~$R$. That is, define the \emph{equivalence closure} of~$R$.
+  \item Show that every subset $S \subseteq X$ defines a Boolean-valued 
+    function $\chi_S\colon X \to \{T, F\}$ and vice versa, and moreover the
+    mapping $S \mapsto \chi_S$ is bijective. 
+  \item Explain why the set-theoretic relation is essentially as the same as the
+    functional relation. 
 \end{enumerate}
 
 \bibliographystyle{plain}
