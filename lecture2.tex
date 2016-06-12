@@ -26,16 +26,11 @@ We begin a minimalistic typing system consisting of function types with primitiv
 types (such as types of Boolean values and natural numbers). We call it
 \emph{simply typed lambda calculus \textit{\`a la} Curry}.
 \begin{definition}
-  Given a set of type variables~$\mathbb{V}$ and a set $\mathbb{G}$ of ground
-  types (a.k.a.\ primitive types), the set $\mathbb{T} = \mathbb{T}_\mathbb{G}$
-  of \emph{types} is inductively defined as
-  \begin{multicols}{3}
+  Given type variables~$\mathbb{V}$, the set $\mathbb{T}$ of
+  \emph{types} is inductively defined by
+  \begin{multicols}{2}
     \begin{prooftree}
       \AXC{$B \in \mathbb{V}$}
-      \UIC{$B \in \mathbb{T}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$B \in \mathbb{G}$}
       \UIC{$B \in \mathbb{T}$}
     \end{prooftree}
     \begin{prooftree}
@@ -47,23 +42,19 @@ types (such as types of Boolean values and natural numbers). We call it
   \end{multicols}
 \end{definition}
 \begin{definition}
-  Given a set of variables and a set of ground types, we define the following
-  notions.
-  \begin{enumerate}
-    \item A \emph{statement} consists of a $\lambda$-term~$M$
+    A \emph{statement} consists of a $\lambda$-term~$M$
       and a type~$\sigma \in \mathbb{T}$ denoted by 
       \[
         M : \sigma
       \]
       and we say that $M$ has the type $\sigma$.
-    \item A \emph{context}~$\Gamma$ is a (possibly infinite) set of statements 
+
+    A \emph{context}~$\Gamma$ is a set of statements 
       \[
         \Gamma = \{x_1 : \sigma_1, x_2 : \sigma_2, \ldots, x_n : \sigma_n\}
       \]
       where $x_i$ are all distinct variables. 
-  \end{enumerate}
 \end{definition}
-A judgement in the system of assignment is constructed inductively as follows:
 \begin{definition}[Typing rules]
   A \emph{judgement} consists of a context~$\Gamma$ and a statement~$M:\sigma$ denoted by
       \[
@@ -136,7 +127,8 @@ The third one is left as an exercise to the reader.
 \subsection{Explicit typing: system of typed terms}
 Instead of having an external typing system, it is also possible to internalise
 the typing information as part of $\lambda$-terms. This system is called
-\emph{simply typed lambda calculus \textit{\`a la} Church}.
+\emph{simply typed lambda calculus \textit{\`a la} Church}, denoted by
+$\lambda_\to$.
 \begin{definition}
   The set $\Lambda_\mathbb{T}$ of typed $\lambda$-terms is inductively defined
   \begin{multicols}{2}
@@ -158,7 +150,7 @@ the typing information as part of $\lambda$-terms. This system is called
   \end{multicols}
 \end{definition}
 Likewise, the \emph{substitution} and the \emph{one-step $\beta$-reduction} are
-defined on typed $\lambda$-terms in the same way.
+defined on typed $\lambda$-terms in the same way. 
 \begin{definition}[Typing rules]
   A judgement $\Gamma \vdash M : \sigma$ on typed terms is constructed
   inductively by the following rules.
@@ -207,20 +199,11 @@ from typed $\lambda$-terms to $\lambda$-terms with implicit type.
   \end{align*}
 \end{definition}
 \begin{proposition}
-  Let $M$ and $N$ be typed $\lambda$-terms in~$\Lambda_\T$. Then,
-  \begin{enumerate}
-    \item 
-      \[
-        \Gamma \vdash M : \sigma \implies
-        \Gamma \vdash |M| : \sigma
-      \]
-    \item 
-      \[
-        M \reduce N 
-        \implies
-        |M| \reduce |N|
-      \]
-  \end{enumerate}
+  Let $M$ and $N$ be typed $\lambda$-terms in~$\Lambda_\T$. Then, 
+  \[
+    \Gamma \vdash M : \sigma \implies \Gamma \vdash |M| : \sigma
+    \quad\text{and}\quad M \reduce N \implies |M| \reduce |N|.
+  \]
 \end{proposition}
 \begin{proposition}
   Let $M$ and $N$ be $\lambda$-terms in~$\Lambda$. 
@@ -237,8 +220,8 @@ from typed $\lambda$-terms to $\lambda$-terms with implicit type.
 \end{proposition}
 
 In practice, the type inference is left to the evaluator of a programming
-language, so it is natural to ask if this system of assignment has the following
-properties:
+language, so it is natural to ask if the following properties can be done
+in a mechanical way:
 \begin{description}
   \item[Typability:] Is there a type $\sigma$ with $\vdash M : \sigma$? 
   \item[Type checking:] Does $\vdash M : \sigma$ hold for a given type $\sigma$?
@@ -260,6 +243,9 @@ Both questions are answered positively:
     \[
       \vdash \lambda (x : \sigma).\, x\; x : \tau.
     \]
+  \item Find a type for Church numerals $\underline{n} = \lambda f.\,(\lambda
+    x.\, f^n\;x)$. Note that you may find $\underline{0}$ and $\underline{1}$
+    confusing.
   \end{enumerate}
 \section{Type safety}
 \subsection{Preservation}
@@ -323,8 +309,8 @@ Another feature of well-typed terms is that a well-typed \emph{closed} term is
 either a \emph{value} or reducible---``well-typed programs do not get stuck!''
 
 \begin{theorem}[Progress Theorem]
-  If ${}\vdash M : \sigma$ for a typed $\lambda$-term~$M$, then either $M$ is in
-  a value or there is $M'$ with $M \onereduce M'$.
+  If ${}\vdash M : \sigma$ for $M \in \Lambda_\T$, then either $M$ is a value or
+  there is $M'$ with $M \onereduce M'$.
 \end{theorem}
 \todo[inline]{define value?}
 
@@ -346,23 +332,67 @@ and the strong normalisation, we actually have shown that there exists a
 decidable evaluator of simply typed lambda calculus that always reduce a
 well-typed term of type~$\sigma$ to a value of type~$\sigma$. In fact, since
 statements are proved by induction, we can implement an evaluator naively from
-the proofs. In fact, we will see later how to extract a program from a
+the proofs. Moreover, we will see later how to extract a program from a
 \emph{formal} proof.
 \subsection*{Exercise}
 \begin{enumerate}
   \item (*)Show that if $\Gamma, x : \tau \vdash M : \sigma$
     and $\Gamma \vdash N : \tau$ then $\Gamma \vdash M\subst{x}{N} : \sigma$.
     Hint: Recall the definition of substitution and prove by induction
-    on $\Gamma, x:\tau\vdash M : \sigma$.
+    on the derivation of $\Gamma, x:\tau\vdash M : \sigma$.
   \item Show that $\Gamma, x : \tau \vdash M :\sigma
-    \iff \Gamma', x' : \tau \vdash M\subst{x}{x'} : \sigma$. That is,
+    \iff \Gamma, x' : \tau \vdash M\subst{x}{x'} : \sigma$. That is,
     $\alpha$-equivalent (typed) terms have the same type.
-  \item Finish the proof of Theorem~\ref{thm:preservation}.
+  \item Complete the proof of Theorem~\ref{thm:preservation}. Hint: Use the
+    above two statements.
   \item Prove that Preservation Theorem and Progress Theorem hold for
-    simply lambda calculus \textit{\`a la} Curry using type erasing.
+    simply typed lambda calculus \textit{\`a la} Curry using type erasing.
 \end{enumerate}
 \section{Programming in simply typed lambda calculus}
-It is also convenient to add some primitive types our typed lambda calculus (or
+Church numerals are typable in simply typed lambda calculus.
+In this section, we use simply typed lambda calculus \emph{\'a la} Curry.
+The type of natural numbers is of the form
+\[
+  \nat_\tau \defeq (\tau \to \tau) \to (\tau \to \tau) 
+\]
+for every type $\tau \in \T$. For brevity, the subscript of~$\nat_\tau$ is
+suppressed, so is written as $\nat$. Then, Church numerals have a type for every
+type~$\tau$:
+  \begin{description}
+    \item[Church numerals]
+      \begin{align*}
+        & \underline{n} \defeq \lambda f\,x.\,
+        f^n x \\
+        \vdash{} & \underline{n} : \nat
+      \end{align*}
+    \item[successor]
+      \begin{align*}
+        & \suc \defeq \lambda n \,f\,x\,.\;(f\;(n\;f\;x)) \\
+        \vdash{} & \suc : \nat \to \nat
+      \end{align*}
+    \item[addition]
+      \begin{align*}
+        & \add \defeq \lambda n\,m\,f\,x.\; (m\;f)\;(n\;f\;x) \\
+        \vdash{} & \add : \nat \to \nat \to \nat
+      \end{align*}
+    \item[muliplication] 
+      \begin{align*}
+        & \mul \defeq \lambda n\,m\,f\,x.\, (m\;(n\;f))\;x\\
+      \vdash{} & \mul : \nat \to \nat
+      \end{align*}
+    \item[conditional]
+      \begin{align*}
+        & \ifz \defeq \lambda c\,n\,m.\, c\;(\lambda z.\, n)\;m\\
+        \vdash {} & \ifz : \nat \to \nat \to \nat \to \nat
+      \end{align*}
+  \end{description}
+  \todo{definable functions, extended polynomials}
+\begin{theorem}[Schwichtenberg]
+  The $\lambda_\to$-definable functions are exactly
+  the extended polynomials.
+\end{theorem}
+\subsection{System T}
+It is also convenient to add some primitive types to our typed lambda calculus (or
 so-called built-in types in programming languages used in practice) as well as
 \emph{primitive terms}. For example, for a system with natural numbers, we
 include numerals in the generation of syntax:
@@ -411,8 +441,8 @@ rules:
 
 However, it still remains to add primitive operations such as addition,
 multiplication, division, and so on with a proper set of reduction rules. As we
-have seen that Church numerals and arithmetic operations in untyped lambda
-calculus can be defined with recursion. Something similar can be done:
+have seen that recursions on natural numbers in untyped lambda calculus can be
+defined with the fixpoint operator. Something similar can be done:
 \begin{definition}
   In addition to typing rules introduced so far, we add the following
   \begin{prooftree}

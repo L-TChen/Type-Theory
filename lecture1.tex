@@ -408,6 +408,8 @@ operations, e.g.\ addition, multiplication, and even exponential, on natural
 number can be defined. In fact, every computable function (on natural numbers)
 is definable in lambda calculus. 
 
+\todo[inline]{introduce convention $\lambda x_1x_2\dots x_n.\;M$
+stands for $\lambda x_1.\,\lambda x_2.\, \dots\lambda x_n.\,M$ etc.}
 \begin{definition}[Church numerals]
   Define $f^1 \defeq f$ and $f^{n+1} \defeq f\,f^n$. Then, 
   \[
@@ -433,7 +435,7 @@ is definable in lambda calculus.
 \begin{proposition}[Addition]
   Define a $\lambda$-term 
   \[
-    \mathtt{add} \defeq \lambda n.\,\lambda m.\, (m\;\mathtt{succ})\;n
+    \mathtt{add} \defeq \lambda n\,m\,f\,x.\; (m\;f)\;(n\;f\;x) 
   \]
   as the addition operation on Church numerals.
   Then, 
@@ -471,8 +473,7 @@ is definable in lambda calculus.
     n\,(\lambda v.\,x)\,y 
   \]
   where $n$, $x$, and $y$ are variables and 
-  $\mathtt{if\_then\_else\_} \defeq \lambda n.\,(\lambda x.\,(\lambda y.\,
-  n\,(\lambda v.\, x)\, y))$.
+  $\mathtt{if\_then\_else\_} \defeq \lambda n\,x\,y\,n.\,(\lambda v.\, x)\, y$.
   Then, for any two $\lambda$-terms $M$ and~$N$,
   \begin{align*}
     \mathtt{if}\;\overline{0}\;\mathtt{then}\;M\;\mathtt{else}\;N
