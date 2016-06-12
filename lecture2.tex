@@ -16,18 +16,24 @@ intention of such terms.
 This motivates us to introduce \emph{types} over $\lambda$-terms. There are two
 approaches given by Curry and Church corresponding to
 two paradigms in programming language called \emph{implicit} and \emph{explicit
-  typing} respectively.  In the typed lambda calculus \emph{\`a la} Curry, a
+  typing} respectively.  In the typed lambda calculus \textit{\`a la} Curry, a
 $\lambda$-term is assigned to all possible types; while in the calculus
-\emph{\`a la} Church, a $\lambda$-term is annotated with types. 
+\textit{\`a la} Church, a $\lambda$-term is annotated with types. 
 
 \subsection{Implicit typing: system with type assignment}
 For an implicit typing system, types are defined in addition to $\lambda$-terms.
-We begin a minimalistic typing system consisting of function types and primitive
-types such as types of Boolean values, natural numbers, etc. 
+We begin a minimalistic typing system consisting of function types with primitive
+types (such as types of Boolean values and natural numbers). We call it
+\emph{simply typed lambda calculus \textit{\`a la} Curry}.
 \begin{definition}
-  Given a collection $\mathbb{G}$ of ground types (a.k.a.\ primitive types), the
-  collection $\mathbb{T} = \mathbb{T}_\mathbb{G}$ of \emph{types} is inductively
-  defined as \begin{multicols}{2}
+  Given a set of type variables~$\mathbb{V}$ and a set $\mathbb{G}$ of ground
+  types (a.k.a.\ primitive types), the set $\mathbb{T} = \mathbb{T}_\mathbb{G}$
+  of \emph{types} is inductively defined as
+  \begin{multicols}{3}
+    \begin{prooftree}
+      \AXC{$B \in \mathbb{V}$}
+      \UIC{$B \in \mathbb{T}$}
+    \end{prooftree}
     \begin{prooftree}
       \AXC{$B \in \mathbb{G}$}
       \UIC{$B \in \mathbb{T}$}
@@ -35,7 +41,7 @@ types such as types of Boolean values, natural numbers, etc.
     \begin{prooftree}
       \AXC{$\sigma \in \mathbb{T}$}
       \AXC{$\tau   \in \mathbb{T}$}
-      \RightLabel{(function)}
+      \RightLabel{(fun)}
       \BIC{$\sigma \to \tau \in \mathbb{T}$}
     \end{prooftree}
   \end{multicols}
@@ -96,27 +102,28 @@ A judgement in the system of assignment is constructed inductively as follows:
       : (\sigma \to \tau \to \rho) \to (\sigma\to\tau) \to \sigma\to\rho$
       for all $\sigma, \tau, \rho \in \mathbb{T}$.
   \end{enumerate}
-  To see why the first judgement is derivable, we apply typing rules
-  step by step:
-  \begin{prooftree}
-    \AXC{$x : \sigma \in \Gamma, x : \sigma$}
-    \RightLabel{(var)}
-    \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
-    \RightLabel{(abs)}
-    \UIC{$\Gamma \vdash \lambda x.\; x : (\sigma \to \sigma)$}
-  \end{prooftree}
-  And, also the second one:
-  \begin{prooftree}
-    \AXC{$x : \sigma \in x : \sigma, y:\tau$}
-    \RightLabel{(var)}
-    \UIC{$x : \sigma, y: \tau \vdash x : \sigma$}
-    \RightLabel{(abs)}
-    \UIC{$x : \sigma \vdash \lambda y.\, x : \tau \to \sigma$}
-    \RightLabel{(app)}
-    \UIC{$\vdash \lambda x.\, (\lambda y.\, x) : \sigma \to (\tau \to \sigma)$}
-  \end{prooftree}
-  The third one is left as an exercise to the reader.
 \end{example}
+To see why the first judgement is derivable, we apply typing rules
+step by step:
+\begin{prooftree}
+  \AXC{$x : \sigma \in \Gamma, x : \sigma$}
+  \RightLabel{(var)}
+  \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
+  \RightLabel{(abs)}
+  \UIC{$\Gamma \vdash \lambda x.\; x : (\sigma \to \sigma)$}
+\end{prooftree}
+And, also the second one:
+\begin{prooftree}
+  \AXC{$x : \sigma \in x : \sigma, y:\tau$}
+  \RightLabel{(var)}
+  \UIC{$x : \sigma, y: \tau \vdash x : \sigma$}
+  \RightLabel{(abs)}
+  \UIC{$x : \sigma \vdash \lambda y.\, x : \tau \to \sigma$}
+  \RightLabel{(app)}
+  \UIC{$\vdash \lambda x.\, (\lambda y.\, x) : \sigma \to (\tau \to \sigma)$}
+\end{prooftree}
+The third one is left as an exercise to the reader.
+
 \begin{example}
   Not every $\lambda$-term has a type. For example,
   \[
@@ -126,35 +133,10 @@ A judgement in the system of assignment is constructed inductively as follows:
 \end{example}
 
 
-Let's come back to some practical issues of our system.  In addition to the
-above three rules, we often add rules for primitive types, and pick variables in
-$\Lambda$ as constants of that type. For example, we may start with a context
-\[
-  \Gamma_\nat = \{\zero : \nat, \suc : \nat \to \nat\}
-\]
-and define $\underline{n} \defeq \suc^n\;\zero$. In this way, we can derive
-every $\underline{n}$ has the type of $\nat$:
-\[
-  \Gamma_\nat \vdash \underline{n} : \nat
-\]
-
-In practice, the type inference is left to the evaluator of a programming
-language, so it is natural to ask if this system of assignment has the following
-properties:
-\begin{description}
-  \item[Typability:] Is there a type $\sigma$ with $\vdash M : \sigma$? 
-  \item[Type checking:] Does $\vdash M : \sigma$ hold for a given type $\sigma$?
-  \end{description}
-\begin{theorem}
-  Typability and type checking are both \emph{decidable}.
-\end{theorem}
-%See \cite[Section 3.2]{Sorensen2006} for further detail.
-
 \subsection{Explicit typing: system of typed terms}
 Instead of having an external typing system, it is also possible to internalise
-the typing information as part of $\lambda$-terms:
-$\lambda$-terms are now
-annotated:
+the typing information as part of $\lambda$-terms. This system is called
+\emph{simply typed lambda calculus \textit{\`a la} Church}.
 \begin{definition}
   The set $\Lambda_\mathbb{T}$ of typed $\lambda$-terms is inductively defined
   \begin{multicols}{2}
@@ -199,17 +181,75 @@ defined on typed $\lambda$-terms in the same way.
   \end{prooftree}
   \end{multicols}
 \end{definition}
+Unlike implicit typing, every well-typed term with explicit typing has 
+a unique type:
+\begin{proposition}
+  For every typed term $M$, context~$\Gamma$, and types $\sigma, \tau$, 
+  \[
+    \Gamma \vdash M : \sigma
+    \quad\text{and}\quad
+    \Gamma \vdash M : \tau
+    \implies
+    \sigma = \tau
+  \]
+\end{proposition}
 
-The typing information can be erased from typed terms, but typability still
-remains.
+\subsection{Implicit typing versus explicit typing}
+The typing information can be erased from typed terms and translated
+from typed $\lambda$-terms to $\lambda$-terms with implicit type.
 \begin{definition}
-  An \emph{erasing map} $|-|\colon \Lambda_\T \to \Lambda$ is defined inductively:
-  \todo[inline]{finish it}
+  An \emph{erasing map} $|-|\colon \Lambda_\T \to \Lambda$ is defined
+  inductively:
+  \begin{align*}
+    |x| & \defeq x \\
+    |(M\; N)| & \defeq (|M|\;|N|) \\
+    |\lambda (x:\sigma).\, M| & \defeq \lambda x.\, |M|
+  \end{align*}
 \end{definition}
 \begin{proposition}
-  The following statements are true:
-  \todo[inline]{translation}
+  Let $M$ and $N$ be typed $\lambda$-terms in~$\Lambda_\T$. Then,
+  \begin{enumerate}
+    \item 
+      \[
+        \Gamma \vdash M : \sigma \implies
+        \Gamma \vdash |M| : \sigma
+      \]
+    \item 
+      \[
+        M \reduce N 
+        \implies
+        |M| \reduce |N|
+      \]
+  \end{enumerate}
 \end{proposition}
+\begin{proposition}
+  Let $M$ and $N$ be $\lambda$-terms in~$\Lambda$. 
+  \begin{enumerate}
+    \item If $\Gamma \vdash M : \sigma$, then there is a typed term $M'$ with 
+      \[
+        |M'| = M
+        \quad\text{and}\quad
+        \Gamma \vdash M' : \sigma
+      \]
+    \item If $M \reduce N$ and $M = |M'|$ for some typed $\lambda$-term $M'$,
+      then there exists $N'$ with $|N'| = N$ and $M' \reduce N'$.
+    \end{enumerate}
+\end{proposition}
+
+In practice, the type inference is left to the evaluator of a programming
+language, so it is natural to ask if this system of assignment has the following
+properties:
+\begin{description}
+  \item[Typability:] Is there a type $\sigma$ with $\vdash M : \sigma$? 
+  \item[Type checking:] Does $\vdash M : \sigma$ hold for a given type $\sigma$?
+  \end{description}
+Both questions are answered positively:
+
+\begin{theorem}
+  Typability and type checking are both \emph{decidable}.
+\end{theorem}
+%See \cite[Section 3.2]{Sorensen2006} for further detail.
+
 \subsection*{Exercise}
 \begin{enumerate}
   \item Show that $\Omega$ does not have a type.
@@ -223,15 +263,33 @@ remains.
   \end{enumerate}
 \section{Type safety}
 \subsection{Preservation}
-One of the main features of typed programs is that ``well-typed programs do not
-go wrong'':
-\begin{theorem}[Preservation]
-  Suppose that $M \reduce N$. Then, 
+One of the main features of typed programs is that that every well-typed terms
+always reduces to a term of the same type---``well-typed programs do not go
+wrong!''.
+\begin{theorem}[Preservation Theorem]
+  \label{thm:preservation}
+  Let $M$ and $N$ be typed $\lambda$-terms. 
+  If $M \onereduce N$, then
   \[
     \Gamma \vdash M : \sigma \implies \Gamma \vdash N : \sigma
   \]
 \end{theorem}
 \begin{proof}
+  We prove it by induction on both the derivation of $\Gamma \vdash M :
+  \sigma$ and $M \onereduce N$. However, the only non-trivial case is
+  \[
+    \Gamma \vdash (\lambda (x : \tau).\, M_1)\; N : \sigma
+    \quad\text{and}\quad
+    (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
+  \]
+  with the hypothesis assumption
+  \[
+    \Gamma, x : \tau \vdash M_1 : \sigma
+    \quad\text{and}\quad
+    \Gamma \vdash N : \tau
+  \]
+  where $\lambda x_1:\tau.\,M_1$ and $\lambda x_2:\tau.\,M_2$ are
+  $\alpha$-equivalent. The rest is left as an exercise.
 \end{proof}
 However, the converse may not hold. Observe the following examples
 \begin{example}
@@ -257,13 +315,136 @@ To see why the latter judgement fails, we need the following lemma:
   \]
   for every subterm $M'$ of~$M$.
 \end{lemma}
+\begin{proof}
+  By induction on $\Gamma \vdash M : \sigma$.
+\end{proof}
 \subsection{Progress}
+Another feature of well-typed terms is that a well-typed \emph{closed} term is
+either a \emph{value} or reducible---``well-typed programs do not get stuck!''
+
+\begin{theorem}[Progress Theorem]
+  If ${}\vdash M : \sigma$ for a typed $\lambda$-term~$M$, then either $M$ is in
+  a value or there is $M'$ with $M \onereduce M'$.
+\end{theorem}
+\todo[inline]{define value?}
+
 \subsection{Strong normalisation}
+The last property of type system in this lecture is called \emph{strong
+  normalisation}. It means that every well-typed terms terminates eventually. 
+\begin{theorem}
+  Suppose that ${}\vdash M : \sigma$. Then,
+  there is no infinite sequence of reductions
+  \[
+    M \onereduce M_1 \onereduce \dots \onereduce \dots.
+  \]
+\end{theorem}
+\begin{corollary}
+  Every well-typed $\lambda$-term ${}\vdash M:\sigma$ has a normal form.
+\end{corollary}
+With the decidability of type checking, Preservation Theorem, Progress Theorem,
+and the strong normalisation, we actually have shown that there exists a
+decidable evaluator of simply typed lambda calculus that always reduce a
+well-typed term of type~$\sigma$ to a value of type~$\sigma$. In fact, since
+statements are proved by induction, we can implement an evaluator naively from
+the proofs. In fact, we will see later how to extract a program from a
+\emph{formal} proof.
 \subsection*{Exercise}
+\begin{enumerate}
+  \item (*)Show that if $\Gamma, x : \tau \vdash M : \sigma$
+    and $\Gamma \vdash N : \tau$ then $\Gamma \vdash M\subst{x}{N} : \sigma$.
+    Hint: Recall the definition of substitution and prove by induction
+    on $\Gamma, x:\tau\vdash M : \sigma$.
+  \item Show that $\Gamma, x : \tau \vdash M :\sigma
+    \iff \Gamma', x' : \tau \vdash M\subst{x}{x'} : \sigma$. That is,
+    $\alpha$-equivalent (typed) terms have the same type.
+  \item Finish the proof of Theorem~\ref{thm:preservation}.
+  \item Prove that Preservation Theorem and Progress Theorem hold for
+    simply lambda calculus \textit{\`a la} Curry using type erasing.
+\end{enumerate}
 \section{Programming in simply typed lambda calculus}
-\todo[inline]{Primitive recursion}
+It is also convenient to add some primitive types our typed lambda calculus (or
+so-called built-in types in programming languages used in practice) as well as
+\emph{primitive terms}. For example, for a system with natural numbers, we
+include numerals in the generation of syntax:
+  \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$x \in V$}
+      \UIC{$x \in \Lambda_{\T, \nat}$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{\phantom{$n \in \mathbb{N}$}}
+      \UIC{$\zero\in \Lambda_{\T, \nat}$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M \in \Lambda_{\T, \nat}$}
+      \UIC{$\suc\;M\in \Lambda_{\T, \nat}$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M \in \Lambda_{\T,\nat}$}
+      \AXC{$N \in \Lambda_{\T,\nat}$}
+      \BIC{$(M\, N) \in \Lambda_{\T, \nat}$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M \in \Lambda_{\T, \nat}$}
+      \AXC{$x \in V$}
+      \AXC{$\tau \in \mathbb{T}$}
+      \TIC{$\lambda (x:\tau).\; M \in \Lambda_{\T, \nat}$}
+    \end{prooftree}
+  \end{multicols}
+\noindent and let $\mathbb{G} \defeq \{\nat\}$ with an addition set of typing
+rules:
+\begin{multicols}{2}
+\begin{prooftree}
+  \AXC{\phantom{$\Gamma$}}
+  \UIC{$\Gamma \vdash \zero : \nat$}
+\end{prooftree}
+\begin{prooftree}
+  \AXC{$\Gamma \vdash M : \nat$}
+  \UIC{$\Gamma \vdash \suc\:M : \nat$}
+\end{prooftree}
+\end{multicols}
+\noindent In this way, we can derive that every $\underline{n} \defeq
+\suc^n\;\zero$ has the type of $\nat$:
+\[
+  \Gamma \vdash \underline{n} : \nat
+\]
+
+However, it still remains to add primitive operations such as addition,
+multiplication, division, and so on with a proper set of reduction rules. As we
+have seen that Church numerals and arithmetic operations in untyped lambda
+calculus can be defined with recursion. Something similar can be done:
+\begin{definition}
+  In addition to typing rules introduced so far, we add the following
+  \begin{prooftree}
+    \AXC{$\Gamma \vdash M : \nat$}
+    \AXC{$\Gamma \vdash M_0 : \sigma$}
+    \AXC{$\Gamma \vdash F : \nat \to (\sigma \to \sigma)$}
+    \TIC{$\Gamma \vdash \fold\;M_0\;F : \nat \to \sigma $}
+  \end{prooftree}
+  with additional reductions
+  \[
+    \fold\;M_0\;F\;\zero
+    \xrightarrow{\beta}
+    M_0
+    \quad\text{and}\quad
+    \fold\;M_0\;F\;(\suc\;M)
+    \xrightarrow{\beta}
+    F\;M\;(\fold\;F\;M).
+  \]
+\end{definition}
+\begin{definition}
+  \todo[inline]{define addition, multiplication using $\fold$}
+\end{definition}
 \subsection*{Exercise}
-\todo[inline]{Introduce PCF}
+\begin{enumerate}
+  \item Define the conditional construct with $\fold$, i.e.\
+    \[
+      \Gamma \vdash \mathtt{if\_then\_else} : \nat \to (\tau \to \tau)
+    \]
+    for every $\tau \in \mathbb{T}$ and show that it reduces to the desired
+    term.
+  \item Define the factorial of natural number with $\fold$.
+\end{enumerate}
 
 \bibliographystyle{plain}
 \bibliography{../../library} 
