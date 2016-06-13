@@ -7,16 +7,16 @@
 \end{frame}
 
 \section{Simply typed lambda calculus}
-As we have seen in the first lecture, $\lambda$-terms can ``call'' themselves,
-projections $\mathbf{K}_1$ and $\mathbf{K}_2$ can also be viewed as Boolean
-values, and so on. Despite its powerfulness, the expressiveness can be a
-disaster if treated as a programming language, because it is difficult to see the
-intention of such terms. 
+As we have seen in the first lecture, untyped lambda calculus is as powerful as
+a computer such that every computable function on natural numbers can be
+expressed. However, despite its powerfulness, the expressiveness can be a
+disaster if treated as a programming language, because it is difficult to see
+the intention of such terms. 
 
 This motivates us to introduce \emph{types} over $\lambda$-terms. There are two
-approaches given by Curry and Church corresponding to
-two paradigms in programming language called \emph{implicit} and \emph{explicit
-  typing} respectively.  In the typed lambda calculus \textit{\`a la} Curry, a
+approaches given by Curry and Church corresponding to two paradigms in
+programming language called \emph{implicit} and \emph{explicit typing}
+respectively.  In the typed lambda calculus \textit{\`a la} Curry, a
 $\lambda$-term is assigned to all possible types; while in the calculus
 \textit{\`a la} Church, a $\lambda$-term is annotated with types. 
 
@@ -41,6 +41,14 @@ types (such as types of Boolean values and natural numbers). We call it
     \end{prooftree}
   \end{multicols}
 \end{definition}
+\begin{convention}
+  For brevity, 
+  \[
+    \sigma_1 \to \sigma_2 \to \dots \sigma_n
+    \quad\text{stands for}\quad \sigma_1 \to (\sigma_2 \to (
+    \dots \to (\sigma_{n-1} \to \sigma_n)\dots)
+  \]
+\end{convention}
 \begin{definition}
     A \emph{statement} consists of a $\lambda$-term~$M$
       and a type~$\sigma \in \mathbb{T}$ denoted by 
@@ -64,9 +72,9 @@ types (such as types of Boolean values and natural numbers). We call it
   system of type assignment are constructed inductively as follows:
   \begin{multicols}{2} 
   \begin{prooftree}
-    \AXC{$(x : \sigma) \in \Gamma$}
+    \AXC{}
     \RightLabel{(var)}
-    \UIC{$\Gamma \vdash x : \sigma$}
+    \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
   \end{prooftree}
   \begin{prooftree}
     \AXC{$\Gamma \vdash M : (\sigma \to \tau)$}
@@ -87,9 +95,9 @@ types (such as types of Boolean values and natural numbers). We call it
   \begin{enumerate}
     \item $\vdash \lambda x.\, x : \sigma \to \sigma$, for all $\sigma \in
       \mathbb{T}$;
-    \item $ \vdash \lambda x.\, (\lambda y.\, x) : \sigma \to (\tau \to \sigma)$
+    \item $ \vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$
       for all $\sigma, \tau\in\mathbb{T}$;
-    \item $\vdash \lambda f.\,\lambda g.\, \lambda x.\, (f\,x)\, (g\,y) 
+    \item $\vdash \lambda f\,g\,x.\, f\,x\, (g\,y) 
       : (\sigma \to \tau \to \rho) \to (\sigma\to\tau) \to \sigma\to\rho$
       for all $\sigma, \tau, \rho \in \mathbb{T}$.
   \end{enumerate}
@@ -97,7 +105,7 @@ types (such as types of Boolean values and natural numbers). We call it
 To see why the first judgement is derivable, we apply typing rules
 step by step:
 \begin{prooftree}
-  \AXC{$x : \sigma \in \Gamma, x : \sigma$}
+  \AXC{}
   \RightLabel{(var)}
   \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
   \RightLabel{(abs)}
@@ -105,13 +113,13 @@ step by step:
 \end{prooftree}
 And, also the second one:
 \begin{prooftree}
-  \AXC{$x : \sigma \in x : \sigma, y:\tau$}
+  \AXC{}
   \RightLabel{(var)}
   \UIC{$x : \sigma, y: \tau \vdash x : \sigma$}
   \RightLabel{(abs)}
   \UIC{$x : \sigma \vdash \lambda y.\, x : \tau \to \sigma$}
   \RightLabel{(app)}
-  \UIC{$\vdash \lambda x.\, (\lambda y.\, x) : \sigma \to (\tau \to \sigma)$}
+  \UIC{$\vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$}
 \end{prooftree}
 The third one is left as an exercise to the reader.
 
@@ -156,9 +164,9 @@ defined on typed $\lambda$-terms in the same way.
   inductively by the following rules.
   \begin{multicols}{2} 
   \begin{prooftree}
-    \AXC{$(x : \sigma) \in \Gamma$}
+    \AXC{}
     \RightLabel{(var)}
-    \UIC{$\Gamma \vdash x : \sigma$}
+    \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
   \end{prooftree}
   \begin{prooftree}
     \AXC{$\Gamma \vdash M : (\sigma \to \tau)$}
@@ -173,8 +181,9 @@ defined on typed $\lambda$-terms in the same way.
   \end{prooftree}
   \end{multicols}
 \end{definition}
-Unlike implicit typing, every well-typed term with explicit typing has 
-a unique type:
+A typed $\lambda$-terms~$M$ with a judgement $\Gamma \vdash M : \sigma$ is
+called \emph{well-typed}.  Unlike implicit typing, every well-typed term with
+explicit typing has a unique type:
 \begin{proposition}
   For every typed term $M$, context~$\Gamma$, and types $\sigma, \tau$, 
   \[
@@ -236,16 +245,14 @@ Both questions are answered positively:
 \subsection*{Exercise}
 \begin{enumerate}
   \item Show that $\Omega$ does not have a type.
-  \item Show that $\vdash \mathbf{K}_1\;\mathbf{I}\;\Omega : \sigma \to \sigma$
-    does not have a type.
   \item Show that $\lambda (x : \sigma).\, x\; x$ is a typed $\lambda$-term but
     there exists no type $\tau$ with 
     \[
       \vdash \lambda (x : \sigma).\, x\; x : \tau.
     \]
-  \item Find a type for Church numerals $\underline{n} = \lambda f.\,(\lambda
-    x.\, f^n\;x)$. Note that you may find $\underline{0}$ and $\underline{1}$
-    confusing.
+  \item Find a type for Church numerals $\underline{n} =
+    \lambda f\,x.\, f^n\;x$. Note that you may find $\underline{0}$ and
+    $\underline{1}$ confusing.
   \end{enumerate}
 \section{Type safety}
 \subsection{Preservation}
@@ -282,7 +289,7 @@ However, the converse may not hold. Observe the following examples
   Recall that 
   \begin{enumerate}
     \item $\mathbf{I} = \lambda x.\, x$
-    \item $\mathbf{K}_1 = \lambda x.\, \lambda y.\, x$
+    \item $\mathbf{K}_1 = \lambda x\,y.\, x$
     \item $\Omega = (\lambda x.\, x\,x)\,(\lambda x.\, x\,x)$
   \end{enumerate}
   and $\mathbf{K}_1\,\mathbf{I}\,\Omega \reduce \mathbf{I}$. However, 
@@ -304,16 +311,16 @@ To see why the latter judgement fails, we need the following lemma:
 \begin{proof}
   By induction on $\Gamma \vdash M : \sigma$.
 \end{proof}
-\subsection{Progress}
-Another feature of well-typed terms is that a well-typed \emph{closed} term is
-either a \emph{value} or reducible---``well-typed programs do not get stuck!''
-
-\begin{theorem}[Progress Theorem]
-  If ${}\vdash M : \sigma$ for $M \in \Lambda_\T$, then either $M$ is a value or
-  there is $M'$ with $M \onereduce M'$.
-\end{theorem}
-\todo[inline]{define value?}
-
+%\subsection{Progress}
+%Another feature of well-typed terms is that a well-typed \emph{closed} term is
+%either a \emph{value} or reducible---``well-typed programs do not get stuck!''
+%
+%\begin{theorem}[Progress Theorem]
+%  If ${}\vdash M : \sigma$ for $M \in \Lambda_\T$, then either $M$ is a value or
+%  there is $M'$ with $M \onereduce M'$.
+%\end{theorem}
+%\todo[inline]{define value?}
+%
 \subsection{Strong normalisation}
 The last property of type system in this lecture is called \emph{strong
   normalisation}. It means that every well-typed terms terminates eventually. 
@@ -336,144 +343,187 @@ the proofs. Moreover, we will see later how to extract a program from a
 \emph{formal} proof.
 \subsection*{Exercise}
 \begin{enumerate}
+  \item Show that $\vdash \mathbf{K}_1\;\mathbf{I}\;\Omega : \sigma \to \sigma$
+    does not have a type.
+  \item Why does the converse of Theorem~\ref{thm:preservation} fail?
   \item (*)Show that if $\Gamma, x : \tau \vdash M : \sigma$
     and $\Gamma \vdash N : \tau$ then $\Gamma \vdash M\subst{x}{N} : \sigma$.
     Hint: Recall the definition of substitution and prove by induction
     on the derivation of $\Gamma, x:\tau\vdash M : \sigma$.
   \item Show that $\Gamma, x : \tau \vdash M :\sigma
     \iff \Gamma, x' : \tau \vdash M\subst{x}{x'} : \sigma$. That is,
-    $\alpha$-equivalent (typed) terms have the same type.
+    $\alpha$-equivalent well-typed terms have the same type.
   \item Complete the proof of Theorem~\ref{thm:preservation}. Hint: Use the
     above two statements.
   \item Prove that Preservation Theorem and Progress Theorem hold for
     simply typed lambda calculus \textit{\`a la} Curry using type erasing.
 \end{enumerate}
 \section{Programming in simply typed lambda calculus}
-Church numerals are typable in simply typed lambda calculus.
-In this section, we use simply typed lambda calculus \emph{\'a la} Curry.
+In this section, we use $\lambda_\to$ in the style of Curry.  
+Church numerals are also typable in simply typed lambda calculus.
 The type of natural numbers is of the form
 \[
-  \nat_\tau \defeq (\tau \to \tau) \to (\tau \to \tau) 
+  \nat_\tau \defeq (\tau \to \tau) \to \tau \to \tau
 \]
-for every type $\tau \in \T$. For brevity, the subscript of~$\nat_\tau$ is
-suppressed, so is written as $\nat$. Then, Church numerals have a type for every
-type~$\tau$:
+for every type $\tau \in \T$, and Church
+numerals are of type $\nat_\tau$ for every type~$\tau$:
   \begin{description}
     \item[Church numerals]
       \begin{align*}
-        & \underline{n} \defeq \lambda f\,x.\,
+        & \bc_n \defeq \lambda f\,x.\,
         f^n x \\
-        \vdash{} & \underline{n} : \nat
+        \vdash{} & \bc_n : \nat_\tau
       \end{align*}
     \item[successor]
       \begin{align*}
         & \suc \defeq \lambda n \,f\,x\,.\;(f\;(n\;f\;x)) \\
-        \vdash{} & \suc : \nat \to \nat
+        \vdash{} & \suc : \nat_\tau \to \nat_\tau
       \end{align*}
     \item[addition]
       \begin{align*}
         & \add \defeq \lambda n\,m\,f\,x.\; (m\;f)\;(n\;f\;x) \\
-        \vdash{} & \add : \nat \to \nat \to \nat
+        \vdash{} & \add : \nat_\tau \to \nat_\tau \to \nat_\tau
       \end{align*}
     \item[muliplication] 
       \begin{align*}
         & \mul \defeq \lambda n\,m\,f\,x.\, (m\;(n\;f))\;x\\
-      \vdash{} & \mul : \nat \to \nat
+      \vdash{} & \mul : \nat_\tau \to \nat_\tau
       \end{align*}
     \item[conditional]
       \begin{align*}
-        & \ifz \defeq \lambda c\,n\,m.\, c\;(\lambda z.\, n)\;m\\
-        \vdash {} & \ifz : \nat \to \nat \to \nat \to \nat
+        & \ifz \defeq \lambda n\,x\,y.\, n\;(\lambda z.\, x)\;y\\
+        \vdash {} & \ifz : ?
       \end{align*}
   \end{description}
-  \todo{definable functions, extended polynomials}
-\begin{theorem}[Schwichtenberg]
-  The $\lambda_\to$-definable functions are exactly
-  the extended polynomials.
-\end{theorem}
-\subsection{System T}
-It is also convenient to add some primitive types to our typed lambda calculus (or
-so-called built-in types in programming languages used in practice) as well as
-\emph{primitive terms}. For example, for a system with natural numbers, we
-include numerals in the generation of syntax:
-  \begin{multicols}{2}
-    \begin{prooftree}
-      \AXC{$x \in V$}
-      \UIC{$x \in \Lambda_{\T, \nat}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{\phantom{$n \in \mathbb{N}$}}
-      \UIC{$\zero\in \Lambda_{\T, \nat}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \in \Lambda_{\T, \nat}$}
-      \UIC{$\suc\;M\in \Lambda_{\T, \nat}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \in \Lambda_{\T,\nat}$}
-      \AXC{$N \in \Lambda_{\T,\nat}$}
-      \BIC{$(M\, N) \in \Lambda_{\T, \nat}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \in \Lambda_{\T, \nat}$}
-      \AXC{$x \in V$}
-      \AXC{$\tau \in \mathbb{T}$}
-      \TIC{$\lambda (x:\tau).\; M \in \Lambda_{\T, \nat}$}
-    \end{prooftree}
-  \end{multicols}
-\noindent and let $\mathbb{G} \defeq \{\nat\}$ with an addition set of typing
-rules:
-\begin{multicols}{2}
-\begin{prooftree}
-  \AXC{\phantom{$\Gamma$}}
-  \UIC{$\Gamma \vdash \zero : \nat$}
-\end{prooftree}
-\begin{prooftree}
-  \AXC{$\Gamma \vdash M : \nat$}
-  \UIC{$\Gamma \vdash \suc\:M : \nat$}
-\end{prooftree}
-\end{multicols}
-\noindent In this way, we can derive that every $\underline{n} \defeq
-\suc^n\;\zero$ has the type of $\nat$:
-\[
-  \Gamma \vdash \underline{n} : \nat
-\]
+The type of~$\ifz$ may not be as obvious as you may expect as it actually
+depends on a specific type $\tau$. Try to find one as general as possible and
+justify your guess.
 
-However, it still remains to add primitive operations such as addition,
-multiplication, division, and so on with a proper set of reduction rules. As we
-have seen that recursions on natural numbers in untyped lambda calculus can be
-defined with the fixpoint operator. Something similar can be done:
+Within simply typed lambda calculus, we may naturally ask how many computable
+functions can be defined, as it excludes non-terminating $\lambda$-terms. 
 \begin{definition}
-  In addition to typing rules introduced so far, we add the following
-  \begin{prooftree}
-    \AXC{$\Gamma \vdash M : \nat$}
-    \AXC{$\Gamma \vdash M_0 : \sigma$}
-    \AXC{$\Gamma \vdash F : \nat \to (\sigma \to \sigma)$}
-    \TIC{$\Gamma \vdash \fold\;M_0\;F : \nat \to \sigma $}
-  \end{prooftree}
-  with additional reductions
+  A function $f\colon \mathbb{N}^k \to \mathbb{N}$ is called
+  \emph{$\lambda_\to$-definable} if there exists a $\lambda$-term $F$
+   of type $\nat \to (\nat \to \dots (\nat \to \nat)\dots)$ (with $k+1$
+  many $\nat$ in total) such that
   \[
-    \fold\;M_0\;F\;\zero
-    \xrightarrow{\beta}
-    M_0
-    \quad\text{and}\quad
-    \fold\;M_0\;F\;(\suc\;M)
-    \xrightarrow{\beta}
-    F\;M\;(\fold\;F\;M).
+    F\,\bc_{n_1}\ldots\bc_{n_k} \reduce \bc_{f(n_1, \dots, n_k)}
   \]
+  for every sequence $(n_1, n_2, \ldots, n_k) \in \mathbb{N}^k$.
 \end{definition}
-\begin{definition}
-  \todo[inline]{define addition, multiplication using $\fold$}
-\end{definition}
+\begin{theorem}[Schwichtenberg]
+  The $\lambda_\to$-definable functions are the class of functions
+  of the form $f\colon \mathbb{N}^k \to \mathbb{N}$ closed under compositions
+  and contains the constant functions, projections, additions, multiplications,
+  and the conditional function 
+  \[
+    \mathrm{ifz}(n_0, n_1, n_2) = 
+    \begin{cases}
+      n_1 & \text{if } n_0 = 0\\
+      n_2 & \text{otherwise.}
+    \end{cases}
+  \]
+\end{theorem}
+
+By a similar technique, we can also define the type of Boolean values as
+\[
+  \bool_\tau \defeq \tau \to \tau \to \tau
+\]
+for every types $\tau$ with the subscript suppressed if there is no danger of
+confusion.  Truth values and the conditional operator are defined by
+\begin{description}
+  \item[Boolean values]
+      \[
+        \true \defeq \lambda x\,y.\,x \\
+        \quad\text{and}\quad
+        \false \defeq \lambda x\,y.\,y \\
+      \]
+  \item[Conditional]
+    \begin{align*}
+      & \cond \defeq \lambda b\,x\,y.\, b\,x\,y\\
+      \vdash {} & \cond : \bool_{\tau} \to \tau \to \tau \to \tau
+    \end{align*}
+\end{description}
+
+%\subsection{System T}
+%It is also convenient to add some primitive types to our typed lambda calculus (or
+%so-called built-in types in programming languages used in practice) as well as
+%\emph{primitive terms}. For example, for a system with natural numbers, we
+%include numerals in the generation of syntax:
+%  \begin{multicols}{2}
+%    \begin{prooftree}
+%      \AXC{$x \in V$}
+%      \UIC{$x \in \Lambda_{\T, \nat}$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{\phantom{$n \in \mathbb{N}$}}
+%      \UIC{$\zero\in \Lambda_{\T, \nat}$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M \in \Lambda_{\T, \nat}$}
+%      \UIC{$\suc\;M\in \Lambda_{\T, \nat}$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M \in \Lambda_{\T,\nat}$}
+%      \AXC{$N \in \Lambda_{\T,\nat}$}
+%      \BIC{$(M\, N) \in \Lambda_{\T, \nat}$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M \in \Lambda_{\T, \nat}$}
+%      \AXC{$x \in V$}
+%      \AXC{$\tau \in \mathbb{T}$}
+%      \TIC{$\lambda (x:\tau).\; M \in \Lambda_{\T, \nat}$}
+%    \end{prooftree}
+%  \end{multicols}
+%\noindent and let $\mathbb{G} \defeq \{\nat\}$ with an addition set of typing
+%rules:
+%\begin{multicols}{2}
+%\begin{prooftree}
+%  \AXC{\phantom{$\Gamma$}}
+%  \UIC{$\Gamma \vdash \zero : \nat$}
+%\end{prooftree}
+%\begin{prooftree}
+%  \AXC{$\Gamma \vdash M : \nat$}
+%  \UIC{$\Gamma \vdash \suc\:M : \nat$}
+%\end{prooftree}
+%\end{multicols}
+%\noindent In this way, we can derive that every $\underline{n} \defeq
+%\suc^n\;\zero$ has the type of $\nat$:
+%\[
+%  \Gamma \vdash \underline{n} : \nat
+%\]
+%
+%However, it still remains to add primitive operations such as addition,
+%multiplication, division, and so on with a proper set of reduction rules. As we
+%have seen that recursions on natural numbers in untyped lambda calculus can be
+%defined with the fixpoint operator. Something similar can be done:
+%\begin{definition}
+%  In addition to typing rules introduced so far, we add the following
+%  \begin{prooftree}
+%    \AXC{$\Gamma \vdash M : \nat$}
+%    \AXC{$\Gamma \vdash M_0 : \sigma$}
+%    \AXC{$\Gamma \vdash F : \nat \to (\sigma \to \sigma)$}
+%    \TIC{$\Gamma \vdash \fold\;M_0\;F : \nat \to \sigma $}
+%  \end{prooftree}
+%  with additional reductions
+%  \[
+%    \fold\;M_0\;F\;\zero
+%    \xrightarrow{\beta}
+%    M_0
+%    \quad\text{and}\quad
+%    \fold\;M_0\;F\;(\suc\;M)
+%    \xrightarrow{\beta}
+%    F\;M\;(\fold\;F\;M).
+%  \]
+%\end{definition}
+%\begin{definition}
+%  \todo[inline]{define addition, multiplication using $\fold$}
+%\end{definition}
 \subsection*{Exercise}
 \begin{enumerate}
-  \item Define the conditional construct with $\fold$, i.e.\
-    \[
-      \Gamma \vdash \mathtt{if\_then\_else} : \nat \to (\tau \to \tau)
-    \]
-    for every $\tau \in \mathbb{T}$ and show that it reduces to the desired
-    term.
-  \item Define the factorial of natural number with $\fold$.
+  \item Define the conjunction operation $\mathtt{and} : \bool_\bool \to \bool
+    \to \bool$ and similarly for $\mathtt{or}$, and $\mathtt{not}$
+    in simply typed lambda calculus.
 \end{enumerate}
 
 \bibliographystyle{plain}
