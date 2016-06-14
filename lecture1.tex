@@ -305,9 +305,9 @@ the $\beta$-redex which is not contained in any other $\beta$-redex, called the
       \underline{(\lambda y.\, y)}\quad
       \underline{(\lambda x.\, (\lambda y.\, y\,y)\, x)} \\
       \onereduce &
-      \underline{(\lambda x.\, (\lambda y.\, y\,y))}\;
+      \lambda x.\, \underline{(\lambda y.\, y\,y)}\quad
       \underline{\vphantom{(\lambda}x} \\
-      \onereduce & (\lambda y.\, y\,y) \\
+      \onereduce & (\lambda x.\, x\,x) \\
       \not\onereduce
     \end{align*}
   \item[the leftmost-innermost strategy] reduces the leftmost innermost
@@ -505,7 +505,7 @@ is definable in lambda calculus.
     n\,(\lambda v.\,x)\,y 
   \]
   where $n$, $x$, and $y$ are variables and 
-  $\mathtt{if\_then\_else\_} \defeq \lambda n\,x\,y\,n.\,(\lambda v.\, x)\, y$.
+  $\mathtt{if\_then\_else\_} \defeq \lambda n\,x\,y.\,n\,(\lambda v.\, x)\, y$.
   Then, for any two $\lambda$-terms $M$ and~$N$,
   \begin{align*}
     \mathtt{if}\;\overline{0}\;\mathtt{then}\;M\;\mathtt{else}\;N
@@ -520,11 +520,11 @@ Here is a list of common combinators:
   \item $\omega \defeq \lambda x.\, x\,x$
   \item $\Omega \defeq (\lambda x.\, x\,x)\,(\lambda x.\,x\,x)
     = \omega\,\omega$
-  \item $\mathbf{K}_1 \defeq \lambda x\,y.\, x) = \mathtt{T}$, the first projection.
-  \item $\mathbf{K}_2 \defeq \lambda x\,y.\, y) = \mathtt{F}$, the second projection.
+  \item $\mathbf{K}_1 \defeq \lambda x\,y.\, x = \mathtt{T}$, the first projection.
+  \item $\mathbf{K}_2 \defeq \lambda x\,y.\, y = \mathtt{F}$, the second projection.
   \item $\mathbf{I} \defeq \lambda x.\, x$, known as the \emph{identity}.
   \item $\mathbf{S}\defeq\lambda f\,g\,x.\, 
-    (f\,x)\,(g\,y)$.
+    (f\,x)\,(g\,x)$.
 \end{enumerate}
 \begin{example}[Summation, informally]
   The summation $\sum_{i = 0}^{n} i$ from $0$ to a given natural number~$n$
@@ -572,7 +572,7 @@ $\lambda$-term!
   reoccur as the argument of~$F$ in the last step.
 \end{proposition}
 \begin{example}[Summation, formally]
-  Using the combinators we known so far, the equation~\eqref{eq:summation}
+  Using the combinators we have known so far, the equation~\eqref{eq:summation}
   can be defined as $\lambda$-terms:
   \begin{align*}
     G \defeq{} &
