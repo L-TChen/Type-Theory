@@ -17,14 +17,15 @@ quantifier
 \end{quote}
 in the metalanguage into our system:
 \[
-  \forall v.\, \sigma(v)
+  \forall t.\, \sigma(t)
 \]
-where $\tau$ is a \emph{type variable}. Therefore, the natural number type can
-be defined as a \emph{single} type:
+where $\tau$ is a \emph{type variable}. For example, the type of natural numbers
+can be defined as a single type:
 \[
-  \nat \defeq \forall v.\, (v \to v) \to v \to v
+  \nat \defeq \forall t.\, (t \to t) \to t \to t
 \]
-Each instance $\nat_\tau$ of $\nat$ is now written as $(\nat\;\tau)$.  Simply
+and the type $\nat_\tau = (\tau \to \tau) \to \tau \to \tau$ becomes an instance
+of $\nat$ with $t$ substituted with~$\tau$.  Simply
 typed lambda calculus extended with this universal type constructor is called
 \emph{System F} introduced by Girard and also called \emph{polymorphic lambda
   calculus}.
@@ -38,8 +39,8 @@ we do not treat the Curry-style variant.
   inductively defined by
   \begin{multicols}{3}
     \begin{prooftree}
-      \AXC{$v \in \mathbb{V}$}
-      \UIC{$v \in \type$}
+      \AXC{$t \in \mathbb{V}$}
+      \UIC{$t \in \type$}
     \end{prooftree}
     \begin{prooftree}
       \AXC{$\sigma \in \type$}
@@ -48,9 +49,9 @@ we do not treat the Curry-style variant.
     \end{prooftree}
     \begin{prooftree}
       \AXC{$\sigma \in \type$}
-      \AXC{$v   \in \mathbb{V}$}
+      \AXC{$t   \in \mathbb{V}$}
       \RightLabel{(poly)}
-      \BIC{$\forall v.\, \sigma \in \type$}
+      \BIC{$\forall t.\, \sigma \in \type$}
     \end{prooftree}
   \end{multicols}
 \end{definition}
@@ -60,23 +61,23 @@ similar definition also extends to types:
   The \emph{free variable} $\FV\colon \type \to \mathbb{V}$ of a type is a
   function inductively defined:
   \begin{align*}
-    \FV(v) & {} = v \\
+    \FV(t) & {} = t \\
     \FV(\sigma \to \tau) & {} = \FV(\sigma) \cup \FV(\tau) \\
-    \FV(\forall v.\, \sigma) & {} = \FV(\sigma) - \{v\}
+    \FV(\forall t.\, \sigma) & {} = \FV(\sigma) - \{t\}
   \end{align*}
   For convenience, the function extends to contexts:
   \[
-    \FV(\Gamma) = \set{ v \in \mathbb{V}}{ \exists (x : \sigma) \in \Gamma
-      \wedge v \in \FV(\rho) }.
+    \FV(\Gamma) = \set{ t \in \mathbb{V}}{ \exists (x : \sigma) \in \Gamma
+      \wedge t \in \FV(\rho) }.
   \]
 \end{definition}
 \begin{example}
-  Assume that $v_1$ and $v_2$ are type variables.
+  Assume that $v$, $v_1$ and $v_2$ are type variables.
   \begin{enumerate}
-    \item $\FV(v_1) = \{v_1\}$.
-    \item $\FV(\forall v.\, (v \to v) \to v \to v) = \emptyset$.
-    \item $\FV(x : v_1, y : v_2, z : \forall v.\,v)
-      = \{v_1, v_2\}$.
+    \item $\FV(t_1) = \{t_1\}$.
+    \item $\FV(\forall t.\, (t \to t) \to t \to t) = \emptyset$.
+    \item $\FV(x : t_1, y : t_2, z : \forall t.\,t)
+      = \{t_1, t_2\}$.
   \end{enumerate}
 \end{example}
 Since the use of variable in a type is to be substituted by other types, we also
@@ -86,16 +87,18 @@ need to define \emph{substitution over types} accordingly and routinely.
   The \emph{(capture-avoidance) substitution} of a type $\rho$ for the free occurrence of a
   variable~$v$ is defined inductively as 
   \begin{align*}
-    v\subst{v}{\rho} & = \tau \\
-    u\subst{v}{\rho} & = u && \text{if $u \neq v$}\\
-    (\sigma\to\tau)\subst{v}{\rho} & =
-    (\sigma\subst{v}{\rho})\to
-    (\tau\subst{v}{\rho}) \\
-    (\forall v.\sigma)\subst{v}{\rho} & = \forall v.\sigma \\
-    (\forall u.\sigma)\subst{v}{\rho} & = \forall v.\sigma\subst{v}{\rho}
-    && \text{if $u \neq v$ and $v \not\in \FV(\rho)$} 
+    t\subst{t}{\rho} & = \rho \\
+    u\subst{t}{\rho} & = u && \text{if $u \neq t$}\\
+    (\sigma\to\tau)\subst{t}{\rho} & =
+    (\sigma\subst{t}{\rho})\to
+    (\tau\subst{t}{\rho}) \\
+    (\forall t.\sigma)\subst{t}{\rho} & = \forall v.\sigma \\
+    (\forall u.\sigma)\subst{t}{\rho} & = \forall u.\sigma\subst{t}{\rho}
+    && \text{if $u \neq t$ and $v \not\in \FV(\rho)$} 
   \end{align*}
 \end{definition}
+
+Now we proceed with terms in polymorphic lambda calculus. 
 
 \begin{definition}
   Given a set~$V$ of variable, a set $\mathbb{V}$ of type variables, 
@@ -109,7 +112,7 @@ need to define \emph{substitution over types} accordingly and routinely.
     \begin{prooftree}
       \AXC{$M \in \term$}
       \AXC{$N \in \term$}
-      \BIC{$(M\, N) \in \term$}
+      \BIC{$(M\;N) \in \term$}
     \end{prooftree}
     \begin{prooftree}
       \AXC{$M \in \term$}
@@ -119,22 +122,24 @@ need to define \emph{substitution over types} accordingly and routinely.
     \end{prooftree}
     \begin{prooftree}
       \AXC{$M \in \term$}
-      \AXC{$v \in \mathbb{V}$}
-      \BIC{$\Lambda v.\, M \in \term$}
+      \AXC{$t \in \mathbb{V}$}
+      \BIC{$\Lambda t.\; M \in \term$}
     \end{prooftree}
     \begin{prooftree}
       \AXC{$M \in \term$}
       \AXC{$\tau \in \type$}
-      \BIC{$(M\, \tau) \in \term$}
+      \BIC{$(M\;\tau) \in \term$}
     \end{prooftree}
   \end{multicols}
 \end{definition}
 \begin{example} \label{ex:f-terms}
   Can you guess the untyped version of the following terms?
   \begin{enumerate}
-    \item $\Lambda v.\,\lambda (x : v).\, x$
-    \item $\Lambda v.\, \lambda (x : v)(y : v).\, x$
-    \item $\Lambda v.\, \lambda (f : v \to v)(x : v).\, f\;f\;x$
+    \item $\Lambda t.\,\lambda (x : t).\, x$
+    \item $\Lambda t.\, \lambda (x : t)(y : t).\, x$
+    \item $(\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N$
+     where  $M, N \in \term$.
+    \item $\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;f\;x$
     \end{enumerate}
 \end{example}
 
@@ -159,9 +164,9 @@ type polymorphism and to instantiate with a specific type:
   \end{prooftree}
   \begin{prooftree}
     \AXC{$\Gamma \vdash M : \sigma$}
-    \AXC{$v \not\in \FV(\Gamma)$}
+    \AXC{$t \not\in \FV(\Gamma)$}
     \RightLabel{($\forall$-intro)}
-    \BIC{$\Gamma \vdash \Lambda v.\;M : \forall v.\, \sigma$}
+    \BIC{$\Gamma \vdash \Lambda t.\;M : \forall v.\, \sigma$}
   \end{prooftree}
   \begin{prooftree}
     \AXC{$\Gamma \vdash M : \forall v.\, \sigma$}
@@ -173,30 +178,36 @@ type polymorphism and to instantiate with a specific type:
 \begin{example} \label{ex:f-welltyped}
   The following terms are well-typed:
   \begin{enumerate}
-    \item ${}\vdash\Lambda v.\,\lambda (x : v).\, x : \forall v.\;v\to v$
-    \item ${}\vdash\Lambda v.\, \lambda (x : v)(y : v).\, x : \forall v.\;v \to v \to v$
+    \item ${}\vdash\Lambda t.\,\lambda (x : t).\, x : \forall t.\;v\to v$
+    \item ${}\vdash\Lambda t.\, \lambda (x : t)(y : t).\, x : \forall t.\;t \to t \to t$
     \item $M : \sigma, N : \sigma
-      \vdash (\Lambda v.\, \lambda (x : v)(y : v).\, x)\;\sigma\;M\;N
+      \vdash (\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N
       : \sigma \to \sigma \to \sigma$
-    \item ${}\vdash\Lambda v.\, \lambda (f : v \to v)(x : v).\, f\;f\;x : 
-      \forall v.\;(v\to v) \to v\to v$
+    \item ${}\vdash\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;f\;x : 
+      \forall t.\;(t\to t) \to t\to t$
     \end{enumerate}
 \end{example}
-We derive the second one and leave other to the reader.
+We derive the second one and leave others to the reader.
 \begin{prooftree}
   \AXC{}
   \RightLabel{(var)}
-  \UIC{$x : v, y : v \vdash x : v$}
-  \UIC{$x : v \vdash \lambda (y : v).\; x : v \to v$}
-  \UIC{$\vdash \lambda (x : v)(y : v).\; x : v \to v \to v$}
-  \UIC{$\vdash \Lambda v.\,\lambda (x : v)(y : v).\; x :\forall v.\,v \to v \to v$}
+  \UIC{$x : t, y : t \vdash x : v$}
+  \UIC{$x : t \vdash \lambda (y : t).\; x : t \to t$}
+  \UIC{$\vdash \lambda (x : t)(y : t).\; x : t \to t \to v$}
+  \UIC{$\vdash \Lambda t.\,\lambda (x : t)(y : t).\; x :\forall t.\,t \to t \to
+    t$}
 \end{prooftree}
 
 In line with the new syntax, we also need to extend \emph{substitution over
-  terms} and \emph{$\beta$-reduction} to take account of type variable in $(M
-\tau)$. However, we can also erase the type information of well-typed terms, and
-reduce it, as if untyped by Preservation Theorem. To be precise, we state the
-erasing map and the result without any proof.
+  terms} and \emph{$\beta$-reduction}. The substitution is rather routine and
+the $\beta$-reduction has an additional rule:
+\[
+  M\;\tau \xrightarrow{\beta} M
+\]
+
+We can also erase the type information of well-typed terms and reduce it, as if
+untyped. To be precise, we state the erasing map and the result without any
+proof.
 \begin{definition}
   The \emph{erasing map} is a function from typed terms in polymorphic lambda
   calculus to untyped terms in lambda calculus defined inductively 
@@ -204,8 +215,8 @@ erasing map and the result without any proof.
     |x| & = x \\
     |\lambda (x : \tau).\,M| & = \lambda x.\, |M| \\
     |(M\;N)| & = (|M|\;|N|) \\
-    |\Lambda v.\, M| & = |M| \\
-    |M\;\tau| & = |M|
+    |\Lambda t.\, M| & = |M| \\
+    |(M\;\tau)| & = |M|
   \end{align*}
 \end{definition}
 \begin{theorem}[Preservation Theorem]
@@ -220,20 +231,33 @@ erasing map and the result without any proof.
 \section{Data types in System F}
 Thanks to type polymorphism, the system can now express much more types,
 including the \emph{product type}, the \emph{sum type}, the type of
-\emph{natural number}, the type of \emph{lists}, and more.
+\emph{natural number}, the type of \emph{lists}, and even every inductive data
+type.
+\subsection{Empty type}
+The empty type is a type supposed to have no inhabitant, and it can be defined
+as
+\[
+  \bot \defeq \forall t.\,t
+\]
+Note that if there is any term of this type~$\bot$, then we can infer that every
+type has a term:
+\begin{prooftree}
+  \AXC{$\vdash M : \bot$}
+  \UIC{$\vdash M\,\tau : \tau$}
+\end{prooftree}
+Can this be true? We will answer it later.
 \subsection{Sum type}
 First of all, the sum type of $\tau$ and $\sigma$ represent the
 ``disjoint union'' of two types. 
 \[
-  \sigma + \tau \defeq \forall v. (\sigma \to v) \to (\tau \to v) \to v
+  \sigma + \tau \defeq \forall t. (\sigma \to t) \to (\tau \to t) \to t
 \]
-The intuition is that every term of $\sigma + \tau$ has two ``constructors''
-$(\sigma \to v)$
-Also the first injection is defined by
+The intuition is that every term of $\sigma + \tau$ has two ``constructors''.
+The first injection is defined by
 \begin{align*}
   \vdash {} & \mathtt{inj}_1 \colon \sigma \to \sigma + \tau \\
-  & \mathtt{inj}_1 \defeq \lambda (x : \sigma).\;\Lambda v.\,\lambda (f :
-  \sigma\to v)(g : \tau\to v).\, f\;x 
+  & \mathtt{inj}_1 \defeq \lambda (x : \sigma).\;\Lambda t.\,\lambda (f :
+  \sigma\to t)(g : \tau\to t).\, f\;x 
 \end{align*}
 and similarly the second injection
 \begin{align*}
@@ -247,20 +271,20 @@ With the sum type, we can implement the usual construct \texttt{case}:
   \vdash \mathtt{case} : \forall\,\rho.\;(\sigma \to \rho) \to (\tau \to \rho)
   \to (\sigma + \tau) \to \rho
 \]
-which returns a term of type $\rho$ given functions $\sigma \to \rho$, $\tau \to
-\rho$, and a term which is either of type $\sigma$ or $\tau$. Try to find the
-exact definition of $\mathtt{case}$.
+so that $\mathtt{case}\;F\;G$ returns a term of type $\rho$ a term with an input
+of type $\sigma + \tau$, provided that $\vdash F : \sigma\to\rho$ and $\vdash G
+: \tau \to \rho$. Try to find the exact definition of $\mathtt{case}$.
 \subsection{Product type}
 The product type can be defined as
 \[
-  \sigma \times \tau \defeq \forall v. (\sigma \to \tau \to v) \to v
+  \sigma \times \tau \defeq \forall t. (\sigma \to \tau \to t) \to t
 \]
 with the pairing function
 \begin{align*}
   {} \vdash & \lambda (x : \sigma)(y : \tau).\; \left< x, y\right> :
   \sigma \to \tau \to \sigma
   \times \tau \\
-  & \left< x, y\right> \defeq \Lambda v.\,\lambda (f : \sigma \to \tau \to v).\,
+  & \left< x, y\right> \defeq \Lambda t.\,\lambda (f : \sigma \to \tau \to t).\,
   f\;x\;y
 \end{align*}
 Try to define projections 
@@ -272,26 +296,26 @@ Try to define projections
 \subsection{Natural numbers}
 Back to Church numerals, we can now define them with a single type:
 \[
-  \nat \defeq \forall v.\, (v\to v)\to v\to v
+  \nat \defeq \forall t.\, (t\to t)\to t\to t
 \]
   \begin{description}
     \item[Polymorphic Church numerals]
       \begin{align*}
         \vdash{} & \bc_n : \nat \\
-        & \bc_n \defeq \Lambda v.\,\lambda (f:v \to v)\,(x:v).\,
-        f^n x
+        & \bc_n \defeq \Lambda t.\,\lambda (f:t \to t)\,(x:t).\,
+        f^n\;x
       \end{align*}
     \item[Successor]
       \begin{align*}
         \vdash{} & \suc : \nat \to \nat \\
-        & \suc \defeq \,\lambda (n : \nat).\,\Lambda v.\,\lambda
-        (f : v \to v)\,(x:v)\,.\;f\;(n\;v\;f\;x) 
+        & \suc \defeq \,\lambda (n : \nat).\,\Lambda t.\,\lambda
+        (f : t \to t)\,(x:t)\,.\;f\;(n\;v\;f\;x) 
       \end{align*}
     \item[Addition]
       \begin{align*}
         \vdash{} & \add : \nat \to \nat \to \nat \\
-        & \add \defeq \lambda (n : \nat)\,(m:\nat)\,\Lambda v.\,
-        \lambda (f:v\to v)\,(x: v).\; (m\;v\;f)\;(n\;v\;f\;x) 
+        & \add \defeq \lambda (n : \nat)\,(m:\nat)\,\Lambda t.\,
+        \lambda (f:t\to t)\,(x: t).\; (m\;t\;f)\;(n\;t\;f\;x) 
       \end{align*}
     \item[Multiplication] 
       \begin{align*}
@@ -300,7 +324,7 @@ Back to Church numerals, we can now define them with a single type:
       \end{align*}
     \item[Conditional]
       \begin{align*}
-        \vdash {} & \ifz : \forall v.\,\nat \to v \to v \to v \\
+        \vdash {} & \ifz : \forall t.\,\nat \to t \to t \to t \\
         & \ifz \defeq\,?
       \end{align*}
   \end{description}
@@ -308,9 +332,9 @@ However, polymorphic lambda calculus allows us to define a certain form of
 recursion on Church numerals, called \emph{primitive recursion} or the
 \texttt{fold} function which you have seen in Haskell.
 \begin{align*}
-  \vdash{} & \mathtt{fold} : \forall v.\, (v \to v) \to v \to \nat \to v  \\
-  & \mathtt{fold} \defeq \Lambda v.\, \lambda (f : v \to v)(e : v)(n : \nat). 
-  n\;v\;f\;e
+  \vdash{} & \mathtt{fold} : \forall t.\, (t \to t) \to t \to \nat \to t  \\
+  & \mathtt{fold} \defeq \Lambda t.\, \lambda (f : t \to t)(e : t)(n : \nat). 
+  n\;t\;f\;e
 \end{align*}
 The addition, multiplication, and predecessor operations can be redefined as
 follows:
@@ -332,15 +356,15 @@ follows:
 Finally, the type of list over a type~$\sigma$ can also be defined in
 polymorphic lambda calculus. It is similar to the type of natural numbers:
 \[
-  \List\,\sigma\defeq \forall v.\, v \to (\sigma \to v \to v) \to v 
+  \List\,\sigma\defeq \forall t.\, t \to (\sigma \to t \to t) \to t 
 \]
 with ``list constructors'' 
 \begin{enumerate}
-  \item $\mathtt{nil}_\sigma \defeq \Lambda v.\lambda (h : v)(f :
-    \sigma\to v \to v).\, h$
-  \item $\mathtt{cons}_\sigma \defeq \lambda (x : \sigma)(xs : \List
-    \sigma).\,\Lambda v.\lambda(h : v)(f : \sigma\to v \to v).f\,x\,(xs\; v\;
-    h\; f)$ which has the type $\sigma \to \List \sigma \to  \List \sigma$.
+  \item $\mathtt{nil}_\sigma \defeq \Lambda t.\lambda (h : t)(f :
+    \sigma\to t \to t).\, h$
+  \item $\mathtt{cons}_\sigma \defeq \lambda (x : \sigma)(xs : \List\,
+    \sigma).\,\Lambda t.\lambda(h : t)(f : \sigma\to t \to t).f\,x\,(xs\; t\;
+    h\; f)$ which has the type $\sigma \to \List\,\sigma \to  \List\,\sigma$.
   \end{enumerate}
 \subsection*{Exercise}
 \begin{enumerate}
@@ -353,14 +377,41 @@ with ``list constructors''
       \mathtt{length}\;(\mathtt{cons}_\sigma\;x\;xs)
       \reduce \suc\;(\mathtt{length}\;xs) 
     \]
+  \item The type of lists we just defined does depend on a specific
+    type~$\sigma$ unnecessarily. Can you generalise it further as well as
+    constructors?
   \end{enumerate}
 
 \section{Parametricity}
+The polymorphism in System F is \emph{parametric} in the sense that every
+instance is uniformly defined. To put it differently, it cannot depend on any
+specific type. It is different from the \emph{ad hoc} polymorphism adopted in
+most of programming languages like C++.
 
+Recall the type of polymorphic identity 
 \[
-  \bot \defeq \forall v.v
+  \forall t.\, t \to t
 \]
+where the input is some term~$M$ of type $t$. Since we have no idea about the $t$
+itself, the only thing we can return is~$M$ itself. It is provable that in
+System F the every term of that type reduces to the identity
+\[
+  \Lambda t.\,\lambda (x : t).\, x 
+\]
+
+In fact, we can prove a generic theorem for every type in System F, and
+here present its special case only:
+\begin{proposition}[\cite{Wadler1989}]
+  For every well-typed term of the form
+  \[
+    \vdash \Lambda t.\, M : \forall t.\,\sigma
+  \]
+  where $\sigma$ does not involved with $\forall$, and every 
+  function $F\colon \sigma\subst{t}{\tau} \to \sigma\subst{t}{\rho}$ 
+\end{proposition}
 \subsection*{Exercise}
 
 
+\bibliographystyle{plain}
+\bibliography{library} 
 \end{document}

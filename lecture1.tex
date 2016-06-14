@@ -57,9 +57,19 @@ and the computation is finished while there is no possible reduction, e.g.
   \noindent corresponding to the introduction of \emph{variables},
   \emph{application}, and \emph{abstraction}.
 \end{definition}
-Throughout this lecture, we assume that $V$ is the variable set for
-$\lambda$-terms. 
-\begin{definition}[free and bound variables]
+The term $(M\;N)$ is intended to present a function application where $N$ is the
+argument being fed into~$M$, and $\lambda x.\; M$ is interpreted as a function
+with a variable $x$ and a function body~$M$. For an abstraction and
+application with many inputs, we have the following conventions
+\[
+  \lambda x_1\,x_2\,\dots x_n.\; M
+  \defeq \lambda x_1.\,(\lambda x_2.\, (\dots (\lambda x_n.\; M)\dots))
+\]
+and
+\[
+  M_0\;M_1\;\dots M_n \defeq (\dots ((M_0\;M_1)\;M_2)\;\dots M_n)
+\]
+\begin{definition}[Free and bound variables]
   \begin{enumerate}[(a)]
     \item The free variable set $\FV\colon \Lambda \to V$ is a function from the
       set~$\Lambda$ of $\lambda$-terms to the variable set~$V$ defined
@@ -234,7 +244,21 @@ and write down all possible chains of reductions.
     function $\BV\colon \Lambda \to V$ inductively
     such that $\BV(M)$ is exactly the set of bound variable in a
     $\lambda$-term~$M$.
-  \item \todo{some exercises}
+  \item Informally speaking, a \emph{subterm} of~$M$ is a valid $\lambda$-term
+    inside~$M$. For example, the set of subterms of $(\lambda x.\, M\;N)\;N$ is
+    \[
+      \{M, N, (M\;N), (\lambda x.\, M\;N), (\lambda x.\, M\;N)\:N\}.
+    \]
+    To formulate the definition correctly, we need a formal definition. Please
+    define it by induction.
+  \item Explain what the following terms mean:
+    \[
+      \lambda x.\,x
+      \qquad
+      \lambda x\,y.\,x
+      \qquad
+      \lambda x\,y. (\lambda x.\, x)
+    \]
 \end{enumerate}
 
 \section{Reduction}
@@ -390,13 +414,34 @@ To answer the previous question, it suffices to prove the following theorem:
   \]
   That is, $N_1$ and $N_2$ are $\alpha$-equivalent.
 \end{corollary}
-\begin{corollary}
-  \todo[inline]{introduce $\lambda$-theory}
+
+Since the meaning of a term shall remain the same after reduction, it makes
+sense to identify 
+\[
+  (\lambda x.\, M)\;N
+  \quad\text{and}\quad
+  M\subst{x}{N}
+\]
+where the latter is simply the result of application. Hence, we define the
+\emph{$\lambda$-logical theory} to be the congruence closure of
+$\xrightarrow{\beta}$. For example, 
+\[
+  (\lambda x.\, M)\;N
+  =_\beta
+  M'\subst{x'}{N}
+\]
+if $(\lambda x.\, M)$ is $\alpha$-equivalent to $(\lambda x'.\,M')$ or
+\[
+  M\;N =_\beta M\;N'
+  \quad\text{if } N =_\beta N'
+\]
+\begin{corollary} \label{coro:logical-theory}
+  If $M =_\beta N$, then $M \reduce N$.
 \end{corollary}
 \subsection*{Exercise}
-\todo[inline]{Evaluate some terms}
 \begin{enumerate}
-  \item Prove Corollary~\ref{coro:uniqueness-normal}.
+  \item Prove
+    Corollary~\ref{coro:uniqueness-normal} \& \ref{coro:logical-theory}.
   \item Read the paper~\cite[Section 7]{Sestoft2002} for more reduction
     strategies.
 \end{enumerate}
@@ -408,23 +453,21 @@ operations, e.g.\ addition, multiplication, and even exponential, on natural
 number can be defined. In fact, every computable function (on natural numbers)
 is definable in lambda calculus. 
 
-\todo[inline]{introduce convention $\lambda x_1x_2\dots x_n.\;M$
-stands for $\lambda x_1.\,\lambda x_2.\, \dots\lambda x_n.\,M$ etc.}
 \begin{definition}[Church numerals]
   Define $f^1 \defeq f$ and $f^{n+1} \defeq f\,f^n$. Then, 
   \[
-    \overline{0} \defeq \lambda f.\, (\lambda x.\, x)
+    \overline{0} \defeq \lambda f\,x.\, x
     \quad
-    \overline{1} \defeq \lambda f.\, (\lambda x.\, f x)
+    \overline{1} \defeq \lambda f\,x.\, f\,x
     \quad\text{and}\quad
-    \overline{n} \defeq \lambda f.\, (\lambda x.\, f^{n} x)
+    \overline{n} \defeq \lambda f\,x.\, f^{n}\,x
   \] 
 \end{definition}
 
 \begin{definition}[Successor]
   Define
   \[
-    \mathtt{succ} \defeq \lambda n.\, (\lambda f.\, (\lambda x.\, f(n f x)))
+    \mathtt{succ} \defeq \lambda n\,f\,x.\, f\,(n\,f\,x)
   \]
   Then,
   \[
@@ -435,7 +478,7 @@ stands for $\lambda x_1.\,\lambda x_2.\, \dots\lambda x_n.\,M$ etc.}
 \begin{proposition}[Addition]
   Define a $\lambda$-term 
   \[
-    \mathtt{add} \defeq \lambda n\,m\,f\,x.\; (m\;f)\;(n\;f\;x) 
+    \mathtt{add} \defeq \lambda n\,m\,f\,x.\; m\;f\;(n\;f\;x) 
   \]
   as the addition operation on Church numerals.
   Then, 
@@ -454,17 +497,6 @@ stands for $\lambda x_1.\,\lambda x_2.\, \dots\lambda x_n.\,M$ etc.}
     \item $\mathtt{add}\;(\mathtt{succ}\;\overline{0})\;\overline{1}$.
     \end{enumerate}
 \end{example}
-\begin{proposition}[Predecessor]
-  \[
-    \mathtt{pred} \defeq \lambda n.\,\lambda f.\,\lambda x.\,n\,(\lambda g.\,\lambda h.\,h\,(g\,f))\,
-    (\lambda u.\,x)\,(\lambda u.\,u)
-  \]
-  Then,
-  \begin{align*}
-      \mathtt{pred}\;\overline{0}   & \reduce \overline{0} \\
-    \mathtt{pred}  \;\overline{n+1} & \reduce \overline{n}
-  \end{align*}
-\end{proposition}
 
 \begin{proposition}[Conditional]
   Define 
@@ -488,12 +520,10 @@ Here is a list of common combinators:
   \item $\omega \defeq \lambda x.\, x\,x$
   \item $\Omega \defeq (\lambda x.\, x\,x)\,(\lambda x.\,x\,x)
     = \omega\,\omega$
-  \item $\mathbf{K}_1 \defeq \lambda x.\,(\lambda y.\,
-    x) = \mathtt{T}$, the first projection.
-  \item $\mathbf{K}_2 \defeq \lambda x.\,(\lambda y.\,
-    y) = \mathtt{F}$, the second projection.
+  \item $\mathbf{K}_1 \defeq \lambda x\,y.\, x) = \mathtt{T}$, the first projection.
+  \item $\mathbf{K}_2 \defeq \lambda x\,y.\, y) = \mathtt{F}$, the second projection.
   \item $\mathbf{I} \defeq \lambda x.\, x$, known as the \emph{identity}.
-  \item $\mathbf{S}\defeq\lambda f.\,\lambda g.\,\lambda x.\, 
+  \item $\mathbf{S}\defeq\lambda f\,g\,x.\, 
     (f\,x)\,(g\,y)$.
 \end{enumerate}
 \begin{example}[Summation, informally]
@@ -546,8 +576,7 @@ $\lambda$-term!
   can be defined as $\lambda$-terms:
   \begin{align*}
     G \defeq{} &
-    \lambda f.\,\lambda n.\,
-    \mathtt{if}\;n\;\mathtt{then}\;\overline{0}\;\mathtt{else}\;
+    \lambda f\,n.\, \mathtt{if}\;n\;\mathtt{then}\;\overline{0}\;\mathtt{else}\;
     f\,(\mathtt{pred}\;n) \\
     \mathtt{sum} \defeq{} & \mathbf{Y}G
   \end{align*}
@@ -571,7 +600,7 @@ $\lambda$-term!
   $\sum_{i=0}^n i$:
   \begin{align*}
     G \defeq{} &
-    \lambda f.\,\lambda n.\,
+    \lambda f\,n.\,
     \mathtt{if}\;n\;\mathtt{then}\;\overline{0}\;\mathtt{else}\;
     f\,(\mathtt{pred}\;n) \\
     \mathtt{sum} \defeq & \Theta\,G \\
