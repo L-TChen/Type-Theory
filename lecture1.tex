@@ -71,8 +71,8 @@ and
 \]
 \begin{definition}[Free and bound variables]
   \begin{enumerate}[(a)]
-    \item The free variable set $\FV\colon \Lambda \to V$ is a function from the
-      set~$\Lambda$ of $\lambda$-terms to the variable set~$V$ defined
+    \item The free variable set $\FV\colon \Lambda \to \mathcal{P}V$ is a function from the
+      set~$\Lambda$ of $\lambda$-terms to a subset of the variable set~$V$ defined
       inductively as follows:
       \begin{align*}
         \FV(x) & = \{ x \} \\
@@ -241,13 +241,13 @@ and write down all possible chains of reductions.
 \subsection*{Exercise}
 \begin{enumerate}
   \item Give an inductive definition of bound variable. That is, define a
-    function $\BV\colon \Lambda \to V$ inductively
+    function $\BV\colon \Lambda \to \mathcal{P}V$ inductively
     such that $\BV(M)$ is exactly the set of bound variable in a
     $\lambda$-term~$M$.
   \item Informally speaking, a \emph{subterm} of~$M$ is a valid $\lambda$-term
-    inside~$M$. For example, the set of subterms of $(\lambda x.\, M\;N)\;N$ is
+    inside~$M$. For example, some subterms of $(\lambda x.\, M\;N)\;N$ are
     \[
-      \{M, N, (M\;N), (\lambda x.\, M\;N), (\lambda x.\, M\;N)\:N\}.
+      M, N, (M\;N), (\lambda x.\, M\;N), (\lambda x.\, M\;N)\:N.
     \]
     To formulate the definition correctly, we need a formal definition. Please
     define it by induction.
