@@ -310,7 +310,7 @@ Back to Church numerals, we can now define them with a single type:
       \begin{align*}
         \vdash{} & \suc : \nat \to \nat \\
         & \suc \defeq \,\lambda (n : \nat).\,\Lambda t.\,\lambda
-        (f : t \to t)\,(x:t)\,.\;f\;(n\;v\;f\;x) 
+        (f : t \to t)\,(x:t)\,.\;f\;(n\;t\;f\;x) 
       \end{align*}
     \item[Addition]
       \begin{align*}
@@ -320,7 +320,7 @@ Back to Church numerals, we can now define them with a single type:
       \end{align*}
     \item[Multiplication] 
       \begin{align*}
-      \vdash{} & \mul : \nat\to \nat \\
+      \vdash{} & \mul : \nat\to \nat \to\nat\\
         & \mul \defeq\,?
       \end{align*}
     \item[Conditional]
