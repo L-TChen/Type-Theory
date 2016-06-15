@@ -332,28 +332,33 @@ Back to Church numerals, we can now define them with a single type:
       \end{align*}
   \end{description}
 However, polymorphic lambda calculus allows us to define a certain form of
-recursion on Church numerals, called \emph{primitive recursion} or the
+recursion on Church numerals, called \emph{iterator} or the
 \texttt{fold} function which you have seen in Haskell.
 \begin{align*}
   \vdash{} & \mathtt{fold} : \forall t.\, (t \to t) \to t \to \nat \to t  \\
-  & \mathtt{fold} \defeq \Lambda t.\, \lambda (f : t \to t)(e : t)(n : \nat). 
-  n\;t\;f\;e
+  & \mathtt{fold} \defeq \Lambda t.\, \lambda (f : t \to t)(e_0 : t)(n : \nat). 
+  n\;t\;f\;e_0
 \end{align*}
-The addition, multiplication, and predecessor operations can be redefined as
-follows:
+where
+\[
+  \mathtt{fold}\;\tau\;f\;e_0\;\bc_0 \reduce e_0
+  \quad\text{and}\quad\mathtt{fold}\;\tau\;f\;e_0\;\bc_{1 + n} \reduce
+  f\;(\mathtt{fold}\;\tau\;f\;e_0\;\bc_n).
+\]
+The addition and multiplication can be redefined as follows:
 \begin{example}
-  Find the types of following terms and justify your answer.
+  Define $\add$ and $\mul$ using $\mathtt{fold}$ and justify your
+  answer.\footnote{
+    Note that, for example, $3 + 7$ is equal to $1 + (1 + (1 + 7))$, and it
+    leads us to the following definition
+    $\add'\defeq \mathtt{fold}\;(\nat \to \nat)\;(\lambda
+    f\;n.\;\suc\;(f\;n))\;(\lambda x.\;x)$. 
+  }
   \begin{enumerate}
-    \item $\pred \defeq \mathtt{fold}\;\nat\;(\lambda (f : \nat \to \nat)(x : \nat).\,
-      x)\;\bc_0$
-    \item $\add' \defeq \mathtt{fold}\;\nat\;\suc\;\bc_0$
+    \item $\add'\defeq \;? : \nat\to\nat\to\nat$
+    \item $\mul'\defeq \;? : \nat\to\nat\to\nat$
   \end{enumerate}
   Moreover, show that each of them reduces to the expected Church numerals
-  \begin{enumerate}
-    \item $\pred\;\bc_0 \reduce \bc_0$ and $\pred\;\bc_{n+1}
-      \reduce \bc_n$.
-    \item $\add'\;\bc_n\;\bc_m \reduce \bc_{n+m}$.
-  \end{enumerate}
 \end{example}
 \subsection{List}
 Finally, the type of list over a type~$\sigma$ can also be defined in
@@ -386,28 +391,48 @@ with ``list constructors''
   \end{enumerate}
 
 %\section{Parametricity}
-%The polymorphism in System F is \emph{parametric} in the sense that every
+%Polymorphism in System F is \emph{parametric} in the sense that every
 %instance is uniformly defined. To put it differently, it cannot depend on any
 %specific type. It is different from the \emph{ad hoc} polymorphism adopted in
-%most of programming languages like C++.
+%programming languages like C++ where programmers are allowed to give a
+%specific implementation for some type.
 %
-%Recall the type of polymorphic identity 
-%\[
-%  \forall t.\, t \to t
-%\]
-%where the input is some term~$M$ of type $t$. Since we have no idea about the $t$
-%itself, the only thing we can return is~$M$ itself. It is provable that in
-%System F the every term of that type reduces to the identity
-%\[
-%  \Lambda t.\,\lambda (x : t).\, x 
-%\]
+%Why is a uniform definition important? Not only we can assure ourselves that a
+%polymorphic function has a uniform result for each instance, but also it
+%automatically satisfies certain properties which only depends on its type (not
+%its instance).
 %
-%In fact, Reynolds shows that every term in polymorphic lambda calculus satisfies
-%certain equations without ``looking inside the term'' in \cite{Reynolds1983}
-%(and also see \cite{Wadler1989}). Here, we will present a simplified statement.
-
-
-\subsection*{Exercise}
+%In the end of this lecture, we state a powerful result informally, originally
+%called \emph{Abstraction Theorem} by Reynolds~\cite{Reynolds1983} and nowadays
+%known as \emph{parametricity}. After that, we apply this theorem to characterise
+%some data types introduced so far.
+%
+%\begin{proposition}
+%  Let $\sigma$ be a type without any free variable and $\sigma^+$ the relation
+%  on~$\sigma$ lifted from~$\sigma$ (defined below). Then, 
+%  \[
+%    \vdash F : \sigma
+%    \implies (F, F) \in \sigma^+.
+%  \]
+%\end{proposition}
+%
+%To decode this proposition, we introduce a new notation: a relation $R_\sigma
+%\subset \sigma_1 \times \sigma_2$ is denoted by $R_\sigma\colon \sigma_1
+%\not\to\sigma_2$. For each type in System F, we define its lifted relation
+%$\sigma^+$
+%\begin{definition}
+%  For each type formation (construct), we define its corresponding formation of
+%  relations 
+%  \begin{enumerate}
+%    \item For $f_i:\sigma_i \to \tau_i$, $(f_1, f_2) \in R_\sigma \to S_\tau$ if
+%      and only if for every $(M_1, M_2) \in R_\Sigma$ we have $(f_1\;M_1,
+%      f_2\;M_2) \in S_\tau$.
+%  \end{enumerate}
+%\end{definition}
+%
+%
+%
+%\subsection*{Exercise}
 
 
 \bibliographystyle{plain}
