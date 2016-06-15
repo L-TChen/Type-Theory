@@ -58,7 +58,7 @@ As we have defined what the set of  free variables of a $\lambda$-term is, a
 similar definition also extends to types:
 \begin{definition}
   The \emph{free variable} $\FV\colon \type \to \mathcal{P}\mathbb{V}$ of a type
-  is a function mapping a type to a set of type variables defined by
+  is a function defined by
   \begin{align*}
     \FV(t) & {} = t \\
     \FV(\sigma \to \tau) & {} = \FV(\sigma) \cup \FV(\tau) \\
@@ -137,13 +137,13 @@ Now we proceed with terms in polymorphic lambda calculus.
     \item $\Lambda t.\,\lambda (x : t).\, x$
     \item $\Lambda t.\, \lambda (x : t)(y : t).\, x$
     \item $(\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N$
-     where  $M, N$ are terms and $t$ a type variable..
+     where  $M, N$ are terms and $\sigma$ a type.
     \item $\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x)$
     \end{enumerate}
 \end{example}
 
-We also extend the typing rules of simply typed lambda calculus to introduce the
-type polymorphism and to instantiate with a specific type:
+We also extend the typing rules of simply typed lambda calculus to introduce 
+type polymorphism and instantiation with a specific type:
 \begin{definition}[Typing rules]
   The set of valid judgements in polymorphic lambda calculus is defined
   inductively as follows:
