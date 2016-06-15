@@ -106,7 +106,7 @@ from the domain $\sigma$ to the codomain $\tau$.
       \mathbb{T}$;
     \item $ \vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$
       for all $\sigma, \tau\in\mathbb{T}$;
-    \item $\vdash \lambda f\,g\,x.\, f\,x\, (g\,y) 
+    \item $\vdash \lambda f\,g\,x.\, f\,x\, (g\,x)
       : (\sigma \to \tau \to \rho) \to (\sigma\to\tau) \to \sigma\to\rho$
       for all $\sigma, \tau, \rho \in \mathbb{T}$.
   \end{enumerate}
@@ -279,13 +279,13 @@ wrong!''
   We prove it by induction on both the derivation of $\Gamma \vdash M :
   \sigma$ and $M \onereduce N$. However, the only non-trivial case is
   \[
-    \Gamma \vdash (\lambda (x : \tau).\, M_1)\; N : \sigma
+    \Gamma \vdash (\lambda (x_1 : \tau).\, M_1)\; N : \sigma
     \quad\text{and}\quad
     (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
   \]
   with the induction hypothesis valid for
   \[
-    \Gamma, x : \tau \vdash M_1 : \sigma
+    \Gamma, x_1 : \tau \vdash M_1 : \sigma
     \quad\text{and}\quad
     \Gamma \vdash N : \tau
   \]
