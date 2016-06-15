@@ -342,13 +342,14 @@ that every well-typed terms terminates eventually.
 \begin{corollary}
   Every well-typed $\lambda$-term ${}\vdash M:\sigma$ has a normal form.
 \end{corollary}
-With the decidability of type checking, Preservation Theorem, Progress Theorem,
-and the strong normalisation, we actually have shown that there exists a
-decidable evaluator of simply typed lambda calculus that always reduce a
-well-typed term of type~$\sigma$ to a value of type~$\sigma$. In fact, since
-statements are proved by induction, we can implement an evaluator naively from
-the proofs. Moreover, we will see later how to extract a program from a
-\emph{formal} proof.
+With the decidability of type checking, Preservation Theorem, Progress Theorem
+(a well-typed term is either a ``value'' or a reducible term), and the strong
+normalisation, we actually have shown that there exists a decidable evaluator of
+simply typed lambda calculus that always reduce a well-typed term of
+type~$\sigma$ to a value of type~$\sigma$. In fact, since statements are proved
+by induction, we can implement an evaluator naively from the proofs. Moreover,
+we will see in logic how to extract a program from a \emph{formal} proof.
+
 \subsection*{Exercise}
 \begin{enumerate}
   \item Show that $\vdash \mathbf{K}_1\;\mathbf{I}\;\Omega : \sigma \to \sigma$
@@ -382,22 +383,22 @@ numerals are of type $\nat_\tau$ for every type~$\tau$:
         f^n x \\
         \vdash{} & \bc_n : \nat_\tau
       \end{align*}
-    \item[successor]
+    \item[Successor]
       \begin{align*}
         & \suc \defeq \lambda n \,f\,x\,.\;f\;(n\;f\;x) \\
         \vdash{} & \suc : \nat_\tau \to \nat_\tau
       \end{align*}
-    \item[addition]
+    \item[Addition]
       \begin{align*}
         & \add \defeq \lambda n\,m\,f\,x.\; (m\;f)\;(n\;f\;x) \\
         \vdash{} & \add : \nat_\tau \to \nat_\tau \to \nat_\tau
       \end{align*}
-    \item[muliplication] 
+    \item[Muliplication] 
       \begin{align*}
         & \mul \defeq \lambda n\,m\,f\,x.\, (m\;(n\;f))\;x\\
-      \vdash{} & \mul : \nat_\tau \to \nat_\tau
+      \vdash{} & \mul : \nat_\tau \to \nat_\tau \to \nat_\tau
       \end{align*}
-    \item[conditional]
+    \item[Conditional]
       \begin{align*}
         & \ifz \defeq \lambda n\,x\,y.\, n\;(\lambda z.\, x)\;y\\
         \vdash {} & \ifz : ?
