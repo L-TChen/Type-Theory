@@ -7,23 +7,22 @@
 \end{frame}
 
 \section{Simply typed lambda calculus}
-As we have seen in the first lecture, untyped lambda calculus is as powerful as
+As we have mentioned in the first lecture, untyped lambda calculus is as powerful as
 a computer such that every computable function on natural numbers can be
-expressed. However, despite its powerfulness, the expressiveness can be a
-disaster if treated as a programming language, because it is difficult to see
-the intention of such terms. 
+expressed. However, its powerfulness can be a disaster if treated as a
+programming language, because it is difficult to see the intention of such
+terms. 
 
-This motivates us to introduce \emph{types} over $\lambda$-terms. There are two
-approaches given by Curry and Church corresponding to two paradigms in
-programming language called \emph{implicit} and \emph{explicit typing}
-respectively.  In the typed lambda calculus \textit{\`a la} Curry, a
-$\lambda$-term is assigned to all possible types; while in the calculus
-\textit{\`a la} Church, a $\lambda$-term is annotated with types. 
+This motivates us to introduce certain descriptions, or called \emph{types}, over
+$\lambda$-terms. There are two approaches given by Curry and Church
+corresponding to two paradigms in programming language called \emph{implicit}
+and \emph{explicit typing} respectively.  In the typed lambda calculus
+\textit{\`a la} Curry, a $\lambda$-term is assigned to all possible types; in
+the calculus \textit{\`a la} Church, a $\lambda$-term is annotated with types. 
 
 \subsection{Implicit typing: system with type assignment}
 For an implicit typing system, types are defined in addition to $\lambda$-terms.
-We begin a minimalistic typing system consisting of function types with primitive
-types (such as types of Boolean values and natural numbers). We call it
+We begin with a minimalistic typing system consisting of function types. We call it
 \emph{simply typed lambda calculus \textit{\`a la} Curry}.
 \begin{definition}
   Given type variables~$\mathbb{V}$, the set $\mathbb{T}$ of
@@ -40,36 +39,42 @@ types (such as types of Boolean values and natural numbers). We call it
       \BIC{$\sigma \to \tau \in \mathbb{T}$}
     \end{prooftree}
   \end{multicols}
+  where $\sigma\to\tau$ is understood as the function type.
 \end{definition}
 \begin{convention}
-  For brevity, 
-  \[
+  In line with the convention on applications
+  \begin{align*}
+    M_1\;M_2 \dots M_n \quad &\defeq\quad
+    (\dots ((M_1\;M_2)\;M_3) \dots)\; M_n \\
     \sigma_1 \to \sigma_2 \to \dots \sigma_n
-    \quad\text{stands for}\quad \sigma_1 \to (\sigma_2 \to (
-    \dots \to (\sigma_{n-1} \to \sigma_n)\dots)
-  \]
+    \quad & \defeq\quad \sigma_1 \to (\sigma_2 \to (
+    \dots \to (\sigma_{n-1} \to \sigma_n)\dots))
+  \end{align*}
 \end{convention}
 \begin{definition}
-    A \emph{statement} consists of a $\lambda$-term~$M$
-      and a type~$\sigma \in \mathbb{T}$ denoted by 
+    A \emph{statement} consists of a $\lambda$-term~$M$ and a type~$\sigma \in
+    \mathbb{T}$ denoted by 
       \[
         M : \sigma
       \]
-      and we say that $M$ has the type $\sigma$.
-
-    A \emph{context}~$\Gamma$ is a set of statements 
+    and we say that $M$ has the type $\sigma$.  A \emph{context}~$\Gamma$ is a
+    set of statements 
       \[
         \Gamma = \{x_1 : \sigma_1, x_2 : \sigma_2, \ldots, x_n : \sigma_n\}
       \]
-      where $x_i$ are all distinct variables. 
+      where $x_i$ are all distinct variables. It is convenient to write 
+      \[
+        \Gamma, x : \sigma\quad\text{for}\quad\Gamma\cup \{x : \sigma\}.
+      \]
 \end{definition}
 \begin{definition}[Typing rules]
   A \emph{judgement} consists of a context~$\Gamma$ and a statement~$M:\sigma$ denoted by
       \[
         \Gamma \vdash M : \sigma
       \]
-  indicating that $M : \sigma$ is derivable from $\Gamma$. Judgements in the
-  system of type assignment are constructed inductively as follows:
+  indicating that $M : \sigma$ is derivable from $\Gamma$. In the case that
+  $\Gamma = \emptyset$, we write $\vdash M : \sigma$ only. Judgements in the
+  system of type assignment are constructed inductively:
   \begin{multicols}{2} 
   \begin{prooftree}
     \AXC{}
@@ -90,6 +95,8 @@ types (such as types of Boolean values and natural numbers). We call it
   \end{multicols}
 \end{definition}
 
+A term~$M$ of type $\sigma \to \tau$ is understood as a \emph{function} 
+from the domain $\sigma$ to the codomain $\tau$.
 \begin{example}
   The following judgements are derivable:
   \begin{enumerate}
@@ -107,9 +114,9 @@ step by step:
 \begin{prooftree}
   \AXC{}
   \RightLabel{(var)}
-  \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
+  \UIC{$x : \sigma \vdash x : \sigma$}
   \RightLabel{(abs)}
-  \UIC{$\Gamma \vdash \lambda x.\; x : (\sigma \to \sigma)$}
+  \UIC{$\vdash \lambda x.\; x : (\sigma \to \sigma)$}
 \end{prooftree}
 And, also the second one:
 \begin{prooftree}
@@ -250,9 +257,8 @@ Both questions are answered positively:
     \[
       \vdash \lambda (x : \sigma).\, x\; x : \tau.
     \]
-  \item Find a type for Church numerals $\underline{n} =
-    \lambda f\,x.\, f^n\;x$. Note that you may find $\underline{0}$ and
-    $\underline{1}$ confusing.
+  \item Describe all possible types for Church numerals $\bc_{n} = \lambda
+    f\,x.\, f^n\;x$. Note that you may find $\bc_{0}$ and $\bc_{1}$ confusing.
   \end{enumerate}
 \section{Type safety}
 \subsection{Preservation}
@@ -275,7 +281,7 @@ wrong!''.
     \quad\text{and}\quad
     (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
   \]
-  with the hypothesis assumption
+  with the induction hypothesis holds for
   \[
     \Gamma, x : \tau \vdash M_1 : \sigma
     \quad\text{and}\quad
@@ -355,8 +361,8 @@ the proofs. Moreover, we will see later how to extract a program from a
     $\alpha$-equivalent well-typed terms have the same type.
   \item Complete the proof of Theorem~\ref{thm:preservation}. Hint: Use the
     above two statements.
-  \item Prove that Preservation Theorem and Progress Theorem hold for
-    simply typed lambda calculus \textit{\`a la} Curry using type erasing.
+  \item Prove that Preservation Theorem holds for simply typed lambda calculus
+    \textit{\`a la} Curry using type erasing.
 \end{enumerate}
 \section{Programming in simply typed lambda calculus}
 In this section, we use $\lambda_\to$ in the style of Curry.  
@@ -376,7 +382,7 @@ numerals are of type $\nat_\tau$ for every type~$\tau$:
       \end{align*}
     \item[successor]
       \begin{align*}
-        & \suc \defeq \lambda n \,f\,x\,.\;(f\;(n\;f\;x)) \\
+        & \suc \defeq \lambda n \,f\,x\,.\;f\;(n\;f\;x) \\
         \vdash{} & \suc : \nat_\tau \to \nat_\tau
       \end{align*}
     \item[addition]
@@ -395,23 +401,22 @@ numerals are of type $\nat_\tau$ for every type~$\tau$:
         \vdash {} & \ifz : ?
       \end{align*}
   \end{description}
-The type of~$\ifz$ may not be as obvious as you may expect as it actually
-depends on a specific type $\tau$. Try to find one as general as possible and
-justify your guess.
+The type of~$\ifz$ may not be as obvious as you may expect.
+Try to find one as general as possible and justify your guess.
 
 Within simply typed lambda calculus, we may naturally ask how many computable
 functions can be defined, as it excludes non-terminating $\lambda$-terms. 
 \begin{definition}
   A function $f\colon \mathbb{N}^k \to \mathbb{N}$ is called
   \emph{$\lambda_\to$-definable} if there exists a $\lambda$-term $F$
-   of type $\nat \to (\nat \to \dots (\nat \to \nat)\dots)$ (with $k+1$
+   of type $\nat \to \nat \to \dots \nat \to \nat$ (with $k+1$
   many $\nat$ in total) such that
   \[
     F\,\bc_{n_1}\ldots\bc_{n_k} \reduce \bc_{f(n_1, \dots, n_k)}
   \]
   for every sequence $(n_1, n_2, \ldots, n_k) \in \mathbb{N}^k$.
 \end{definition}
-\begin{theorem}[Schwichtenberg]
+\begin{theorem}[Schwichtenberg~\cite{Schwichtenberg1976}]
   The $\lambda_\to$-definable functions are the class of functions
   of the form $f\colon \mathbb{N}^k \to \mathbb{N}$ closed under compositions
   and contains the constant functions, projections, additions, multiplications,
