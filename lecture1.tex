@@ -9,35 +9,31 @@ In elementary school, we were always asked to solve
 \[
   (3 + 7) * (4 + 6)= ?
 \]
-but the following is always correct in any sense:
+but it is always correct to write 
 \[
   (3 + 7) * (4 + 6)= (3 + 7) * (4 + 6)
 \]
-Why is this not the answer? It is because we are asked to \emph{reduce} an expression
-to its \emph{normal form} instead of finding its meaning. We also have different
-sequences of reductions:
+But, why is this not the expected answer? Perhaps, it is because we are asked to
+\emph{reduce} an expression to its \emph{normal form} instead of finding its
+meaning. We have different sequences of reductions:
 \begin{align*}
   (3 + 7) * (4 + 6) \leadsto 10 * (4 + 6) \leadsto 10 * 10 \leadsto 100 \\
   (3 + 7) * (4 + 6) \leadsto (3 + 7) * 10 \leadsto 10 * 10 \leadsto 100. \\
 \end{align*}
-Two sequences above are all fine, but sometimes it makes a difference. For example, 
+Two sequences above are all fine, but sometimes it makes a difference. Consider 
 \[
   f(x, y) \defeq x
 \]
-Then,
+and try to reduce the expression
 \[
-  f(0, \int _{-1}^{1}{\frac {dx}{\sqrt {1-x^{2}}}}) \leadsto \dots \leadsto ?
+  f(0, \int _{-1}^{1}{\frac {dx}{\sqrt {1-x^{2}}}}).
 \]
-or just
+Do we really need to reduce the second argument to reduce the whole expression?
 \[
   f(0, \int _{-1}^{1}{\frac {dx}{\sqrt {1-x^{2}}}}) \leadsto 0
 \]
-Do we really need to reduce every term we see in the expression?
-We device a \emph{reduce strategy} to decide which reduction should be performed
-if there many choices. 
-
-In this lecture, we will formalise the above notions in the language of lambda
-calculus.
+To decide which reduction should be performed, we device a \emph{reduce
+  strategy} to address the issue. 
 
 %Informally, lambda calculus can be viewed as a simplest programming language
 %whose syntax only consists of
