@@ -343,12 +343,12 @@ the $\beta$-redex which is not contained in any other $\beta$-redex, called the
     $\beta$-redex in a $\lambda$-term first. For example, 
     \begin{align*}
       & (\lambda x.\, \underline{(\lambda y.\,
-        y)}\;\underline{\vphantom{(\lambda} x})\,
+        y)}\;\;\underline{\vphantom{(\lambda} x})\,
       (\lambda x.\, (\lambda y.\, y\, y)\,x) \\
       \onereduce & (\lambda x.\,x)\;
       (\lambda x.\, \underline{(\lambda y.\, y\,
-        y)}\;\underline{\vphantom{(\lambda}x}) \\
-      \onereduce & \underline{(\lambda x.\,x)}\;\underline{(\lambda x.\, x\,x)} \\
+        y)}\;\;\underline{\vphantom{(\lambda}x}) \\
+      \onereduce & \underline{(\lambda x.\,x)}\;\;\underline{(\lambda x.\, x\,x)} \\
       \onereduce & (\lambda x.\, x\, x) \\
       \not\onereduce
     \end{align*}
@@ -400,10 +400,6 @@ In fact, the leftmost-outermost strategy always reduces $\lambda$-terms to its
       $N$ with $M \reduce N$.
   \end{enumerate}
 \end{definition}
-\begin{theorem}[See {\cite[Theorem 13.2.2]{Barendregt1984a}}]
-  The leftmost-outermost strategy reduce every weakly
-  normalising $\lambda$-term~$M$ to its normal form $F^n(M)$ for some~$n$.
-\end{theorem}
 
 \begin{example}
   Recall Example~\ref{ex:omega}. 
@@ -413,6 +409,12 @@ In fact, the leftmost-outermost strategy always reduces $\lambda$-terms to its
     \item $(\mathbf{K}_1 z) \Omega$ is weakly normalising.
   \end{enumerate}
 \end{example}
+
+\begin{theorem}[See {\cite[Theorem 13.2.2]{Barendregt1984a}}]
+  The leftmost-outermost strategy reduces every weakly
+  normalising $\lambda$-term~$M$ to its normal form $F^n(M)$ for some~$n$.
+\end{theorem}
+
 As we have seen, different strategies may give different results, so it leads to
 a natural question to ask: do different orders of reductions produce the same
 normal form, if any? 
@@ -452,8 +454,8 @@ sense to identify
   M\subst{x}{N}
 \]
 where the latter is simply the result of application. Hence, we define the
-\emph{$\lambda$-logical theory} to be the congruence closure of
-$\xrightarrow{\beta}$. For example, 
+\emph{$\lambda$-logical theory}, denoted by $=_\beta$, to be the congruence
+closure of $\xrightarrow{\beta}$. For example, 
 \[
   (\lambda x.\, M)\;N
   =_\beta
@@ -485,8 +487,7 @@ if $(\lambda x.\, M)$ is $\alpha$-equivalent to $(\lambda x'.\,M')$ or
 There is no \emph{built-in} natural number in lambda calculus. However, 
 not only every natural number can be defined as a $\lambda$-term, but also 
 operations, e.g.\ addition, multiplication, and even exponential, on natural
-number can be defined. In fact, every computable function (on natural numbers)
-is definable in lambda calculus. 
+number can be defined. 
 
 \begin{description}
   \item[Church numerals]
@@ -576,8 +577,8 @@ Here is a list of common combinators:
        n + f(n - 1)  & \text{otherwise}.
     \end{cases}
   \end{equation}
-  Now, assume that $\mathtt{sum}'$ is a fixed-point of $G$, i.e.\
-  $G(\mathtt{sum}') =\mathtt{sum}'$, and we can find that $\mathtt{sum}' =
+  Now, assuming that $\mathtt{sum}'$ is a fixed-point of $G$, i.e.\
+  $G(\mathtt{sum}') =\mathtt{sum}'$, we can find that $\mathtt{sum}' =
   \mathtt{sum}$ by induction. 
 \end{example}
 
@@ -612,13 +613,14 @@ $\lambda$-term!
   \end{align*}
   Try to evaluate $\mathtt{sum}$ with some Church numerals.
 \end{example}
-
+Since the $\mathbf{Y}$ combinator does not really reduce to its argument, here
+is anther fixed-point operator which reduces to its argument:
 \begin{proposition}[Turing's fixed-point combinator]
   Define 
   \[
     \Theta \defeq 
-    (\lambda x.\,(\lambda f.\,(f\,(x\,x\,f))))\;
-    (\lambda x.\,(\lambda f.\,(f\,(x\,x\,f))))
+    (\lambda x\,f.\,f\,(x\,x\,f))\;
+    (\lambda x\,f.\,f\,(x\,x\,f))
   \]
   Then, 
   \[
@@ -642,11 +644,11 @@ $\lambda$-terms. Due to the time constrains, we refer the reader
 to~\cite[Chapter 3]{Barendregt1984} for further detail.
 \subsection*{Exercise}
 \begin{enumerate}
-  \item Define the \emph{flip} operation, i.e.\ a $\lambda$-term~$\mathbf{C}$
+  \item Define the \emph{flip} operation, i.e.\ a $\lambda$-term~$\mathtt{flip}$
     such that
     \[
-      ((\mathbf{C}\,M)\,N)\,P
-      \reduce (M\,P)\,N
+      \mathtt{flip}\;M\;N\;P
+      \reduce M\;P\;N
     \]
   \item Define the pairing $[\,M, N\,]$ of two $\lambda$-terms $M$ and $N$
     such that

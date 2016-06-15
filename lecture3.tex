@@ -57,8 +57,8 @@ we do not treat the Curry-style variant.
 As we have defined what the set of  free variables of a $\lambda$-term is, a
 similar definition also extends to types:
 \begin{definition}
-  The \emph{free variable} $\FV\colon \type \to \mathbb{V}$ of a type is a
-  function inductively defined:
+  The \emph{free variable} $\FV\colon \type \to \mathcal{P}\mathbb{V}$ of a type
+  is a function mapping a type to a set of type variables defined by
   \begin{align*}
     \FV(t) & {} = t \\
     \FV(\sigma \to \tau) & {} = \FV(\sigma) \cup \FV(\tau) \\
@@ -83,8 +83,8 @@ Since the use of variable in a type is to be substituted by other types, we also
 need to define \emph{substitution over types} accordingly and routinely.
 
 \begin{definition}
-  The \emph{(capture-avoidance) substitution} of a type $\rho$ for the free occurrence of a
-  variable~$v$ is defined inductively as 
+  The \emph{(capture-avoidance) substitution} of a type $\rho$ for the free
+  occurrence of a type variable~$t$ is defined inductively as 
   \begin{align*}
     t\subst{t}{\rho} & = \rho \\
     u\subst{t}{\rho} & = u && \text{if $u \neq t$}\\
@@ -137,7 +137,7 @@ Now we proceed with terms in polymorphic lambda calculus.
     \item $\Lambda t.\,\lambda (x : t).\, x$
     \item $\Lambda t.\, \lambda (x : t)(y : t).\, x$
     \item $(\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N$
-     where  $M, N$ are terms.
+     where  $M, N$ are terms and $t$ a type variable..
     \item $\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;f\;x$
     \end{enumerate}
 \end{example}
@@ -177,7 +177,7 @@ type polymorphism and to instantiate with a specific type:
 \begin{example} \label{ex:f-welltyped}
   The following terms are well-typed:
   \begin{enumerate}
-    \item ${}\vdash\Lambda t.\,\lambda (x : t).\, x : \forall t.\;v\to v$
+    \item ${}\vdash\Lambda t.\,\lambda (x : t).\, x : \forall t.\;t\to t$
     \item ${}\vdash\Lambda t.\, \lambda (x : t)(y : t).\, x : \forall t.\;t \to t \to t$
     \item $M : \sigma, N : \sigma
       \vdash (\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N
@@ -190,9 +190,9 @@ We derive the second one and leave others to the reader.
 \begin{prooftree}
   \AXC{}
   \RightLabel{(var)}
-  \UIC{$x : t, y : t \vdash x : v$}
+  \UIC{$x : t, y : t \vdash x : t$}
   \UIC{$x : t \vdash \lambda (y : t).\; x : t \to t$}
-  \UIC{$\vdash \lambda (x : t)(y : t).\; x : t \to t \to v$}
+  \UIC{$\vdash \lambda (x : t)(y : t).\; x : t \to t \to t$}
   \UIC{$\vdash \Lambda t.\,\lambda (x : t)(y : t).\; x :\forall t.\,t \to t \to
     t$}
 \end{prooftree}
@@ -249,13 +249,12 @@ type has a term:
 \end{prooftree}
 Can this be true? We will answer it later.
 \subsection{Sum type}
-First of all, the sum type of $\tau$ and $\sigma$ represent the
-``disjoint union'' of two types. 
+The sum type of $\tau$ and $\sigma$ represents the
+``disjoint union'' of two types, defined as
 \[
   \sigma + \tau \defeq \forall t. (\sigma \to t) \to (\tau \to t) \to t
 \]
-The intuition is that every term of $\sigma + \tau$ has two ``constructors''.
-The first injection is defined by
+with two ``injections'': The first injection is defined by
 \begin{align*}
   \vdash {} & \mathtt{inj}_1 \colon \sigma \to \sigma + \tau \\
   & \mathtt{inj}_1 \defeq \lambda (x : \sigma).\;\Lambda t.\,\lambda (f :
@@ -401,17 +400,12 @@ with ``list constructors''
 %  \Lambda t.\,\lambda (x : t).\, x 
 %\]
 %
-%In fact, we can prove a generic theorem for every type in System F, and
-%here present its special case only:
-%\begin{proposition}[\cite{Wadler1989}]
-%  For every well-typed term of the form
-%  \[
-%    \vdash \Lambda t.\, M : \forall t.\,\sigma
-%  \]
-%  where $\sigma$ does not involved with $\forall$, and every 
-%  function $F\colon \sigma\subst{t}{\tau} \to \sigma\subst{t}{\rho}$ 
-%\end{proposition}
-%\subsection*{Exercise}
+%In fact, Reynolds shows that every term in polymorphic lambda calculus satisfies
+%certain equations without ``looking inside the term'' in \cite{Reynolds1983}
+%(and also see \cite{Wadler1989}). Here, we will present a simplified statement.
+
+
+\subsection*{Exercise}
 
 
 \bibliographystyle{plain}

@@ -46,6 +46,7 @@ We begin with a minimalistic typing system consisting of function types. We call
   \begin{align*}
     M_1\;M_2 \dots M_n \quad &\defeq\quad
     (\dots ((M_1\;M_2)\;M_3) \dots)\; M_n \\
+    \text{we adopt the } & \text{following abbreviation} \\
     \sigma_1 \to \sigma_2 \to \dots \sigma_n
     \quad & \defeq\quad \sigma_1 \to (\sigma_2 \to (
     \dots \to (\sigma_{n-1} \to \sigma_n)\dots))
@@ -68,11 +69,12 @@ We begin with a minimalistic typing system consisting of function types. We call
       \]
 \end{definition}
 \begin{definition}[Typing rules]
-  A \emph{judgement} consists of a context~$\Gamma$ and a statement~$M:\sigma$ denoted by
-      \[
+  A \emph{judgement} consists of a context~$\Gamma$ and a statement~$M:\sigma$
+  denoted by
+  \[
         \Gamma \vdash M : \sigma
       \]
-  indicating that $M : \sigma$ is derivable from $\Gamma$. In the case that
+  which indicates that $M : \sigma$ is derivable from $\Gamma$. In the case that
   $\Gamma = \emptyset$, we write $\vdash M : \sigma$ only. Judgements in the
   system of type assignment are constructed inductively:
   \begin{multicols}{2} 
@@ -217,8 +219,8 @@ from typed $\lambda$-terms to $\lambda$-terms with implicit type.
 \begin{proposition}
   Let $M$ and $N$ be typed $\lambda$-terms in~$\Lambda_\T$. Then, 
   \[
-    \Gamma \vdash M : \sigma \implies \Gamma \vdash |M| : \sigma
-    \quad\text{and}\quad M \reduce N \implies |M| \reduce |N|.
+    \left(\Gamma \vphantom{\reduce} \vdash M : \sigma \implies \Gamma \vdash |M| : \sigma\right)
+    \quad\text{and}\quad \left(M \reduce N \implies |M| \reduce |N|\right).
   \]
 \end{proposition}
 \begin{proposition}
@@ -258,13 +260,13 @@ Both questions are answered positively:
       \vdash \lambda (x : \sigma).\, x\; x : \tau.
     \]
   \item Describe all possible types for Church numerals $\bc_{n} = \lambda
-    f\,x.\, f^n\;x$. Note that you may find $\bc_{0}$ and $\bc_{1}$ confusing.
+    f\,x.\, f^n\;x$. You may find $\bc_{0}$ and $\bc_{1}$ confusing, though.
   \end{enumerate}
 \section{Type safety}
 \subsection{Preservation}
 One of the main features of typed programs is that that every well-typed terms
 always reduces to a term of the same type---``well-typed programs do not go
-wrong!''.
+wrong!''
 \begin{theorem}[Preservation Theorem]
   \label{thm:preservation}
   Let $M$ and $N$ be typed $\lambda$-terms. 
@@ -281,7 +283,7 @@ wrong!''.
     \quad\text{and}\quad
     (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
   \]
-  with the induction hypothesis holds for
+  with the induction hypothesis valid for
   \[
     \Gamma, x : \tau \vdash M_1 : \sigma
     \quad\text{and}\quad
@@ -290,7 +292,7 @@ wrong!''.
   where $\lambda x_1:\tau.\,M_1$ and $\lambda x_2:\tau.\,M_2$ are
   $\alpha$-equivalent. The rest is left as an exercise.
 \end{proof}
-However, the converse may not hold. Observe the following examples
+However, the converse may not hold.
 \begin{example}
   Recall that 
   \begin{enumerate}
@@ -328,8 +330,8 @@ To see why the latter judgement fails, we need the following lemma:
 %\todo[inline]{define value?}
 %
 \subsection{Strong normalisation}
-The last property of type system in this lecture is called \emph{strong
-  normalisation}. It means that every well-typed terms terminates eventually. 
+Another property of type system is called \emph{strong normalisation}. It means
+that every well-typed terms terminates eventually. 
 \begin{theorem}
   Suppose that ${}\vdash M : \sigma$. Then,
   there is no infinite sequence of reductions
