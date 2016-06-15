@@ -5,30 +5,54 @@
 \begin{frame}
 \maketitle
 \end{frame}
-
-We begin with an informal introduction to lambda calculus. Lambda calculus can
-be viewed as a simplest programming language whose syntax only consists of
-\begin{enumerate}[(a)]
-  \item infinitely many variables $x, y, z, \ldots$, 
-  \item function application $F(a)$, or just $F a$, and
-  \item function abstraction $F(x) \defeq M$, or just $\lambda x.\, M$
-    as an anonymous function, whose intuitive meaning is to define a function
-    with a parameter~$x$.
-\end{enumerate}
-The only possible computation is the substitution for the parameter in the
-function body by its argument, written as 
+In elementary school, we were always asked to solve
 \[
-  (\lambda x.\, M)\, N \leadsto M\subst{x}{N}
+  (3 + 7) * (4 + 6)= ?
 \]
-and the computation is finished while there is no possible reduction, e.g.
+but the following is always correct in any sense:
 \[
-  (\lambda x.\, \lambda y.\, (x y) z) (\lambda x.\, x)
-  \leadsto (\lambda y.\, (x y) z)\subst{x}{(\lambda x.\, x)}
-  \leadsto \lambda y.\, (\lambda x.\, x) y z
-  \leadsto \lambda y.\, (x\subst{x}{y}) z
-  \leadsto \lambda y.\, y z
+  (3 + 7) * (4 + 6)= (3 + 7) * (4 + 6)
 \]
+Why is this not the answer? It is because we are asked to \emph{reduce} an expression
+to its \emph{normal form} instead of finding its meaning. We also have different
+sequences of reductions:
+\begin{align*}
+  (3 + 7) * (4 + 6) \leadsto 10 * (4 + 6) \leadsto 10 * 10 \leadsto 100 \\
+  (3 + 7) * (4 + 6) \leadsto (3 + 7) * 10 \leadsto 10 * 10 \leadsto 100. \\
+\end{align*}
+Two sequences above are all fine, but sometimes it makes differences. For example, 
+\[
+  f(x, y) \defeq x
+\]
+Then,
+\[
+  f(0, \int _{-1}^{1}{\frac {dx}{\sqrt {1-x^{2}}}}) \leadsto \dots \leadsto ?
+\]
+or just
+\[
+  f(0, \int _{-1}^{1}{\frac {dx}{\sqrt {1-x^{2}}}}) \leadsto 0
+\]
+Do we really need to reduce every term we see in the expression?
+We device a \emph{reduce strategy} to decide which reduction should be performed
+if there many choices. 
 
+In this lecture, we will formalise the above notions in the language of lambda
+calculus.
+
+%Informally, lambda calculus can be viewed as a simplest programming language
+%whose syntax only consists of
+%\begin{enumerate}[(a)]
+%  \item variables $x, y, z, \ldots$, 
+%  \item function application $F(a)$, or just $F\;a$, and
+%  \item function abstraction $F(x) \defeq M$, or just $\lambda x.\, M$
+%    as an anonymous function.
+%\end{enumerate}
+%The only possible computation is to substitute the argument for the parameter in
+%the function body, written as 
+%\[
+%  (\lambda x.\, M)\, N \leadsto M\subst{x}{N}
+%\]
+%and the computation is finished while there is no possible reduction.
 \section{Introduction}
 
 \begin{definition}[Syntax]
@@ -71,8 +95,8 @@ and
 \]
 \begin{definition}[Free and bound variables]
   \begin{enumerate}[(a)]
-    \item The free variable set $\FV\colon \Lambda \to \mathcal{P}V$ is a function from the
-      set~$\Lambda$ of $\lambda$-terms to a subset of the variable set~$V$ defined
+    \item The free variable set $\FV\colon \Lambda \to \mathcal{P}V$ is a
+      function mapping a $\lambda$-terms to a subset of variables defined
       inductively as follows:
       \begin{align*}
         \FV(x) & = \{ x \} \\
@@ -216,8 +240,11 @@ definition of $\alpha$-equivalence, we define:
     \end{prooftree}
     \begin{prooftree}
       \AXC{$M_1 \onereduce M_2$}
+      \UIC{$M_1\,N \onereduce M_2\,N$}
+    \end{prooftree}
+    \begin{prooftree}
       \AXC{$N_1\onereduce  N_2$}
-      \BIC{$M_1\,N_1 \onereduce M_2\,N_2$}
+      \UIC{$M\,N_1 \onereduce M\,N_2$}
     \end{prooftree}
   \end{multicols}
 \end{definition}
@@ -245,10 +272,11 @@ and write down all possible chains of reductions.
     such that $\BV(M)$ is exactly the set of bound variable in a
     $\lambda$-term~$M$.
   \item Informally speaking, a \emph{subterm} of~$M$ is a valid $\lambda$-term
-    inside~$M$. For example, some subterms of $(\lambda x.\, M\;N)\;N$ are
+    inside~$M$. For example, subterms of $(\lambda x.\, M\;N)\;N$ are
     \[
       M, N, (M\;N), (\lambda x.\, M\;N), (\lambda x.\, M\;N)\:N.
     \]
+    as well as subterms of $M$ and $N$.
     To formulate the definition correctly, we need a formal definition. Please
     define it by induction.
   \item Explain what the following terms mean:
@@ -259,6 +287,11 @@ and write down all possible chains of reductions.
       \qquad
       \lambda x\,y. (\lambda x.\, x)
     \]
+  \item Find all possible sequences of reductions of the following terms:
+    \begin{enumerate}
+      \item  $\Omega \defeq (\lambda x.\, x\,x)(\lambda x.\,x\,x)$
+      \item  $(\lambda x\;y.\;x)\;(\lambda x.\,x)\;\Omega$
+    \end{enumerate}
 \end{enumerate}
 
 \section{Reduction}
@@ -337,7 +370,7 @@ reduction and a finite sequence of reductions at the same time.
   Define the following terms
   \begin{align*}
     \Omega &\defeq (\lambda x.\, x\,x)(\lambda x.\,x\,x) \\
-    \mathbf{K}_1 & \defeq \lambda x.\,(\lambda y.\, x).
+    \mathbf{K}_1 & \defeq \lambda x\,y.\;x
   \end{align*}
   First of all, we observe that $\Omega$ has an infinite chain of reductions:
   \[
@@ -436,7 +469,13 @@ if $(\lambda x.\, M)$ is $\alpha$-equivalent to $(\lambda x'.\,M')$ or
   \quad\text{if } N =_\beta N'
 \]
 \begin{corollary} \label{coro:logical-theory}
-  If $M =_\beta N$, then $M \reduce N$.
+  The following statements hold:
+  \begin{enumerate}
+    \item If $M =_\beta N$, then there exists some~$L$ with $M \reduce L$ and $N
+      \reduce L$.
+    \item If $M =_\beta N$ and $N$ is a normal form, then 
+      $M \reduce N$.
+  \end{enumerate}
 \end{corollary}
 \subsection*{Exercise}
 \begin{enumerate}
@@ -453,67 +492,62 @@ operations, e.g.\ addition, multiplication, and even exponential, on natural
 number can be defined. In fact, every computable function (on natural numbers)
 is definable in lambda calculus. 
 
-\begin{definition}[Church numerals]
+\begin{description}
+  \item[Church numerals]
   Define $f^1 \defeq f$ and $f^{n+1} \defeq f\,f^n$. Then, 
   \[
-    \overline{0} \defeq \lambda f\,x.\, x
+    \bc_0 \defeq \lambda f\,x.\, x
     \quad
-    \overline{1} \defeq \lambda f\,x.\, f\,x
+    \bc_{1} \defeq \lambda f\,x.\, f\,x
     \quad\text{and}\quad
-    \overline{n} \defeq \lambda f\,x.\, f^{n}\,x
+    \bc_{n} \defeq \lambda f\,x.\, f^{n}\,x
   \] 
-\end{definition}
+  \item[Successor]
+    \begin{align*}
+      \mathtt{succ} &\defeq \lambda n\,f\,x.\, f\,(n\,f\,x) \\
+      \mathtt{succ}\;\overline{n}&\reduce \overline{n+1}.
+    \end{align*}
+    for any natural number~$n \in \mathbb{N}$.
+  \item[Predecessor]
+    \begin{align*}
+      \mathtt{pred} & \defeq \lambda n.\,\lambda f.\,\lambda x.\,n\,(\lambda
+      g.\,\lambda h.\,h\,(g\,f))\,
+      (\lambda u.\,x)\,(\lambda u.\,u) \\
+      \mathtt{pred}\;\bc_{0}   & \reduce \bc_{0} \\
+      \mathtt{pred}  \;\bc_{n+1} & \reduce \bc_{n}
+    \end{align*}
+  \item[Addition]
+    \begin{align*}
+      \mathtt{add} & \defeq \lambda n\,m\,f\,x.\; m\;f\;(n\;f\;x)  \\
+      \mathtt{add}\;\bc_{n}\;\bc_{m}\;
+      & \reduce\;\bc_{n + m}
+    \end{align*}
+\end{description}
 
-\begin{definition}[Successor]
-  Define
-  \[
-    \mathtt{succ} \defeq \lambda n\,f\,x.\, f\,(n\,f\,x)
-  \]
-  Then,
-  \[
-    \mathtt{succ}\;\overline{n} \reduce \overline{n+1}.
-  \]
-  for any natural number~$n$.
-\end{definition}
-\begin{proposition}[Addition]
-  Define a $\lambda$-term 
-  \[
-    \mathtt{add} \defeq \lambda n\,m\,f\,x.\; m\;f\;(n\;f\;x) 
-  \]
-  as the addition operation on Church numerals.
-  Then, 
-  \[
-    \mathtt{add}\;\overline{n}\;\overline{m}\;
-    \reduce\;\overline{n + m}
-  \]
-\end{proposition}
 \begin{example}
   Evaluate the following terms.
   \begin{enumerate}
-    \item $\mathtt{add}\;\overline{0}\;\overline{1}
-      \reduce \overline{1}$.
-    \item $\mathtt{add}\;\overline{1}\;\overline{1}
-      \reduce \overline{2}$.
-    \item $\mathtt{add}\;(\mathtt{succ}\;\overline{0})\;\overline{1}$.
+    \item $\mathtt{add}\;\bc_{0}\;\bc_{1}
+      \reduce \bc_{1}$.
+    \item $\mathtt{add}\;\bc_{1}\;\bc_{1}
+      \reduce \bc_{2}$.
+    \item $\mathtt{add}\;(\mathtt{succ}\;\bc_{0})\;\bc_{1}$.
     \end{enumerate}
 \end{example}
 
-\begin{proposition}[Conditional]
-  Define 
-  \[
-    \mathtt{if}\;n\;\mathtt{then}\;x\;\mathtt{else}\;y\; \defeq 
-    n\,(\lambda v.\,x)\,y 
-  \]
-  where $n$, $x$, and $y$ are variables and 
-  $\mathtt{if\_then\_else\_} \defeq \lambda n\,x\,y.\,n\,(\lambda v.\, x)\, y$.
-  Then, for any two $\lambda$-terms $M$ and~$N$,
-  \begin{align*}
-    \mathtt{if}\;\overline{0}\;\mathtt{then}\;M\;\mathtt{else}\;N
-    \reduce M \\ 
-    \mathtt{if}\;\overline{n+1}\;\mathtt{then}\;M\;\mathtt{else}\;N
-    \reduce N.
-  \end{align*}
-\end{proposition}
+\begin{description}
+  \item[Conditional]
+    \begin{align*}
+      \mathtt{if}\_\mathtt{then}\_\mathtt{else}\_
+      & \defeq \lambda n\;x\;y.\;n\,(\lambda v.\,x)\,y  \\
+      \mathtt{if} \quad\bc_{0}\quad & \mathtt{then}\quad M\quad\mathtt{else}\quad
+      N  \reduce M \\
+      \mathtt{if} \quad\bc_{n+1}\quad &\mathtt{then}\quad M\quad\mathtt{else}\quad
+      N \reduce N.
+    \end{align*}
+    for any two $\lambda$-terms $M$ and~$N$,
+\end{description}
+
 \subsection{Some combinators and the fixed-point Combinator}
 Here is a list of common combinators:
 \begin{enumerate}
@@ -612,7 +646,7 @@ $\lambda$-terms. Due to the time constrains, we refer the reader
 to~\cite[Chapter 3]{Barendregt1984} for further detail.
 \subsection*{Exercise}
 \begin{enumerate}
-  \item Define the \emph{swap} operation, i.e\ a $\lambda$-term~$\mathbf{C}$
+  \item Define the \emph{flip} operation, i.e.\ a $\lambda$-term~$\mathbf{C}$
     such that
     \[
       ((\mathbf{C}\,M)\,N)\,P

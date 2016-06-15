@@ -1,4 +1,4 @@
-tex = latexmk -pdf -outdir=output
+tex = latexmk -pdf -outdir="./output"
 
 lectures = lecture0 lecture1 lecture2 lecture3 
 
