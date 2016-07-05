@@ -6,8 +6,7 @@ all: $(lectures)
 
 $(lectures):
 	$(tex) $@_note.tex
-	$(tex) $@_slide.tex
-	cp output/$@_note.pdf output/$@_slide.pdf pdf
+	cp output/$@_note.pdf pdf
 	
 
 clean:

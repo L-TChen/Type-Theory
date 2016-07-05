@@ -53,7 +53,8 @@ To decide which reduction should be performed, we device a \emph{reduce
 
 \begin{definition}[Syntax]
   Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
-  \emph{variables}.  Then, \emph{$\lambda$-terms} are defined inductively:
+  \emph{variables}.  Then, the set~$\Lambda$ of \emph{$\lambda$-terms} are
+  defined inductively:
   \begin{multicols}{3}
     \begin{prooftree}
       \AXC{$x \in V$}
@@ -69,9 +70,10 @@ To decide which reduction should be performed, we device a \emph{reduce
     \end{prooftree}
     \columnbreak
     \begin{prooftree}
-      \AXC{$M \in \Lambda, x \in V$}
+      \AXC{$M \in \Lambda$}
+      \AXC{$x \in V$}
       \RightLabel{(abs)}
-      \UIC{$\lambda x.\, M \in \Lambda$}
+      \BIC{$\lambda x.\, M \in \Lambda$}
     \end{prooftree}
   \end{multicols}
   \noindent corresponding to the introduction of \emph{variables},
@@ -99,9 +101,9 @@ and
         \FV(M\, N) & = \FV(M) \cup \FV(N) \\
         \FV(\lambda x.\, M) & = \FV(M) - \{ x \}.
       \end{align*}
-      That is, a variable $v$ of a $\lambda$-term~$M$ is \emph{free} if $v \in
-      \FV(M)$, otherwise $v$ in a $\lambda$-term is
-      \emph{bound}. The set of bound variable is denoted by~$\BV(M)$.
+      That is, a variable $v$ of a $\lambda$-term~$M$ has a \emph{free}
+      occurrence if $v \in \FV(M)$; a variable~$x$ is \emph{bound} if it occurs
+      under the scope of a~$\lambda x. M$ (i.e.\ $x$ occurs in~$M$). The set of bound variable is denoted by~$\BV(M)$.
     \item A $\lambda$-term~$M$ is called \emph{closed} or a \emph{combinator} if
       $\FV(M) = \emptyset$. That
       is, $M$ contains no free variable.
@@ -213,9 +215,9 @@ x.\, M)\, N$ (only):
   $(\lambda x.\, M)$. 
   That is,
   \[
-    (\lambda x.\, M)\, N \xrightarrow{\beta} M'\subst{x'}{N}
+    (\lambda x.\, M)\, N \xrightarrow{\beta} M'\subst{x}{N}
   \]
-  if $(\lambda x.\, M)$ is $\alpha$-equivalent to $(\lambda x'.\, M')$ and
+  if $M$ is $\alpha$-equivalent to $M'$ and
   $M'\subst{x'}{N}$ is defined.  A term of this form $(\lambda x.\, M)\, N$ is
   called a \emph{$\beta$-redex}.
 \end{definition}
@@ -296,7 +298,7 @@ Informally, a reduction strategy is a procedure of selecting $\beta$-redexes
 to be reduced if there are multiple choices. 
 \begin{definition}
   A \emph{reduction strategy} is a function $F\colon\Lambda\to\Lambda$ on
-  $\lambda$-terms such that either $M$ is $\alpha$-equivalent to $F(M)$ or there
+  $\lambda$-terms such that either $M = F(M)$ or there
   exists a finite sequence of one-step $\beta$-reductions
       \[
         M \onereduce M_1 \onereduce \dots \onereduce F(M)
@@ -310,13 +312,14 @@ to be reduced if there are multiple choices.
      %   index approach, or \cite{Chargueraud2012} for the locally nameless
      %   representation.}
 \end{definition}
-For convenience, we say that \emph{$M$ reduces to~$N$ eventually} if either $M$ is
-$\alpha$-equivalent to~$N$ or there exists a finite sequence of
-one-step $\beta$-reductions:
+For convenience, we say that \emph{$M$ reduces to~$N$ eventually} if either $M$
+is equal to~$N$ or there exists a finite sequence of one-step
+$\beta$-reductions:
 \[
   M \onereduce M' \onereduce \dots \onereduce N,
 \]
-denoted by $M \reduce N$.
+denoted by $M \reduce N$. To put it differently, $\reduce$ is the transitive
+closure of~$\onereduce$.
 
 For example, we may start from the $\beta$-redex which does not contain
 any $\beta$-redex, called the \emph{innermost $\beta$-redex}. Or, we start from
@@ -454,17 +457,17 @@ sense to identify
   M\subst{x}{N}
 \]
 where the latter is simply the result of application. Hence, we define the
-\emph{$\lambda$-logical theory}, denoted by $=_\beta$, to be the congruence
-closure of $\xrightarrow{\beta}$. For example, 
+$=_\beta$, to be the congruence closure of $\xrightarrow{\beta}$, and we say
+that $M$ is \emph{$\beta$-convertible} to~$N$. For example, 
 \[
   (\lambda x.\, M)\;N
   =_\beta
-  M'\subst{x'}{N}
+  M'\subst{x}{N}
 \]
-if $(\lambda x.\, M)$ is $\alpha$-equivalent to $(\lambda x'.\,M')$ or
+if $M$ is $\alpha$-equivalent to $M'$ or
+$M =_\beta N$ if
 \[
-  M\;N =_\beta M\;N'
-  \quad\text{if } N =_\beta N'
+  M \onereduce M_1 \xleftarrow{\beta1} M_2 \onereduce N
 \]
 \begin{corollary} \label{coro:logical-theory}
   The following statements hold:
@@ -491,7 +494,7 @@ number can be defined.
 
 \begin{description}
   \item[Church numerals]
-  Define $f^1 \defeq f$ and $f^{n+1} \defeq f\,f^n$. Then, 
+  Define $f^1(M) \defeq f(M)$ and $f^{n+1} \defeq f (f^n(M))$. Then, 
   \[
     \bc_0 \defeq \lambda f\,x.\, x
     \quad
@@ -502,7 +505,7 @@ number can be defined.
   \item[Successor]
     \begin{align*}
       \mathtt{succ} &\defeq \lambda n\,f\,x.\, f\,(n\,f\,x) \\
-      \mathtt{succ}\;\overline{n}&\reduce \overline{n+1}.
+      \mathtt{succ}\;\bc_n &\reduce \bc_{n+1}.
     \end{align*}
     for any natural number~$n \in \mathbb{N}$.
   \item[Predecessor]
@@ -536,13 +539,13 @@ number can be defined.
   \item[Conditional]
     \begin{align*}
       \mathtt{if}\_\mathtt{then}\_\mathtt{else}\_
-      & \defeq \lambda n\;x\;y.\;n\,(\lambda v.\,x)\,y  \\
+      & \defeq \lambda n\;x\;y.\;n\,(\lambda v.\,y)\,x  \\
       \mathtt{if} \quad\bc_{0}\quad & \mathtt{then}\quad M\quad\mathtt{else}\quad
       N  \reduce M \\
       \mathtt{if} \quad\bc_{n+1}\quad &\mathtt{then}\quad M\quad\mathtt{else}\quad
       N \reduce N.
     \end{align*}
-    for any two $\lambda$-terms $M$ and~$N$,
+    for any two $\lambda$-terms $M$ and~$N$.
 \end{description}
 
 \subsection{Some combinators and the fixed-point Combinator}
@@ -607,8 +610,8 @@ $\lambda$-term!
   can be defined as $\lambda$-terms:
   \begin{align*}
     G \defeq{} &
-    \lambda f\,n.\, \mathtt{if}\;n\;\mathtt{then}\;\overline{0}\;\mathtt{else}\;
-    f\,(\mathtt{pred}\;n) \\
+    \lambda f\,n.\, \mathtt{if}\;n\;\mathtt{then}\;\bc_0\;\mathtt{else}\;\;
+    \add\;n\;(f\;(\mathtt{pred}\;n)) \\
     \mathtt{sum} \defeq{} & \mathbf{Y}G
   \end{align*}
   Try to evaluate $\mathtt{sum}$ with some Church numerals.
@@ -633,8 +636,8 @@ is anther fixed-point operator which reduces to its argument:
   \begin{align*}
     G \defeq{} &
     \lambda f\,n.\,
-    \mathtt{if}\;n\;\mathtt{then}\;\overline{0}\;\mathtt{else}\;
-    f\,(\mathtt{pred}\;n) \\
+    \mathtt{if}\;n\;\mathtt{then}\;\bc_0\;\mathtt{else}\;\;
+    \add\;n\;(f\,(\mathtt{pred}\;n)) \\
     \mathtt{sum} \defeq & \Theta\,G \\
   \end{align*}
 \end{example}
@@ -659,6 +662,11 @@ to~\cite[Chapter 3]{Barendregt1984} for further detail.
   \item Define the multiplication $m \times n$ on Church numerals.
   \item Define the factorial $n!$ on Church numerals.
 \end{enumerate}
+
+\subsection*{Acknowledgement}
+  I am grateful to Su Horng, Chia-an Yu, and Yu-Hsi Chiang for their suggestions
+  and corrections.
+
 \bibliographystyle{plain}
 \bibliography{library} 
 \end{document}
