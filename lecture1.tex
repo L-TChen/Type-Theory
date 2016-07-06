@@ -318,8 +318,21 @@ $\beta$-reductions:
 \[
   M \onereduce M' \onereduce \dots \onereduce N,
 \]
-denoted by $M \reduce N$. To put it differently, $\reduce$ is the transitive
-closure of~$\onereduce$.
+denoted by $M \reduce N$. To put it formally, $\reduce$ is the reflexive and
+transitive closure of~$\onereduce$ defined by
+\begin{multicols}{2}
+  \begin{prooftree}
+    \AXC{\vphantom{$\reduce$}}
+    \RightLabel{($0$-step)}
+    \UIC{$M\reduce M$}
+  \end{prooftree}
+  \begin{prooftree}
+    \AXC{$M \onereduce N$}
+    \AXC{$N \reduce L$}
+    \RightLabel{($n+1$-steps)}
+    \BIC{$M\reduce L$}
+  \end{prooftree}
+\end{multicols}
 
 For example, we may start from the $\beta$-redex which does not contain
 any $\beta$-redex, called the \emph{innermost $\beta$-redex}. Or, we start from
@@ -443,10 +456,10 @@ To answer the previous question, it suffices to prove the following theorem:
   \[
     \xymatrix{
       & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-      N_1 \ar@{}[r]|{\equiv_\alpha} & N & N_2 \ar@{}[l]|{\equiv_\alpha} \\
+      N_1 \ar@{}[r]|{=} & N & N_2 \ar@{}[l]|{=} \\
     }
   \]
-  That is, $N_1$ and $N_2$ are $\alpha$-equivalent.
+  That is, $N_1$ and $N_2$ are equal.
 \end{corollary}
 
 Since the meaning of a term shall remain the same after reduction, it makes
@@ -464,11 +477,31 @@ that $M$ is \emph{$\beta$-convertible} to~$N$. For example,
   =_\beta
   M'\subst{x}{N}
 \]
-if $M$ is $\alpha$-equivalent to $M'$ or
+if $M$ is $\alpha$-equivalent to $M'$;
 $M =_\beta N$ if
 \[
   M \onereduce M_1 \xleftarrow{\beta1} M_2 \onereduce N
 \]
+To put it differently, $=_\beta$ can defined as follows:
+\begin{multicols}{3}
+\begin{prooftree}
+  \AXC{$M \reduce N$}
+  \UIC{$M =_\beta N$}
+\end{prooftree}
+\begin{prooftree}
+  \AXC{$M =_\beta N$}
+  \RightLabel{(Sym)}
+  \UIC{$N =_\beta M$}
+\end{prooftree}
+\begin{prooftree}
+  \AXC{$M =_\beta N$}
+  \AXC{$N =_\beta L$}
+  \RightLabel{(Trans)}
+  \BIC{$M =_\beta L$}
+\end{prooftree}
+\end{multicols}
+Two $\lambda$-terms are $\beta$-convertible if they can be connected by
+$\beta$-reductions.
 \begin{corollary} \label{coro:logical-theory}
   The following statements hold:
   \begin{enumerate}
