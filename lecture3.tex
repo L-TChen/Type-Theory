@@ -179,9 +179,9 @@ type polymorphism and instantiation with a specific type:
   \begin{enumerate}
     \item ${}\vdash\Lambda t.\,\lambda (x : t).\, x : \forall t.\;t\to t$
     \item ${}\vdash\Lambda t.\, \lambda (x : t)(y : t).\, x : \forall t.\;t \to t \to t$
-    \item $M : \sigma, N : \sigma
-      \vdash (\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N
-      : \sigma \to \sigma \to \sigma$
+    \item $a : \sigma, b : \sigma
+      \vdash (\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;a\;b
+      : \sigma$
     \item ${}\vdash\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x) :
       \forall t.\;(t\to t) \to t\to t$
     \end{enumerate}
