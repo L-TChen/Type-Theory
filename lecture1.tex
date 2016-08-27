@@ -201,24 +201,24 @@ This identification can be defined formally through the following two steps.
     (\lambda x.\, M) \to_\alpha (\lambda y.\, M\subst{x}{y})
   \]
   if $y \not\in \FV(M)$. The relation
-  $\to_\alpha$ is called $\alpha$-conversion. Let $\equiv_\alpha$ be the
+  $\to_\alpha$ is called $\alpha$-conversion. Let $=_\alpha$ be the
   congruence closure of~$\to_\alpha$. We say that $M$ and $N$ are
-  \emph{$\alpha$-equivalent} if $M \equiv_\alpha N$.
+  \emph{$\alpha$-equivalent} if $M =_\alpha N$.
 \end{definition}
 
 \subsection{$\beta$-conversion}
 Now, we can give a definition of reduction on a term of this form~$(\lambda
 x.\, M)\, N$ (only):
 \begin{definition}[$\beta$-conversion]
-  A term $(\lambda x.\, M)\, N$ can reduce to $M'\subst{x'}{N}$ whenever the
-  substitution is defined and $(\lambda x'.\, M')$ is $\alpha$-equivalent to
-  $(\lambda x.\, M)$. 
+  A term $(\lambda x.\, M)\, N$ can reduce to $M'\subst{x}{N}$ whenever the
+  substitution is defined and $M'$ is $\alpha$-equivalent to
+  $M$. 
   That is,
   \[
     (\lambda x.\, M)\, N \xrightarrow{\beta} M'\subst{x}{N}
   \]
-  if $M$ is $\alpha$-equivalent to $M'$ and
-  $M'\subst{x'}{N}$ is defined.  A term of this form $(\lambda x.\, M)\, N$ is
+  if $M =_\alpha M'$ and
+  $M'\subst{x}{N}$ is defined.  A term of this form $(\lambda x.\, M)\, N$ is
   called a \emph{$\beta$-redex}.
 \end{definition}
 Yet, the definition is not complete. A reduction may be performed inside a
@@ -294,37 +294,24 @@ and write down all possible chains of reductions.
 
 \section{Reduction}
 \subsection{Reduction strategy}
-Informally, a reduction strategy is a procedure of selecting $\beta$-redexes
-to be reduced if there are multiple choices. 
-\begin{definition}
-  A \emph{reduction strategy} is a function $F\colon\Lambda\to\Lambda$ on
-  $\lambda$-terms such that either $M = F(M)$ or there
-  exists a finite sequence of one-step $\beta$-reductions
-      \[
-        M \onereduce M_1 \onereduce \dots \onereduce F(M)
-      \]
-     % \footnote{%
-     %   We may also require a reduction strategy 
-     %   to rename bound variables whenever necessary, and thus  
-     %   $N_1$ is required to be as the same as $N_2$. But, in practice,
-     %   there are \emph{nameless} representations of $\lambda$-terms, so renaming
-     %   is not required. See \cite[Appendix C]{Barendregt1984a} for the de Bruijn
-     %   index approach, or \cite{Chargueraud2012} for the locally nameless
-     %   representation.}
-\end{definition}
-For convenience, we say that \emph{$M$ reduces to~$N$ eventually} if either $M$
-is equal to~$N$ or there exists a finite sequence of one-step
-$\beta$-reductions:
+Intuitively, we say that \emph{$M$ reduces to~$N$ eventually} if there exists a
+finite sequence of one-step $\beta$-reductions:
 \[
-  M \onereduce M' \onereduce \dots \onereduce N,
+  M \onereduce M_1 \onereduce \dots \onereduce N,
 \]
-denoted by $M \reduce N$. To put it formally, $\reduce$ is the reflexive and
-transitive closure of~$\onereduce$ defined by
+and rename bound variables in-between. To put it
+formally, $\reduce$ is a relation defined inductively by
 \begin{multicols}{2}
   \begin{prooftree}
-    \AXC{\vphantom{$\reduce$}}
-    \RightLabel{($0$-step)}
-    \UIC{$M\reduce M$}
+    \AXC{$M =_\alpha N$}
+    \RightLabel{(0-step)}
+    \UIC{$M\reduce N$}
+  \end{prooftree}
+  \begin{prooftree}
+    \AXC{$M =_\alpha N$}
+    \AXC{$N \reduce L$}
+    \RightLabel{(renaming)}
+    \BIC{$M\reduce L$}
   \end{prooftree}
   \begin{prooftree}
     \AXC{$M \onereduce N$}
@@ -333,6 +320,13 @@ transitive closure of~$\onereduce$ defined by
     \BIC{$M\reduce L$}
   \end{prooftree}
 \end{multicols}
+
+A reduction strategy is a procedure of selecting $\beta$-redexes
+to be reduced whenever there are multiple choices. 
+\begin{definition}
+  A \emph{reduction strategy} is a function $F\colon\Lambda\to\Lambda$ such that
+  $M \reduce F(M)$.
+\end{definition}
 
 For example, we may start from the $\beta$-redex which does not contain
 any $\beta$-redex, called the \emph{innermost $\beta$-redex}. Or, we start from
@@ -456,10 +450,10 @@ To answer the previous question, it suffices to prove the following theorem:
   \[
     \xymatrix{
       & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-      N_1 \ar@{}[r]|{=} & N & N_2 \ar@{}[l]|{=} \\
+      N_1 \ar@{}[r]|{=_\alpha} & N & N_2 \ar@{}[l]|{=_\alpha} \\
     }
   \]
-  That is, $N_1$ and $N_2$ are equal.
+  That is, $N_1$ and $N_2$ are $\alpha$-equivalent.
 \end{corollary}
 
 Since the meaning of a term shall remain the same after reduction, it makes
@@ -490,13 +484,11 @@ To put it differently, $=_\beta$ can defined as follows:
 \end{prooftree}
 \begin{prooftree}
   \AXC{$M =_\beta N$}
-  \RightLabel{(Sym)}
   \UIC{$N =_\beta M$}
 \end{prooftree}
 \begin{prooftree}
   \AXC{$M =_\beta N$}
   \AXC{$N =_\beta L$}
-  \RightLabel{(Trans)}
   \BIC{$M =_\beta L$}
 \end{prooftree}
 \end{multicols}
@@ -649,8 +641,9 @@ $\lambda$-term!
   \end{align*}
   Try to evaluate $\mathtt{sum}$ with some Church numerals.
 \end{example}
-Since the $\mathbf{Y}$ combinator does not really reduce to its argument, here
-is anther fixed-point operator which reduces to its argument:
+Since the $\mathbf{Y}F$  does not really reduce to $F (\mathbf{Y}F)$ but
+$\mathbf{Y}F =_\beta F(\mathbf{Y}F)$ only, here is anther fixed-point operator
+such that $\Theta F \reduce F(\Theta F)$:
 \begin{proposition}[Turing's fixed-point combinator]
   Define 
   \[
