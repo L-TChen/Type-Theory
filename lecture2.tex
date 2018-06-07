@@ -1,32 +1,36 @@
-%! TEX root = lecture2_note.tex
-\title{Lambda Calculus and Types, 2}
-\subtitle{Simply Typed Lambda Calculus}
+%! TEX root = lecture2_slide.tex
+\title{Lambda Calculus and Types}
+\subtitle{Higher-Order Functions}
 \begin{document}
 \begin{frame}
 \maketitle
 \end{frame}
 
-\section{Simply typed lambda calculus}
-As we have mentioned in the first lecture, untyped lambda calculus is as powerful as
-a computer such that every computable function on natural numbers can be
-expressed. However, its powerfulness can be a disaster if treated as a
-programming language, because it is difficult to see the intention of such
-terms. 
+\begin{frame}{Type-driven Development}
 
-This motivates us to introduce certain descriptions, or called \emph{types}, over
-$\lambda$-terms. There are two approaches given by Curry and Church
-corresponding to two paradigms in programming language called \emph{implicit}
-and \emph{explicit typing} respectively.  In the typed lambda calculus
-\textit{\`a la} Curry, a $\lambda$-term is assigned to all possible types; in
-the calculus \textit{\`a la} Church, a $\lambda$-term is annotated with types. 
+  \begin{enumerate}
+    \item Untyped lambda calculus is as powerful as Turing machine---every
+      computable function on natural numbers can be expressed.
+    \item It is difficult to see the intention of $\lambda$-terms. 
+    \item Let \alert{types} guide you how to design programs. 
+  \end{enumerate}
 
+  \begin{description}
+    \item[Implicit typing]
+      types are reconstructed from $\lambda$-terms 
+    \item[Explicit typing] (preferable) 
+    $\lambda$-terms are annotated with types.
+  \end{description}
+\end{frame}
+
+\section{Simply Typed Lambda Calculus}
 \subsection{Implicit typing: system with type assignment}
-For an implicit typing system, types are defined in addition to $\lambda$-terms.
-We begin with a minimalistic typing system consisting of function types. We call it
-\emph{simply typed lambda calculus \textit{\`a la} Curry}.
+\begin{frame}[allowframebreaks]{Implicit Typing}
+
+For an implicit typing system, types are introduced separately.
 \begin{definition}
   Given type variables~$\mathbb{V}$, the set $\mathbb{T}$ of
-  \emph{types} is inductively defined by
+  \emph{types} is defined by
   \begin{multicols}{2}
     \begin{prooftree}
       \AXC{$B \in \mathbb{V}$}
@@ -39,47 +43,43 @@ We begin with a minimalistic typing system consisting of function types. We call
       \BIC{$\sigma \to \tau \in \mathbb{T}$}
     \end{prooftree}
   \end{multicols}
-  where $\sigma\to\tau$ is understood as the function type.
+  where $\sigma\to\tau$ is the type of functions from $\sigma$ to $\tau$.
 \end{definition}
-\begin{convention}
-  In line with the convention on applications
-  \begin{align*}
-    M_1\;M_2 \dots M_n \quad &\defeq\quad
-    (\dots ((M_1\;M_2)\;M_3) \dots)\; M_n \\
-    \text{we adopt the } & \text{following abbreviation} \\
-    \sigma_1 \to \sigma_2 \to \dots \sigma_n
-    \quad & \defeq\quad \sigma_1 \to (\sigma_2 \to (
-    \dots \to (\sigma_{n-1} \to \sigma_n)\dots))
-  \end{align*}
-\end{convention}
+N.B.\ If $\mathbb{V}$ is empty, then $\mathbb{T}$ is also empty. Why?
+
+In line with the convention for application, 
+\[
+    \sigma_1 \to \sigma_2 \to \dots \sigma_n \quad  \defeq\quad \sigma_1 \to
+    (\sigma_2 \to ( \dots \to (\sigma_{n-1} \to \sigma_n)\dots))
+  \]
 \begin{definition}
-    A \emph{statement} consists of a $\lambda$-term~$M$ and a type~$\sigma \in
-    \mathbb{T}$ denoted by 
+  That \alert{\emph{$M$ has type $\sigma$}} is denoted by
       \[
         M : \sigma
       \]
-    and we say that $M$ has the type $\sigma$.  A \emph{context}~$\Gamma$ is a
-    set of statements 
+      Given distinct variables $x_i$'s, a \alert{\emph{typing context}}~$\Gamma$
+      is a set 
       \[
         \Gamma = \{x_1 : \sigma_1, x_2 : \sigma_2, \ldots, x_n : \sigma_n\}
       \]
-      where $x_i$ are all distinct variables. It is convenient to write 
+  \end{definition}
+  \begin{block}{Convention}
       \[
-        \Gamma, x : \sigma\quad\text{for}\quad\Gamma\cup \{x : \sigma\}.
+        \Gamma, x : \sigma\quad\text{stands for}\quad\Gamma\cup \{x : \sigma\}.
       \]
-\end{definition}
-\begin{definition}[Typing rules]
-  A \emph{judgement} consists of a context~$\Gamma$ and a statement~$M:\sigma$
+  \end{block}
+
+\begin{definition}[Typing judgement]
+  A \alert{\emph{typing judgement}} is a context~$\Gamma$ with $M:\sigma$
   denoted by
   \[
         \Gamma \vdash M : \sigma
-      \]
-  which indicates that $M : \sigma$ is derivable from $\Gamma$. In the case that
-  $\Gamma = \emptyset$, we write $\vdash M : \sigma$ only. Judgements in the
-  system of type assignment are constructed inductively:
+  \]
+\end{definition}
+\begin{definition}[Typing rules]
   \begin{multicols}{2} 
   \begin{prooftree}
-    \AXC{}
+    \AXC{\phantom{$\Gamma$}}
     \RightLabel{(var)}
     \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
   \end{prooftree}
@@ -96,31 +96,31 @@ We begin with a minimalistic typing system consisting of function types. We call
   \end{prooftree}
   \end{multicols}
 \end{definition}
+\end{frame}
 
-A term~$M$ of type $\sigma \to \tau$ is understood as a \emph{function} 
-from the domain $\sigma$ to the codomain $\tau$.
+\begin{frame}[allowframebreaks]{Typing Derivation}
+  \begin{itemize}
+    \item A \alert{\emph{typing derivation}} of a typing judgement $\Gamma
+      \vdash M : \sigma$ is a tree of instances of typing rules whose root is
+      $\Gamma \vdash M : \sigma$.
+    \item A typing judgement is \alert{\emph{derivable}} if there is a typing
+      derivation of that judgement. 
+  \end{itemize}
 \begin{example}
-  The following judgements are derivable:
-  \begin{enumerate}
-    \item $\vdash \lambda x.\, x : \sigma \to \sigma$, for all $\sigma \in
-      \mathbb{T}$;
-    \item $ \vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$
-      for all $\sigma, \tau\in\mathbb{T}$;
-    \item $\vdash \lambda f\,g\,x.\, f\,x\, (g\,x)
-      : (\sigma \to \tau \to \rho) \to (\sigma\to\tau) \to \sigma\to\rho$
-      for all $\sigma, \tau, \rho \in \mathbb{T}$.
-  \end{enumerate}
+    The judgement $\vdash \lambda x.\, x : \sigma \to \sigma$, for all $\sigma \in
+    \mathbb{T}$, can be derived by
+  \begin{prooftree}
+    \AXC{}
+    \RightLabel{(var)}
+    \UIC{$x : \sigma \vdash x : \sigma$}
+    \RightLabel{(abs)}
+    \UIC{$\vdash \lambda x.\; x : (\sigma \to \sigma)$}
+  \end{prooftree}
 \end{example}
-To see why the first judgement is derivable, we apply typing rules
-step by step:
-\begin{prooftree}
-  \AXC{}
-  \RightLabel{(var)}
-  \UIC{$x : \sigma \vdash x : \sigma$}
-  \RightLabel{(abs)}
-  \UIC{$\vdash \lambda x.\; x : (\sigma \to \sigma)$}
-\end{prooftree}
-And, also the second one:
+\framebreak
+\begin{example}
+    The judgement $ \vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$
+      for all $\sigma, \tau\in\mathbb{T}$, can be derived by
 \begin{prooftree}
   \AXC{}
   \RightLabel{(var)}
@@ -130,7 +130,16 @@ And, also the second one:
   \RightLabel{(app)}
   \UIC{$\vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$}
 \end{prooftree}
-The third one is left as an exercise to the reader.
+\end{example}
+
+
+\begin{block}{Exercise}
+    Derive $\vdash \lambda f\,g\,x.\, f\,x\, (g\,x) : (\sigma \to \tau \to \rho) \to
+    (\sigma\to\tau) \to \sigma\to\rho$ for all $\sigma, \tau, \rho \in
+    \mathbb{T}$.
+\end{block}
+
+\framebreak
 
 \begin{example}
   Not every $\lambda$-term has a type. For example,
@@ -139,15 +148,17 @@ The third one is left as an exercise to the reader.
   \]
   does not have a type, since $\sigma \to \sigma$ is not equal to $\sigma$.
 \end{example}
+\begin{block}{Exercise}
+  Describe all possible types for Church numeral $\bc_{n}$.  Hint. You may find
+  $\bc_{0}$ and $\bc_{1}$ confusing.
+\end{block}
+\end{frame}
 
 
-\subsection{Explicit typing: system of typed terms}
-Instead of having an external typing system, it is also possible to internalise
-the typing information as part of $\lambda$-terms. This system is called
-\emph{simply typed lambda calculus \textit{\`a la} Church}, denoted by
-$\lambda_\to$.
-\begin{definition}
-  The set $\Lambda_\mathbb{T}$ of typed $\lambda$-terms is inductively defined
+\subsection{Explicit Typing: System of Typed Terms}
+\begin{frame}[allowframebreaks]{Explicit typing}
+\begin{definition}[Typed terms]
+  The set $\Lambda_\mathbb{T}$ of typed $\lambda$-terms is defined by
   \begin{multicols}{2}
     \begin{prooftree}
       \AXC{$x \in V$}
@@ -162,15 +173,15 @@ $\lambda_\to$.
       \AXC{$M \in \Lambda_\T$}
       \AXC{$x \in V$}
       \AXC{$\tau \in \mathbb{T}$}
-      \TIC{$\lambda (x:\tau).\; M \in \Lambda_\T$}
+      \TIC{$\lambda \alert{x:\tau}.\; M \in \Lambda_\T$}
     \end{prooftree}
   \end{multicols}
 \end{definition}
-Likewise, the \emph{substitution} and the \emph{one-step $\beta$-reduction} are
-defined on typed $\lambda$-terms in the same way. 
-\begin{definition}[Typing rules]
-  A judgement $\Gamma \vdash M : \sigma$ on typed terms is constructed
-  inductively by the following rules.
+Substitution and $\alpha\beta\eta$-conversions are defined in a similar way. 
+\framebreak
+
+\begin{definition}[Typing Rules]
+  A typing derivation on \emph{typed terms} is defined by 
   \begin{multicols}{2} 
   \begin{prooftree}
     \AXC{}
@@ -178,7 +189,7 @@ defined on typed $\lambda$-terms in the same way.
     \UIC{$\Gamma, x : \sigma \vdash x : \sigma$}
   \end{prooftree}
   \begin{prooftree}
-    \AXC{$\Gamma \vdash M : (\sigma \to \tau)$}
+    \AXC{$\Gamma \vdash M : \sigma \to \tau$}
     \AXC{$\Gamma \vdash N : \sigma$}
     \RightLabel{(app)}
     \BIC{$\Gamma \vdash (M\;N) : \tau$}
@@ -186,13 +197,12 @@ defined on typed $\lambda$-terms in the same way.
   \begin{prooftree}
     \AXC{$\Gamma, x : \sigma \vdash M : \tau$}
     \RightLabel{(abs)}
-    \UIC{$\Gamma \vdash \lambda (x:\sigma).\; M : (\sigma \to \tau)$}
+    \UIC{$\Gamma \vdash \lambda x:\sigma.\; M : \sigma \to \tau$}
   \end{prooftree}
   \end{multicols}
 \end{definition}
-A typed $\lambda$-terms~$M$ with a judgement $\Gamma \vdash M : \sigma$ is
-called \emph{well-typed}.  Unlike implicit typing, every well-typed term with
-explicit typing has a unique type:
+A typed $\lambda$-terms~$M$ with a derivable judgement
+$\Gamma \vdash M : \sigma$ is \alert{well-typed}. 
 \begin{proposition}
   For every typed term $M$, context~$\Gamma$, and types $\sigma, \tau$, 
   \[
@@ -203,27 +213,36 @@ explicit typing has a unique type:
     \sigma = \tau
   \]
 \end{proposition}
+\begin{block}{Exercise}
+  Show that $\lambda (x : \sigma).\, x\; x$ is a typed $\lambda$-term but
+    there exists no type $\tau$ with 
+    \[
+      \vdash \lambda (x : \sigma).\, x\; x : \tau
+    \]
+  \end{block}
+\end{frame}
 
 \subsection{Implicit typing versus explicit typing}
-The typing information can be erased from typed terms and translated
-from typed $\lambda$-terms to $\lambda$-terms with implicit type.
-\begin{definition}
-  An \emph{erasing map} $|-|\colon \Lambda_\T \to \Lambda$ is defined
-  inductively:
+
+\begin{frame}{From Typed Terms to Untyped Terms}
+  An \emph{erasing map} $|-|\colon \Lambda_\T \to \Lambda$ is defined by
   \begin{align*}
-    |x| & \defeq x \\
-    |(M\; N)| & \defeq (|M|\;|N|) \\
-    |\lambda (x:\sigma).\, M| & \defeq \lambda x.\, |M|
+    |x| & = x \\
+    |(M\; N)| & = (|M|\;|N|) \\
+    |\lambda (x:\sigma).\, M| & = \lambda x.\, |M|
   \end{align*}
-\end{definition}
-\begin{proposition}
+\begin{proposition}\label{prop:type-erasure}
   Let $M$ and $N$ be typed $\lambda$-terms in~$\Lambda_\T$. Then, 
-  \[
-    \left(\Gamma \vphantom{\reduce} \vdash M : \sigma \implies \Gamma \vdash |M| : \sigma\right)
-    \quad\text{and}\quad \left(M \reduce N \implies |M| \reduce |N|\right).
-  \]
+  \begin{align*}
+    \Gamma  \vdash M : \sigma & \text{ implies } \Gamma \vdash |M| :
+    \sigma \\ 
+    M \reduce N & \text{ implies } |M| \reduce |N|
+  \end{align*}
 \end{proposition}
-\begin{proposition}
+\end{frame}
+
+\begin{frame}{From Untyped Terms to Typed Terms}
+\begin{proposition}\label{prop:type-reconstruction}
   Let $M$ and $N$ be $\lambda$-terms in~$\Lambda$. 
   \begin{enumerate}
     \item If $\Gamma \vdash M : \sigma$, then there is a typed term $M'$ with 
@@ -236,63 +255,68 @@ from typed $\lambda$-terms to $\lambda$-terms with implicit type.
       then there exists $N'$ with $|N'| = N$ and $M' \reduce N'$.
     \end{enumerate}
 \end{proposition}
-
-In practice, the type inference is left to the evaluator of a programming
-language, so it is natural to ask if the following properties can be done
-in a mechanical way:
+\begin{block}{Homework}
+  Prove Propositions~\ref{prop:type-erasure} and~\ref{prop:type-reconstruction}
+  by induction. 
+\end{block}
+\end{frame}
+\begin{frame}{Type Inference}
 \begin{description}
   \item[Typability:] Is there a type $\sigma$ with $\vdash M : \sigma$? 
   \item[Type checking:] Does $\vdash M : \sigma$ hold for a given type $\sigma$?
   \end{description}
-Both questions are answered positively:
+Both questions are positive.
 
 \begin{theorem}
-  Typability and type checking are both \emph{decidable}.
+  Typability and type checking are both \emph{decidable}
+  in simply typed $\lambda$-calculus.
 \end{theorem}
-%See \cite[Section 3.2]{Sorensen2006} for further detail.
 
 \subsection*{Exercise}
-\begin{enumerate}
-  \item Show that $\Omega$ does not have a type.
-  \item Show that $\lambda (x : \sigma).\, x\; x$ is a typed $\lambda$-term but
-    there exists no type $\tau$ with 
-    \[
-      \vdash \lambda (x : \sigma).\, x\; x : \tau.
-    \]
-  \item Describe all possible types for Church numerals $\bc_{n} = \lambda
-    f\,x.\, f^n\;x$. You may find $\bc_{0}$ and $\bc_{1}$ confusing, though.
-  \end{enumerate}
-\section{Type safety}
+  
+\end{frame}
+
+\section{Properties of Simply Typed Lambda Calculus}
 \subsection{Preservation}
-One of the main features of typed programs is that that every well-typed terms
-always reduces to a term of the same type---``well-typed programs do not go
-wrong!''
+\begin{frame}{Type Safety}
+``Well-typed programs do not go wrong!''
 \begin{theorem}[Preservation Theorem]
   \label{thm:preservation}
   Let $M$ and $N$ be typed $\lambda$-terms. 
   If $M \onereduce N$, then
   \[
-    \Gamma \vdash M : \sigma \implies \Gamma \vdash N : \sigma
+    \Gamma \vdash M : \sigma \text{ implies } \Gamma \vdash N : \sigma
   \]
 \end{theorem}
-\begin{proof}
-  We prove it by induction on both the derivation of $\Gamma \vdash M :
-  \sigma$ and $M \onereduce N$. However, the only non-trivial case is
-  \[
-    \Gamma \vdash (\lambda (x_1 : \tau).\, M_1)\; N : \sigma
-    \quad\text{and}\quad
-    (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
-  \]
-  with the induction hypothesis valid for
-  \[
-    \Gamma, x_1 : \tau \vdash M_1 : \sigma
-    \quad\text{and}\quad
-    \Gamma \vdash N : \tau
-  \]
-  where $\lambda x_1:\tau.\,M_1$ and $\lambda x_2:\tau.\,M_2$ are
-  $\alpha$-equivalent. The rest is left as an exercise.
-\end{proof}
-However, the converse may not hold.
+
+``Well-typed programs never get stuck!''
+\begin{theorem}[Progress Theorem]
+  If ${}\vdash M : \sigma$ for $M \in \Lambda_\T$, then either $M$ is a value or
+  there is $N$ with $M \onereduce N$.
+\end{theorem}
+The evaluation of well-typed programs always produces a value of the same type
+if terminates. 
+\end{frame}
+
+%\begin{proof}
+%  We prove it by induction on both the derivation of $\Gamma \vdash M :
+%  \sigma$ and $M \onereduce N$. However, the only non-trivial case is
+%  \[
+%    \Gamma \vdash (\lambda (x_1 : \tau).\, M_1)\; N : \sigma
+%    \quad\text{and}\quad
+%    (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
+%  \]
+%  with the induction hypothesis valid for
+%  \[
+%    \Gamma, x_1 : \tau \vdash M_1 : \sigma
+%    \quad\text{and}\quad
+%    \Gamma \vdash N : \tau
+%  \]
+%  where $\lambda x_1:\tau.\,M_1$ and $\lambda x_2:\tau.\,M_2$ are
+%  $\alpha$-equivalent. The rest is left as an exercise.
+%\end{proof}
+\begin{frame}[allowframebreaks]{Converse of Preservation}
+The converse of Preservation Theorem does not hold.
 \begin{example}
   Recall that 
   \begin{enumerate}
@@ -307,29 +331,75 @@ However, the converse may not hold.
     \vdash \mathbf{K}_1\;\mathbf{I}\;\Omega : \sigma \to \sigma.
   \]
 \end{example}
-To see why the latter judgement fails, we need the following lemma:
+\framebreak
+To see why the latter judgement fails, we need the following:
 \begin{lemma}[Typability of subterms]
-  Let $M$ be a  $\lambda$-term and $\sigma$ a type. Then,  
+  Let $M$ be a well-typed $\lambda$-term and $\sigma$ a type under the
+  context~$\Gamma$. Then, for every subterm $M'$ of~$M$ there exists $\Gamma'$
+  such that
   \[
-    \Gamma \vdash M : \sigma 
-    \implies \Gamma' \vdash M' : \sigma'
+    \Gamma' \vdash M' : \sigma'.
   \]
-  for every subterm $M'$ of~$M$.
 \end{lemma}
 \begin{proof}
   By induction on $\Gamma \vdash M : \sigma$.
 \end{proof}
-%\subsection{Progress}
-%Another feature of well-typed terms is that a well-typed \emph{closed} term is
-%either a \emph{value} or reducible---``well-typed programs do not get stuck!''
-%
-%\begin{theorem}[Progress Theorem]
-%  If ${}\vdash M : \sigma$ for $M \in \Lambda_\T$, then either $M$ is a value or
-%  there is $M'$ with $M \onereduce M'$.
-%\end{theorem}
-%\todo[inline]{define value?}
-%
+  $\Omega$ is not typable, so $\mathbf{K}_1\,\mathbf{I}\,\Omega$ is not typable.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Proving Preservation Theorem}
+  To prove type preservation, we need a few lemmas. 
+
+  Let $\mathrm{dom}(\Gamma)$ denote the set of variables which occur in
+  $\Gamma$. 
+  \begin{lemma}[Weakening]
+    If $\Gamma \vdash M : \tau$ and $x \not\in \Gamma$, then 
+    $\Gamma, x : \sigma \vdash M : \tau$. 
+  \end{lemma}
+  \begin{lemma}[Substitution]
+    If $\Gamma, x : \tau \vdash M : \sigma$ and $\Gamma \vdash N : \tau$ then
+    $\Gamma \vdash M\subst{x}{N} : \sigma$.
+    
+  \end{lemma}
+
+  \begin{corollary}
+    If $\Gamma, x : \tau \vdash M :\sigma$ and $x'$ is not in
+    $\mathrm{dom}(\Gamma)$, then $ \Gamma, x' : \tau \vdash M\subst{x}{x'} :
+    \sigma$. 
+  \end{corollary}
+  \framebreak
+  \begin{proof}
+    Since $x'$ is not in $\Gamma$, it follows that 
+    \[
+      \Gamma, x' : \tau, x : \tau \vdash M 
+    \]
+    by Weakening Lemma and also by definition $\Gamma, x' : \tau \vdash x' :
+    \tau$.
+    Therefore, by Substitution Lemma, it follows that
+    \[
+      \Gamma, x' : \tau \vdash M\subst{x}{x'} : \sigma
+    \]
+  \end{proof}
+  \begin{block}{Homework}
+    Prove Preservation Theorem by induction.  Use Substitution Lemma if
+    applicable. 
+  \end{block}
+\end{frame}
+
+\begin{frame}{Progress Theorem}
+  A \emph{value} is a $\lambda$-abstraction. 
+\begin{theorem}[Progress Theorem]
+  If ${}\vdash M : \sigma$ for $M \in \Lambda_\T$, then either $M$ is a value or
+  there is $N$ with $M \onereduce N$.
+\end{theorem}
+\begin{proof}
+  By induction on typing derivations. 
+\end{proof}
+\end{frame}
+
 \subsection{Strong normalisation}
+\begin{frame}{Strong Normalisation}
+  
 Another property of type system is called \emph{strong normalisation}. It means
 that every well-typed terms terminates eventually. 
 \begin{theorem}
@@ -342,40 +412,16 @@ that every well-typed terms terminates eventually.
 \begin{corollary}
   Every well-typed $\lambda$-term ${}\vdash M:\sigma$ has a normal form.
 \end{corollary}
-With the decidability of type checking, Preservation Theorem, Progress Theorem
-(a well-typed term is either a ``value'' or a reducible term), and the strong
-normalisation, we actually have shown that there exists a decidable evaluator of
-simply typed lambda calculus that always reduce a well-typed term of
-type~$\sigma$ to a value of type~$\sigma$. In fact, since statements are proved
-by induction, we can implement an evaluator naively from the proofs. Moreover,
-we will see in logic how to extract a program from a \emph{formal} proof.
+\end{frame}
 
-\subsection*{Exercise}
-\begin{enumerate}
-  \item Show that $\vdash \mathbf{K}_1\;\mathbf{I}\;\Omega : \sigma \to \sigma$
-    does not have a type.
-  \item Why does the converse of Theorem~\ref{thm:preservation} fail?
-  \item (*)Show that if $\Gamma, x : \tau \vdash M : \sigma$
-    and $\Gamma \vdash N : \tau$ then $\Gamma \vdash M\subst{x}{N} : \sigma$.
-    Hint: Recall the definition of substitution and prove by induction
-    on the derivation of $\Gamma, x:\tau\vdash M : \sigma$.
-  \item Show that $\Gamma, x : \tau \vdash M :\sigma
-    \iff \Gamma, x' : \tau \vdash M\subst{x}{x'} : \sigma$. That is,
-    $\alpha$-equivalent well-typed terms have the same type.
-  \item Complete the proof of Theorem~\ref{thm:preservation}. Hint: Use the
-    above two statements.
-  \item Prove that Preservation Theorem holds for simply typed lambda calculus
-    \textit{\`a la} Curry using type erasing.
-\end{enumerate}
-\section{Programming in simply typed lambda calculus}
-In this section, we use $\lambda_\to$ in the style of Curry.  
-Church numerals are also typable in simply typed lambda calculus.
+\section{Programming in Simply Typed Lambda Calculus}
+\begin{frame}[allowframebreaks]{Church Encodings of Natural Numbers}
 The type of natural numbers is of the form
 \[
   \nat_\tau \defeq (\tau \to \tau) \to \tau \to \tau
 \]
-for every type $\tau \in \T$, and Church
-numerals are of type $\nat_\tau$ for every type~$\tau$:
+for every type $\tau \in \T$.
+  
   \begin{description}
     \item[Church numerals]
       \begin{align*}
@@ -407,23 +453,48 @@ numerals are of type $\nat_\tau$ for every type~$\tau$:
 The type of~$\ifz$ may not be as obvious as you may expect.
 Try to find one as general as possible and justify your guess.
 
-Within simply typed lambda calculus, we may naturally ask how many computable
-functions can be defined, as it excludes non-terminating $\lambda$-terms. 
-\begin{definition}
+\end{frame}
+\begin{frame}{Church Encodings of Boolean values}
+We can also define the type of Boolean values 
+for each type variable as
+\[
+  \bool_\tau \defeq \tau \to \tau \to \tau
+\]
+\begin{description}
+  \item[Boolean values]
+      \[
+        \true \defeq \lambda x\,y.\,x 
+        \quad\text{and}\quad
+        \false \defeq \lambda x\,y.\,y 
+      \]
+  \item[Conditional]
+    \begin{align*}
+      & \cond \defeq \lambda b\,x\,y.\, b\,x\,y\\
+      \vdash {} & \cond : \bool_{\tau} \to \tau \to \tau \to \tau
+    \end{align*}
+\end{description}
+\begin{block}{Exercise}
+  Define conjunction $\mathtt{and}$, disjunction $\mathtt{or}$, and negation
+  $\mathtt{not}$ in simply typed lambda calculus.
+\end{block}
+\end{frame}
+
+\begin{frame}{Definability}
+%Within simply typed lambda calculus, we wonder how many computable functions can
+%be defined, as it excludes non-terminating $\lambda$-terms. 
   A function $f\colon \mathbb{N}^k \to \mathbb{N}$ is called
-  \emph{$\lambda_\to$-definable} if there exists a $\lambda$-term $F$
-   of type $\nat \to \nat \to \dots \nat \to \nat$ (with $k+1$
-  many $\nat$ in total) such that
+  \alert{\emph{$\lambda_\to$-definable}} if there is a $\lambda$-term $F$ of
+  type $\nat \to \nat \to \dots \nat \to \nat$ such that
   \[
     F\,\bc_{n_1}\ldots\bc_{n_k} \reduce \bc_{f(n_1, \dots, n_k)}
   \]
   for every sequence $(n_1, n_2, \ldots, n_k) \in \mathbb{N}^k$.
-\end{definition}
+
 \begin{theorem}[Schwichtenberg~\cite{Schwichtenberg1976}]
   The $\lambda_\to$-definable functions are the class of functions
   of the form $f\colon \mathbb{N}^k \to \mathbb{N}$ closed under compositions
   and containing the constant functions, projections, additions, multiplications,
-  and the conditional function 
+  and the conditional 
   \[
     \mathrm{ifz}(n_0, n_1, n_2) = 
     \begin{cases}
@@ -432,26 +503,7 @@ functions can be defined, as it excludes non-terminating $\lambda$-terms.
     \end{cases}
   \]
 \end{theorem}
-
-By a similar technique, we can also define the type of Boolean values as
-\[
-  \bool_\tau \defeq \tau \to \tau \to \tau
-\]
-for every types $\tau$ with the subscript suppressed if there is no danger of
-confusion.  Truth values and the conditional operator are defined by
-\begin{description}
-  \item[Boolean values]
-      \[
-        \true \defeq \lambda x\,y.\,x \\
-        \quad\text{and}\quad
-        \false \defeq \lambda x\,y.\,y \\
-      \]
-  \item[Conditional]
-    \begin{align*}
-      & \cond \defeq \lambda b\,x\,y.\, b\,x\,y\\
-      \vdash {} & \cond : \bool_{\tau} \to \tau \to \tau \to \tau
-    \end{align*}
-\end{description}
+\end{frame}
 
 %\subsection{System T}
 %It is also convenient to add some primitive types to our typed lambda calculus (or
@@ -527,13 +579,19 @@ confusion.  Truth values and the conditional operator are defined by
 %\begin{definition}
 %  \todo[inline]{define addition, multiplication using $\fold$}
 %\end{definition}
-\subsection*{Exercise}
-\begin{enumerate}
-  \item Define the conjunction operation $\mathtt{and} : \bool_\bool \to \bool
-    \to \bool$ and similarly for $\mathtt{or}$, and $\mathtt{not}$
-    in simply typed lambda calculus.
-\end{enumerate}
+\begin{frame}{Remark}
+With the decidability of type checking, Preservation Theorem, Progress Theorem
+(a well-typed term is either a ``value'' or a reducible term), and the strong
+normalisation, we actually have exhibited a decidable evaluator of simply typed
+lambda calculus that always reduce a well-typed term of type~$\sigma$ to a value
+of type~$\sigma$.
+\end{frame}
 
-\bibliographystyle{plain}
+\begin{frame}[allowframebreaks]{References}
+
+\bibliographystyle{amsalpha}
 \bibliography{library} 
+
+\end{frame}
+
 \end{document}

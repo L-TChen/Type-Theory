@@ -1,25 +1,23 @@
-\mode<presentation>{\beamertemplatenavigationsymbolsempty}
+\usetheme[block=fill]{metropolis}
+%\usecolortheme[snowy]{owl}
+%\usecolortheme{beaver}
+
 \newcounter{saveenumi}
 \newcommand{\seti}{\setcounter{saveenumi}{\value{enumi}}}
 \newcommand{\conti}{\setcounter{enumi}{\value{saveenumi}}}
 \mode<presentation>{\resetcounteronoverlays{saveenumi}}
 
-\useinnertheme{rectangles}
-\usecolortheme{beaver}
-\usecolortheme{rose}
  
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
 \usepackage[british]{babel}
 \mode<article>{\usepackage{mathptmx}}
 \mode<article>{\usepackage[a4paper]{geometry}}
-\usepackage{mathrsfs,bussproofs}
+\usepackage{mathrsfs}
+\usepackage{bussproofs}
 \usepackage{multicol}
-\usepackage{paralist}
 
 \EnableBpAbbreviations
 \usepackage{graphicx}
-\usepackage[all]{xy}
+\usepackage[all,cmtip]{xy}
 \usepackage{todonotes}
 
 \mode<article>{\usepackage{hyperref}}
@@ -30,6 +28,8 @@
 %\theoremstyle{remark}
 \newtheorem{convention}[theorem]{Convention}
 \newtheorem{remark}{Remark}[section]
+
+\newfontfamily\CJKtext{Noto Sans CJK TC DemiLight}
 
 \newcommand{\FV}{\mathbf{FV}}
 \newcommand{\BV}{\mathbf{BV}}
@@ -47,10 +47,11 @@
 \makeatother
 
 \newcommand{\op}{\mathrm{op}}
-\newcommand{\subst}[2]{[\,#1\defeq#2\,]}
+\newcommand{\subst}[2]{[\,#1\mapsto#2\,]}
 
 \newcommand{\leftexp}[2]{{\vphantom{#2}}^{#1}{#2}}
 \newcommand{\set}[2]{\{\,#1\mid#2\,\}}
+\newcommand{\sem}[1]{[\![#1]\!]} 
 \newcommand{\id}{\mathit{id}}
 
 \newcommand{\M}{\mathsf{M}}
@@ -59,11 +60,12 @@
 \newcommand{\T}{\mathbb{T}}
 
 % Macros for PCF
-\newcommand{\reduce}{\xrightarrow{\beta*}}
-\newcommand{\onereduce}{\xrightarrow{\beta1}}
+\newcommand{\reduce}{\longrightarrow_{\beta*}}
+\newcommand{\onereduce}{\longrightarrow_{\beta1}}
 \newcommand{\nat}{\mathtt{nat}}
 \newcommand{\bool}{\mathtt{bool}}
 \newcommand{\List}{\mathtt{list}}
+\newcommand{\Bool}{\mathbb{B}}
 
 \newcommand{\bc}{\mathbf{c}}
 \newcommand{\add}{\mathtt{add}}
@@ -81,9 +83,8 @@
 
 \newcommand {\textplus}{\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}}
 
-\author[L.-T. Chen]{Chen, Liang-Ting\\
-  \href{mailto:ltchen@hawaii.edu}{\texttt{ltchen@hawaii.edu}}}
-\institute{Department of Information and Computer Sciences \\
-  University of Hawaii at Manoa}
-\date[FLOLAC'16]{2016 Formosan Summer School on \\<all>
+\author[L.-T. Chen]{\CJKtext{陳亮廷} Chen, Liang-Ting}
+\institute{Swansea University, UK}
+\date[FLOLAC'18]{2018 \CJKtext{邏輯、語言與計算暑期研習營} \\
+  Formosan Summer School on \\<all>
   Logic, Language, and Computation}

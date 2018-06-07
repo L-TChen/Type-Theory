@@ -1,235 +1,348 @@
-%! TEX root = lecture1_note.tex
-\title{Lambda Calculus and Types, 1}
+%!TEX TS-program = xelatex
+%! TEX root = lecture1_slide.tex
+\title{Lambda Calculus and Types}
 \subtitle{Untyped Lambda Calculus}
 \begin{document}
 \begin{frame}
 \maketitle
 \end{frame}
-At school, we were always asked to solve expressions like
-\[
-  (3 + 7) * (4 + 6)= ?
-\]
-but it is always correct to write 
-\[
-  (3 + 7) * (4 + 6)= (3 + 7) * (4 + 6)
-\]
-But, why is this not the expected answer? Perhaps, it is because we are asked to
-\emph{reduce} an expression to its \emph{normal form} instead of finding its
-meaning. We have different sequences of reductions:
-\begin{align*}
-  (3 + 7) * (4 + 6) \leadsto 10 * (4 + 6) \leadsto 10 * 10 \leadsto 100 \\
-  (3 + 7) * (4 + 6) \leadsto (3 + 7) * 10 \leadsto 10 * 10 \leadsto 100. \\
-\end{align*}
-Two sequences above are all fine, but sometimes it makes a difference. Consider 
-\[
-  f(x, y) \defeq x
-\]
-and try to reduce the expression
-\[
-  f(0, \int _{-1}^{1}{\frac {dx}{\sqrt {1-x^{2}}}}).
-\]
-Do we really need to reduce the second argument to reduce the whole expression?
-\[
-  f(0, \int _{-1}^{1}{\frac {dx}{\sqrt {1-x^{2}}}}) \leadsto 0
-\]
-To decide which reduction should be performed, we device a \emph{reduce
-  strategy} to address the issue. 
 
-%Informally, lambda calculus can be viewed as a simplest programming language
-%whose syntax only consists of
-%\begin{enumerate}[(a)]
-%  \item variables $x, y, z, \ldots$, 
-%  \item function application $F(a)$, or just $F\;a$, and
-%  \item function abstraction $F(x) \defeq M$, or just $\lambda x.\, M$
-%    as an anonymous function.
-%\end{enumerate}
-%The only possible computation is to substitute the argument for the parameter in
-%the function body, written as 
-%\[
-%  (\lambda x.\, M)\, N \leadsto M\subst{x}{N}
-%\]
-%and the computation is finished while there is no possible reduction.
-\section{Introduction}
+\begin{frame}{Introduction}
+  $\lambda$-calculus \dots
+  \begin{enumerate}
+    \item was developed by Alonzo Church (Turing's PhD supervisor)
+    \item is a model of computation
+    \item is a backbone of programming languages
+  \end{enumerate}
+  \mode<presentation>{\vfill}
+  As a programming language, it only supports $3$ constructs 
+  \begin{enumerate}
+    \item variable
+    \item function definition
+    \item function application
+  \end{enumerate}
+  \mode<presentation>{\vfill}
+\end{frame}
 
-\begin{definition}[Syntax]
+\section{Syntax of Lambda Calculus}
+
+\begin{frame}{Terms of $\lambda$-calculus}
+\begin{definition}[Syntax of $\lambda$-calculus]
   Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
-  \emph{variables}.  Then, the set~$\Lambda$ of \emph{$\lambda$-terms} are
-  defined inductively:
-  \begin{multicols}{3}
+  \emph{variables}. The set~$\Lambda$ of \alert{$\lambda$-terms} is defined
+  by
+%  \begin{multicols}{2}
     \begin{prooftree}
       \AXC{$x \in V$}
       \RightLabel{(var)}
       \UIC{$x \in \Lambda$}
     \end{prooftree}
-    \columnbreak
+%    \columnbreak%
     \begin{prooftree}
       \AXC{$M \in \Lambda$}
       \AXC{$N \in \Lambda$}
       \RightLabel{(app)}
       \BIC{$(M\, N) \in \Lambda$}
     \end{prooftree}
-    \columnbreak
+%    \columnbreak%
     \begin{prooftree}
       \AXC{$M \in \Lambda$}
       \AXC{$x \in V$}
       \RightLabel{(abs)}
       \BIC{$\lambda x.\, M \in \Lambda$}
     \end{prooftree}
-  \end{multicols}
-  \noindent corresponding to the introduction of \emph{variables},
-  \emph{application}, and \emph{abstraction}.
+%  \end{multicols}
+\noindent Application is left associative; abstraction is right associative. 
 \end{definition}
-The term $(M\;N)$ is intended to present a function application where $N$ is the
-argument being fed into~$M$. The term $\lambda x.\; L$ is interpreted as a function
-with a variable $x$ and a function body~$L$. For an abstraction and application
-with many inputs, we have the following conventions
-\[
-  \lambda x_1\,x_2\,\dots x_n.\; M
-  \defeq \lambda x_1.\,(\lambda x_2.\, (\dots (\lambda x_n.\; M)\dots))
-\]
-and
-\[
-  M_0\;M_1\;\dots M_n \defeq (\dots ((M_0\;M_1)\;M_2)\;\dots M_n)
-\]
-\begin{definition}[Free and bound variables]
-  \begin{enumerate}[(a)]
-    \item The free variable set $\FV\colon \Lambda \to \mathcal{P}V$ is a
-      function mapping a $\lambda$-terms to a subset of variables defined
-      inductively as follows:
-      \begin{align*}
-        \FV(x) & = \{ x \} \\
-        \FV(M\, N) & = \FV(M) \cup \FV(N) \\
-        \FV(\lambda x.\, M) & = \FV(M) - \{ x \}.
-      \end{align*}
-      That is, a variable $v$ of a $\lambda$-term~$M$ has a \emph{free}
-      occurrence if $v \in \FV(M)$; a variable~$x$ is \emph{bound} if it occurs
-      under the scope of a~$\lambda x. M$ (i.e.\ $x$ occurs in~$M$). The set of bound variable is denoted by~$\BV(M)$.
-    \item A $\lambda$-term~$M$ is called \emph{closed} or a \emph{combinator} if
-      $\FV(M) = \emptyset$. That
-      is, $M$ contains no free variable.
-  \end{enumerate}
-\end{definition}
+\end{frame}
 
-\subsection{Substitution}
-One of the most subtle definition in lambda calculus is the \emph{substitution},
-as we shall follow the principle that free variables remain free after
-substitution. Consider the following case:
-\[
-  (\lambda x.\, \lambda y.\, f\,x\, y)
-\]
-It is intended to be a function wrapping another term with two inputs $x$ and
-$y$. Then, the following term
-\[
-  ((\lambda x.\, \lambda y.\, f\,x\, y)\,y)\,z
-\]
-is supposed to replace variables $x$ and $y$ by $y$ and $z$ respectively, right? 
-Try it step by step:
-\begin{align}
- ((\lambda x.\, \lambda y.\, f\,x\, y)\, y)\, z  \to{}
-        & ((\lambda y.\, f\,x\,y)\subst{x}{y})\, \, z  \label{eq:subst-ex} \\
-  ={}   & (\lambda y.\, f\,y\,y)\,z \\
-  \to{} & (f\,y\,y)\subst{y}{z} \\
-  ={}   & f\,z\,z
-\end{align}
-The variable $y$ is gone! 
-We can avoid this unwanted situation by renaming the bound variables in a
-$\lambda$-term first:
-\[
-  ((\lambda x'.\,(\lambda y'.\, f\,x'\,y'))\, y)\, z
-  \to (\lambda y'.\, f\,y\,y')\,z
-  \to f\,y\,z
-\]
-The following sections are devoted to a correct definition of reduction.
-First of all, we do not perform substitution if any free variable
-becomes bound after substitution:
-\begin{definition}
-    The \emph{(capture-avoidance) substitution} of $P$ for the free occurrences
-    of $x$ is a partial function mapping a $\lambda$-term $M$ to another
-    $\lambda$-term, denoted by $M\subst{x}{P}$, defined inductively as follows:
-    \begin{align*}
-      x\subst{x}{P} & = P \\
-      y\subst{x}{P} & = y && \text{if $x \neq y$} \\
-      (M\, N)\subst{x}{P} & = (M\subst{x}{P}\, N\subst{x}{P}) \\
-      (\lambda x.\, M)\subst{x}{P} & = (\lambda x.\, M) \\
-      (\lambda y.\, M)\subst{x}{P} & = (\lambda y.\, M\subst x P)
-      && \text{if $x \neq y$, and $y \not\in \FV(P)$.}\\
-    \end{align*}
-\end{definition}
-Given this new definition, the substitution in \eqref{eq:subst-ex} is
-not allowed (or, undefined):
-\[
-  (\lambda y.\, f\,x\,y)\subst{x}{y}
-\]
-\subsection{$\alpha$-conversion}
-Secondly, we identify any two $\lambda$-terms if they only differ in the name of
-bound variables.
+\begin{frame}{Meta-Language and Object-Language}
+  \begin{itemize}
+    \item \emph{Meta-language} is the language we use to describe the object of
+      study. E.g., naive set theory. 
+    \item \emph{Meta-variable} is a placeholder \emph{in} the meta-language. 
+    \item \emph{Object-language} is the object of study. E.g., arithmetic
+      expressions, $\lambda$-terms, etc.
+    \item \emph{Variable} refers to some variable of $\lambda$-calculus.
+  \end{itemize}
+  \begin{example}
+  As \emph{naming} a function is not supported in $\lambda$-calculus, we do so
+  in the meta-language:
+    \[
+      \mathtt{id} \defeq \lambda x.\, x
+    \]
+    $\mathtt{id}$ is a synonym of the $\lambda$-term on RHS in the meta-language.
+  \end{example}
+ 
+\end{frame}
 
-For example, $(\lambda x.\, x)$ may be renamed to $(\lambda y.\, y)$, and we
-consider them the same. The name of variable do not affect program behaviours
-but only readability. We say that two terms $M$ and $N$ are \emph{equivalent up
-  to renaming (of bound variables)}, if $N$ can be derived from~$M$ by renaming
-bound variables.
+\begin{frame}
+  \begin{example}[Projections]
+  The first and the second projections are made of abstractions and
+  variables only:
+  \[
+    \mathtt{fst} \defeq \lambda x.\, \lambda y.\, x
+    \quad\text{and}\quad \mathtt{snd} \defeq \lambda x.\, \lambda y.\, y
+  \]
+  \end{example}
+  For brevity $\lambda x_1\,x_2\,\ldots x_n.\, M \defeq \lambda x_1.\,(\lambda
+  x_2.\,(\ldots (\lambda x_n.\, M)\ldots))$.\\
+  \mode<presentation>{\vfill}
+  Hence, projections are equal to
+  \[
+    \lambda x\,y.\, x \quad\text{and}\quad 
+    \lambda x\,y.\, y
+  \]
+  \mode<presentation>{\vfill}
+  In Haskell: $\mathtt{\backslash x\,y \to \,x}$ and
+  $\mathtt{\backslash x\,y \to \,y}$. However, $\mathtt{fst} =
+  \mathtt{\backslash x\,y \to \,x}$ is a proper term in Haskell
+  (object-language).
+\end{frame}
 
-This identification can be defined formally through the following two steps.
-\begin{definition}[Congruence]
-  A congruence is an equivalence relation in respect of the structure of
-  $\lambda$-terms:
+\begin{frame}{$\alpha$-equivalence, informally}
+  \begin{definition}
+    Two $\lambda$-terms are \alert{$\alpha$-equivalent} if variables
+    \emph{bound} by abstractions can be renamed to derive the same term. 
+  \end{definition}
+  \begin{example}
+    \begin{enumerate}
+      \item $\lambda x.\, x \neq \lambda y.\, y$  but $\lambda x.\, x
+        \equiv_\alpha \lambda y.\, y$. 
+      \item $\lambda x.\, \lambda y.\, y \equiv_\alpha 
+        \lambda z.\, \lambda y.\, y$. 
+      \item $\lambda x.\, \lambda y.\, x \mathrel{\not\equiv}_\alpha
+        \lambda x.\, \lambda y.\, y$. 
+    \end{enumerate}
+  \end{example}
+  $\alpha$-equivalent terms are considered `programs of the same structure'.
+  Renaming variables do not change program behaviour but
+  readability.
+\end{frame}
+
+\begin{frame}{Concrete and Abstract Syntax}
+  \begin{block}{Concrete Syntax}
+    A string possibly annotated with brackets and other delimiters.
+  \end{block}
+  
+  \begin{block}{Abstract Binding Tree}
+    A tree structure with pointers where each node is an operator 
+    with arguments as its sub-trees.
+  \end{block}
+
+  \[
+    (\lambda x\, y.\, (\lambda z.\, z\, x)\, y)
+  \]
+\end{frame}
+
+\section{Operational Semantics}
+\begin{frame}{Evaluation, informally}
+  \begin{itemize}
+    \item The term $(M\;N)$ is understood as a function application where
+      $N$ is the argument for the `function' $M$.
+    \item The term $\lambda x.\; L$ is understood as a function with a parameter
+      $x$ and the function body~$L$. 
+    \item The only \alert{`computation'} in $\lambda$-calculus
+      is function application:
+    \[
+      (\lambda x.\, M)\,N \longrightarrow M[x \mapsto N]
+    \]
+    where $M[x \mapsto N]$ means that $x$ in $M$ is substituted for $N$. 
+  \end{itemize}
+  How to evaluate the following terms? 
   \begin{enumerate}
-    \item An \emph{congruence} on $\lambda$-terms is an equivalence
-      relation~$\sim$ on $\lambda$-terms subject to following additional
-      structural rules
+    \item $(\lambda x.\,\lambda y.\,x)\,M\,N$
+    \item $(\lambda y.\,\lambda y.\,y)\,M$
+    \item $(\lambda x.\, \lambda y.\,x)\,y$
+  \end{enumerate}
+%\[
+%  \lambda x_1\,x_2\,\dots x_n.\; M
+%  \defeq \lambda x_1.\,(\lambda x_2.\, (\dots (\lambda x_n.\; M)\dots))
+%\]
+%and
+%\[
+%  M_0\;M_1\;\dots M_n \defeq (\dots ((M_0\;M_1)\;M_2)\;\dots M_n)
+%\]
+\end{frame}
+%
+\begin{frame}[allowframebreaks]{Naive Substitution}
+  \begin{definition}
+    For $x \in V$ and $M \in \Lambda$, the substitution of $x$ for $M$ is
+    defined by
+    \begin{align*}
+      x[x \mapsto M] & = M \\
+      y[x \mapsto M] & = M & \text{if $x \neq y$} \\
+      (M\,N)[x \mapsto L] & = (M[x \mapsto L]\,N[x \mapsto L]) \\
+      (\lambda x.\, M)[y \mapsto N] & = \lambda x.\, M[y \mapsto N] 
+    \end{align*}
+  \end{definition}
+    A bound variable may become free. 
+    \[
+      (\lambda x.\, x)[x \mapsto y] = \lambda x.\, y
+    \]
+  \begin{definition}
+    For $x \in V$ and $M \in \Lambda$, the substitution
+    of $x$ for $M$ is defined by
+    \begin{align*}
+      x[x \mapsto M] & = M \\
+      y[x \mapsto M] & = M && \text{if $x \neq y$} \\
+      (M\,N)[x \mapsto L] & = (M[x \mapsto L]\,N[x \mapsto L]) \\
+      (\lambda x.\, M)[y \mapsto N] & = \lambda x.\, M[y \mapsto N] 
+                                    && \text{if $x \neq y$} \\
+      (\lambda x.\, M)[y \mapsto N] & = \lambda x.\, M
+                                    && \text{if $x = y$} 
+    \end{align*}
+  \end{definition}
+    A variable may be captured by an abstraction. 
+    \[
+      (\lambda x. y)[y \mapsto x] = \lambda x.\, x
+    \]
+\end{frame}
+
+\begin{frame}{Free and Bound Variables}
+\begin{definition}
+  The set $\FV$ of free variables of a term $M$ is defined by
+  \begin{align*}
+    \FV(x) & = \{x\} \\
+    \FV(\lambda x.\, M) & = \FV(M) - \{x\} \\
+    \FV(M\;N) & = \FV(M) \cup \FV(N)
+  \end{align*}
+  A variable $y$ which occurs in $M$ is \alert{free} if $y \in \FV(M)$;
+  \alert{bound} otherwise. 
+  A $\lambda$-term~$M$ is \alert{\emph{closed}} or a \alert{\emph{combinator}}
+  if $\FV(M) = \emptyset$. 
+\end{definition}
+  \begin{enumerate}
+    \item A \alert{variable} can be \emph{free} and \emph{bound} at the same
+      time. 
+    \item An \alert{occurrence} of a variable can only be
+      either \emph{free} or \emph{bound}. 
+  \end{enumerate}
+\end{frame}
+\begin{frame}
+  \begin{center}
+    \includegraphics[height=7cm]{img/e0a.jpg}
+  \end{center}
+  \begin{enumerate}
+    \item A \alert{variable} can be \emph{free} and \emph{bound} at the same
+      time. 
+
+    \item An \alert{occurrence} of a variable is either \emph{free} or
+      \emph{bound}. 
+  \end{enumerate}
+
+\end{frame}
+\begin{frame}{Capture-Avoiding Substitution}
+  Capture-avoiding substitution of $L$ for the \alert{free occurrences} of $x$ is a
+  \emph{partial} function from $\lambda$-terms to $\lambda$-terms defined by
+  \begin{align*}
+    x\subst{x}{L} & = L \\
+    y\subst{x}{L} & = y && \text{if $x \neq y$} \\
+    (M\, N)\subst{x}{L} & = (M\subst{x}{L}\; N\subst{x}{L}) \\
+    (\lambda x.\, M)\subst{x}{L} & = \lambda x.\, M \\
+    (\lambda y.\, M)\subst{x}{L} & = \lambda y.\, M\subst x L
+                                 &&\text{if $x \neq y$ and $y \not\in \FV(L)$}
+  \end{align*}
+  \begin{definition}[Freshness]
+    A variable $y$ is \alert{fresh} for $L$ if $y \notin \FV(L)$.  
+  \end{definition}
+\end{frame}
+\begin{frame}{Congruence}
+\begin{definition}
+  \begin{enumerate}
+    \item A \alert{congruence} on $\lambda$-terms is a 
+      relation~$R$ on $\lambda$-terms subject to following rules
       \begin{multicols}{2}
         \begin{prooftree}
-          \AXC{$M_1\sim M_2$}
-          \AXC{$N_1\sim N_2$}
-          \BIC{$M_1\,N_1\sim M_2\,N_2$}
+          \AXC{$M_1 \mathrel{R} M_2$}
+          \AXC{$N_1 \mathrel{R} N_2$}
+          \BIC{$(M_1\,N_1) \mathrel{R} (M_2\,N_2)$}
         \end{prooftree}
         \begin{prooftree}
-          \AXC{$M_1\sim M_2$}
-          \UIC{$\lambda x.\, M_1\sim \lambda x.\, M_2$}
+          \AXC{$M_1 \mathrel{R}M_2$}
+          \UIC{$(\lambda x.\, M_1) \mathrel{R}(\lambda x.\, M_2)$}
         \end{prooftree}
       \end{multicols}
-    \item The congruence closure of a relation~$R$ on $\lambda$-terms is the
-      least congruence~$\overline{R}$ containing~$R$. 
+    \item The \alert{congruence closure}~$\overline{R}$ of a relation~$R$ is
+      the smallest congruence containing~$R$. 
+    \item The \alert{congruence and equivalence closure} of a relation $R$ 
+      is the smallest congruence and equivalence relation
+      containing~$R$. 
   \end{enumerate}
 \end{definition}
+\vfill
+  \begin{block}{Homework}
+    Define congruence closure using inference rules. 
+  \end{block}
+\end{frame}
 
-\begin{definition}[$\alpha$-conversion: renaming of bound variables]
-  Whenever a variable $y$ does not occur freely in~$M$, we can rename the bound
-  variable $x$ in~$\lambda x.\, M$ to~$y$, i.e.\ 
+\begin{frame}{Renaming of Bound Variables}
+If a variable $y$ is \emph{fresh} for $M$, the bound variable $x$ of~$\lambda
+x.\, M$ to~$y$ can be renamed without changing the meaning. 
+\begin{definition}[$\alpha$-conversion]
+  $\alpha$-conversion is a relation $\to_\alpha$ defined by
   \[
-    (\lambda x.\, M) \to_\alpha (\lambda y.\, M\subst{x}{y})
+    (\lambda x.\, M) \longrightarrow_\alpha \lambda y.\, M\subst{x}{y}
+    \quad\text{if $y$ is fresh for $M$}.
   \]
-  if $y \not\in \FV(M)$. The relation
-  $\to_\alpha$ is called $\alpha$-conversion. Let $=_\alpha$ be the
-  congruence closure of~$\to_\alpha$. We say that $M$ and $N$ are
-  \emph{$\alpha$-equivalent} if $M =_\alpha N$.
 \end{definition}
+Let $=_\alpha$ be the congruence and equivalence closure
+of~$\longrightarrow_\alpha$. We say that $M$ and $N$ are
+\emph{$\alpha$-equivalent} if $M =_\alpha N$.
 
-\subsection{$\beta$-conversion}
-Now, we can give a definition of reduction on a term of this form~$(\lambda
-x.\, M)\, N$ (only):
+  \mode<presentation>{\vfill}
+\begin{block}{Convention}
+  $\lambda$-terms are equal up to $\alpha$-equivalence/renaming of bound variables. 
+\end{block}
+\end{frame}
+
+\begin{frame}{$\eta$-conversion}
+  Pointy style is \emph{assumed} to be equivalent to point-free style. 
+  \begin{description}
+    \item[$\eta$-reduction]
+      $\lambda x.\,(M\,x) \longrightarrow_\eta M$
+    \item[$\eta$-expansion]
+      $M \longrightarrow_\eta \lambda x.\,(M\,x) $
+      where $x$ is fresh for $M$.
+    \item[$\eta$-equivalence]
+      the congruence and equivalence closure of $\longrightarrow_\eta$. 
+  \end{description}
+  \mode<presentation>{\vfill}
+  $\eta$-equivalence is a form of \emph{extensionality} limited to
+  $\lambda$-terms.
+  \[
+    f = g \iff \forall x.\, f(x) = g(x)
+  \]
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Evaluation}
 \begin{definition}[$\beta$-conversion]
-  A term $(\lambda x.\, M)\, N$ can reduce to $M'\subst{x}{N}$ whenever the
-  substitution is defined and $M'$ is $\alpha$-equivalent to
-  $M$. 
-  That is,
+  $\beta$-conversion is a relation defined by
   \[
-    (\lambda x.\, M)\, N \xrightarrow{\beta} M'\subst{x}{N}
+    (\lambda x.\, M)\, N \longrightarrow_{\beta} M\subst{x}{N}
   \]
-  if $M =_\alpha M'$ and
-  $M'\subst{x}{N}$ is defined.  A term of this form $(\lambda x.\, M)\, N$ is
-  called a \emph{$\beta$-redex}.
+  Any term of this form $(\lambda x.\, M)\, N$ is called a \emph{$\beta$-redex}.
 \end{definition}
-Yet, the definition is not complete. A reduction may be performed inside a
-$\lambda$-term like $\lambda y.\, (\lambda x.\, x)\, M$. Similar to the
-definition of $\alpha$-equivalence, we define:
-\begin{definition}[One-step $\beta$-reduction]
-  The \emph{one-step $\beta$-reduction} is a relation on $\lambda$-terms
-  defined inductively as follows:
+  Good: 
+    \[
+      ((\lambda x.\,\lambda y.\,x)\,M)
+      \longrightarrow_{\beta}
+      (\lambda y.\, x)\subst{x}{M}
+      = \lambda y.\, x\subst{x}{M}
+      = \lambda y.\, M
+    \]
+  Bad: 
+  \[
+    (\lambda x.\, \lambda y.\, x)\, M\,N
+    \longrightarrow_{\beta} \, ?
+  \]
+\framebreak
+\begin{definition}
+  The \alert{full $\beta$-reduction} is a relation on $\lambda$-terms
+  defined by
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$M_1 \xrightarrow{\beta} M_2$}
+      \AXC{$M_1 \longrightarrow_{\beta} M_2$}
       \UIC{$M_1 \onereduce M_2$}
     \end{prooftree}
     \begin{prooftree}
@@ -246,92 +359,277 @@ definition of $\alpha$-equivalence, we define:
     \end{prooftree}
   \end{multicols}
 \end{definition}
-%
-%\begin{definition}
-%  The \emph{$\lambda$-theory} of $\lambda$-terms is the congruence closure,
-%  denoted by~$\equiv$, of $\alpha$-conversion~$\to_\alpha$ and
-%  $\beta$-conversion~$\to_\beta$.
-%\end{definition}
-%The $\lambda$-theory identifies $\lambda$-terms ought to have the same
-%meaning. 
-However, given this definition of one-step $\beta$-reduction, we only know what a
-\emph{correct} step of reduction is, but we still do not know \emph{how} 
-a reduction should be performed in a systematic way---a term may have multiple
-reductions at the same time. Given $\lambda$-terms $M$ and~$N$, consider the following
-\[
-  (\lambda x.\, (\lambda y.\, M)\,x)\,
-  (\lambda x.\, (\lambda y.\, N)\,x)
-\]
-and write down all possible chains of reductions.
-\subsection*{Exercise}
+  Now fixed:
+  \[
+    (\lambda x.\, \lambda y.\, x)\, M\,N
+    \onereduce (\lambda y.\, M)\,N
+    \onereduce M\subst{y}{N} \onereduce \ldots
+  \]
+\end{frame}
+
+\section{Programming in Lambda Calculus}
+\begin{frame}[allowframebreaks]{Programming in $\lambda$-calculus}
+  
+Boolean values and conditional can be encoded as closed $\lambda$-terms. 
+  
+\begin{description}
+  \item[Boolean]
+    \begin{align*}
+      & \mathtt{True}  && \defeq && \lambda x\,y.\, x \\
+      & \mathtt{False} && \defeq && \lambda x\,y.\, y
+    \end{align*}
+
+  \item[Conditional]
+    \begin{align*}
+      \mathtt{if}\_\mathtt{then}\_\mathtt{else}\_
+      & \defeq \lambda b\;x\;y.\;b\,x\,y  \\
+      \mathtt{if} \quad\mathtt{True} \quad & \mathtt{then}\quad M\quad\mathtt{else}\quad
+      N  \reduce M \\
+      \mathtt{if} \quad\mathtt{False} \quad &\mathtt{then}\quad M\quad\mathtt{else}\quad
+      N \reduce N
+    \end{align*}
+    for any two $\lambda$-terms $M$ and~$N$.
+\end{description}
+
+\framebreak
+  Natural numbers can be encoded as $\lambda$-terms, so can arithmetic operations. 
+  \begin{description}
+    \item[Church numerals] 
+      \begin{align*}
+        &\bc_0 &&\defeq\;&& \lambda f\,x.\, x \\
+        &\bc_{1} &&\defeq\;&& \lambda f\,x.\, f\,x \\
+        &\bc_{n+1} &&\defeq\;&& \lambda f\,x.\, f^{n+1}\,(x)
+      \end{align*}
+      for $n > 0$ where $f^{n+1}(M)  \defeq f (f^n\, M))$.
+    \item[Successor]
+      \begin{align*}
+        & \mathtt{succ} && \defeq\; && \lambda n.\,\lambda f\,x.\, f\,(n\,f\,x) \\
+        & \mathtt{succ}\;\bc_n && \reduce\; && \bc_{n+1}
+      \end{align*}
+      for any natural number~$n \in \mathbb{N}$.
+    \item[Predecessor]
+      \begin{align*}
+        & \mathtt{pred} && \defeq\; && \lambda n.\, \lambda f\,x.\, ? \\
+        & \mathtt{pred}\;\bc_{0}  && \reduce\; && \bc_{0} \\
+        & \mathtt{pred}  \;\bc_{n+1} && \reduce\; && \bc_{n}
+      \end{align*}
+    \item[Addition]
+      \begin{align*}
+        & \mathtt{add} && \defeq\; && \lambda n\,m.\,\lambda f\,x.\;
+        m\;f\;(n\;f\;x)  \\ & \mathtt{add}\;\bc_{n}\;\bc_{m}\;
+                            && \reduce\; && \bc_{n + m}
+      \end{align*}
+    \item[Conditional]
+      \begin{align*}
+        & \mathtt{ifz} && \defeq \; \lambda n\;x\;y.\;n\;(\lambda z.\;y)\;x 
+        \\
+        & \mathtt{ifz}\;\bc_0\;M\;N && \reduce \; M \\
+        & \mathtt{ifz}\;\bc_{n+1}\;M\;N && \reduce \; N
+      \end{align*}
+  \end{description}
+  \framebreak
+
+  Here is a list of common combinators:
 \begin{enumerate}
-  \item Give an inductive definition of bound variable. That is, define a
-    function $\BV\colon \Lambda \to \mathcal{P}V$ inductively
-    such that $\BV(M)$ is exactly the set of bound variable in a
-    $\lambda$-term~$M$.
-  \item Informally speaking, a \emph{subterm} of~$M$ is a valid $\lambda$-term
-    inside~$M$. For example, subterms of $(\lambda x.\, M\;N)\;N$ are
-    \[
-      M, N, (M\;N), (\lambda x.\, M\;N), (\lambda x.\, M\;N)\:N.
-    \]
-    as well as subterms of $M$ and $N$.
-    To formulate the definition correctly, we need a formal definition. Please
-    define it by induction.
-  \item Explain what the following terms mean:
-    \[
-      \lambda x.\,x
-      \qquad
-      \lambda x\,y.\,x
-      \qquad
-      \lambda x\,y. (\lambda x.\, x)
-    \]
-  \item Find all possible sequences of reductions of the following terms:
-    \begin{enumerate}
-      \item  $\Omega \defeq (\lambda x.\, x\,x)(\lambda x.\,x\,x)$
-      \item  $(\lambda x\;y.\;x)\;(\lambda x.\,x)\;\Omega$
-    \end{enumerate}
+  \item $\omega \defeq \lambda x.\, x\,x$
+  \item $\Omega \defeq (\lambda x.\, x\,x)\,(\lambda x.\,x\,x)
+    = \omega\,\omega$
+  \item $\mathbf{I} \defeq \lambda x.\, x$, the \emph{identity}.
+  \item $\mathbf{S}\defeq\lambda f\,g\,x.\, 
+    (f\,x)\,(g\,x)$.
 \end{enumerate}
+  \begin{block}{Exercise}
+    \begin{enumerate}
+      \item Evaluate $\mathtt{succ}\,\bc_0$ and $\mathtt{add}\,\bc_{1}\,\bc_{2}$. 
+      \item Define $\mathtt{pred}$. 
+      \item Define Boolean operations, i.e.\ $\mathtt{not}$, $\mathtt{and}$,
+        and $\mathtt{or}$. 
+      \item Is $\omega$ allowed in Haskell? 
+    \end{enumerate}
+  \end{block}
+\end{frame}
 
-\section{Reduction}
-\subsection{Reduction strategy}
-Intuitively, we say that \emph{$M$ reduces to~$N$ eventually} if there exists a
-finite sequence of one-step $\beta$-reductions:
+\begin{frame}[allowframebreaks]{General Recursion}
+
+  The summation $\sum_{i = 0}^{n} i$ for $n \in \mathbb{N}$ \emph{can
+  be} defined as
 \[
-  M \onereduce M_1 \onereduce \dots \onereduce N,
+  \mathtt{sum}(n) =
+    \begin{cases} 
+     0 & \text{if } n = 0 \\
+     n + \mathtt{sum}(n - 1)  & \text{otherwise}.
+    \end{cases}
 \]
-and rename bound variables in-between. To put it
-formally, $\reduce$ is a relation defined inductively by
-\begin{multicols}{2}
-  \begin{prooftree}
-    \AXC{$M =_\alpha N$}
-    \RightLabel{(0-step)}
-    \UIC{$M\reduce N$}
-  \end{prooftree}
-  \begin{prooftree}
-    \AXC{$M =_\alpha N$}
-    \AXC{$N \reduce L$}
-    \RightLabel{(renaming)}
-    \BIC{$M\reduce L$}
-  \end{prooftree}
-  \begin{prooftree}
-    \AXC{$M \onereduce N$}
-    \AXC{$N \reduce L$}
-    \RightLabel{($n+1$-steps)}
-    \BIC{$M\reduce L$}
-  \end{prooftree}
-\end{multicols}
+Can we avoid the self-reference? Consider the function
+$G\colon (\mathbb{N} \to \mathbb{N}) \to (\mathbb{N} \to \mathbb{N})$
+defined by
+\begin{equation} \label{eq:summation}
+  (Gf)(n) \defeq
+  \begin{cases}
+     0 & \text{if } n = 0 \\
+     n + f(n - 1)  & \text{otherwise}.
+  \end{cases}
+\end{equation}
+Assuming that $\mathtt{sum}'$ is a fixed-point of $G$, i.e.\
+$G(\mathtt{sum}') =\mathtt{sum}'$, we can show that $\mathtt{sum}' =
+\mathtt{sum}$ by induction. 
 
-A reduction strategy is a procedure of selecting $\beta$-redexes
-to be reduced whenever there are multiple choices. 
-\begin{definition}
-  A \emph{reduction strategy} is a function $F\colon\Lambda\to\Lambda$ such that
-  $M \reduce F(M)$.
-\end{definition}
+\framebreak
+\begin{proposition}[Curry's paradoxical combinator]
+  Define
+  \[
+    \mathbf{Y} \defeq \lambda f.\, (\lambda x.\, f\,(x\,x))\,(\lambda
+    x.\,f\,(x\,x)).
+  \]
+  Then, 
+  \begin{align*}
+    \mathbf{Y}F
+    & \onereduce \underline{(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))} \\
+    & \onereduce F\,(\underline{(\lambda x.\,F\,(x\,x))\,(\lambda x.\,
+      F\,(x\,x))})
+  \end{align*}
+  for every $\lambda$-term~$F$. 
+\end{proposition}
 
-For example, we may start from the $\beta$-redex which does not contain
-any $\beta$-redex, called the \emph{innermost $\beta$-redex}. Or, we start from
-the $\beta$-redex which is not contained in any other $\beta$-redex, called the
-\emph{outermost $\beta$-redex}. 
+\framebreak
+\begin{example}[Summation, formally]
+  Using the combinators we have known so far, the equation~\eqref{eq:summation}
+  can be defined as $\lambda$-terms:
+  \begin{align*}
+    G \defeq{} & 
+    \lambda f\,n.\, \mathtt{ifz}\;n\;bc_0\;
+    (\add\;n\;(f\;(\mathtt{pred}\;n))) \\
+    \mathtt{sum} \defeq{} & \mathbf{Y}G
+  \end{align*}
+\end{example}
+  Try to evaluate $\mathtt{sum}$ with, say, $\bc_3$.
+
+\framebreak
+Here is a fixed-point operator such that $\Theta F \reduce F(\Theta F)$.
+\begin{proposition}[Turing's fixed-point combinator]
+  Define 
+  \[
+    \Theta \defeq 
+    (\lambda x\,f.\,f\,(x\,x\,f))\;
+    (\lambda x\,f.\,f\,(x\,x\,f))
+  \]
+  Then, 
+  \[
+    \Theta F \reduce F (\Theta F)
+  \]
+\end{proposition}
+Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
+\begin{align*}
+  G \defeq{} &
+  \lambda f\,n.\,
+  \mathtt{ifz}\;n\;bc_0\;
+  (\add\;n\;(f\,(\mathtt{pred}\;n))) \\
+  \mathtt{sum} \defeq\; & \Theta\,G 
+\end{align*}
+
+\begin{block}{Exercise}
+\begin{enumerate}
+  \item Define the \emph{flip} operation, i.e.\ a $\lambda$-term~$\mathtt{flip}$
+    such that
+    \[
+      \mathtt{flip}\;M\;N\;P
+      \reduce M\;P\;N
+    \]
+  \item Define the multiplication $m \times n$ on Church numerals.
+  \item Define the factorial $n!$ on Church numerals.
+\end{enumerate}
+\end{block}
+
+\end{frame}
+\section{Properties of Lambda Calculus}
+\begin{frame}[allowframebreaks]{Church-Rosser Property}
+  \begin{example}
+    Suppose $M \in \Lambda$ and $y \not\in \FV(M)$. 
+    Then, consider 
+    \[
+      (\lambda y.\, M)\, ((\lambda x.\, x\,x)(\lambda x.\, x\, x))
+    \]
+  \end{example}
+  \mode<presentation>{\vfill}
+  Observations:
+  \begin{itemize}
+    \item Some evaluation may diverge while some may converge.
+    \item Full $\beta$-reduction lacks for determinacy. 
+  \end{itemize}
+  Question:
+  \begin{itemize}
+    \item Does every path give the same evaluation?
+  \end{itemize}
+
+  \framebreak
+
+  Let $\reduce$ denote the reflexive and transitive closure of $\onereduce$.
+%  \begin{multicols}{2}
+%    \begin{prooftree}
+%      \AXC{\phantom{$M \reduce N$}}
+%      \UIC{$M\reduce N$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M \onereduce N$}
+%      \AXC{$N \reduce L$}
+%      \BIC{$M\reduce L$}
+%    \end{prooftree}
+%  \end{multicols}
+\begin{theorem}[Church-Rosser Property]
+  Given $N_1$ and $N_2$ with $M \reduce N_1$ and $M\reduce N_2$, there is $L$
+  such that
+  \[
+    \xymatrix{
+      & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
+      N_1 \ar@{-->}[rd]_{\beta*} & & N_2 \ar@{-->}[ld]^{\beta*} \\
+      & L
+    }
+  \]
+\end{theorem}
+\framebreak
+A term is in normal form if $M \not\onereduce$. 
+
+\begin{corollary}[Uniqueness of normal forms]\label{coro:uniqueness-normal}
+  Suppose that $N_1$ and $N_2$ are in normal form. Then, 
+  \[
+    \xymatrix{
+      & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
+      N_1 \ar@{}[r]|{=} & N & N_2 \ar@{}[l]|{=} \\
+    }
+  \]
+\end{corollary}
+
+\begin{block}{Homework}
+  Show this corollary.
+\end{block}
+
+\begin{corollary}
+  Let $=_\beta$ denote the congruence closure of $\onereduce$. 
+  \begin{enumerate}
+    \item If $M =_\beta N$, then there exists $L$ such that 
+      \[
+        M \reduce L
+        \; _{\beta*}\longleftarrow N
+      \]
+    \item If in addition $N$ is in normal form, then 
+      $M \reduce N$. 
+  \end{enumerate}
+\end{corollary}
+\begin{block}{Homework}
+  Show this corollary.
+\end{block}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Evaluation Strategies}
+An evaluation strategy is a procedure of selecting $\beta$-redexes
+to reduce. It is a subset $\longrightarrow_{\mathrm{ev}}$ of the full
+$\beta$-reduction $\onereduce$.
+
+\begin{description}
+  \item[Innermost $\beta$-redex] does not contain any $\beta$-redex.
+  \item[Outermost $\beta$-redex] is not contained in any other $\beta$-redex.
+\end{description}
+
 \begin{description}
   \item[the leftmost-outermost strategy] reduces the leftmost outermost
     $\beta$-redex in a $\lambda$-term first. For example, 
@@ -362,337 +660,84 @@ the $\beta$-redex which is not contained in any other $\beta$-redex, called the
       \onereduce & (\lambda x.\, x\, x) \\
       \not\onereduce
     \end{align*}
-  \item[the rightmost-innermost strategy and the rightmost-outermost strategy]
-    are defined similarly but they reduce $\lambda$-terms from right to left
+  \item[the rightmost-innermost/outermost strategy]
+    are defined similarly where $\lambda$-terms are reduced from right to left
     instead.
 \end{description}
-There are also strategies which does not reduce any $\beta$-redex in an
-abstraction~$(\lambda x.\, M)$ including the so-called
-\emph{call-by-value} and \emph{call-by-name} reduction strategies.
+\begin{description}
+  \item[Call-by-value strategy]
+    rightmost-outermost but not inside any $\lambda$-abstraction
+  \item[Call-by-name strategy]
+    leftmost-outermost but not inside any $\lambda$-abstraction
+\end{description}
 
-However, with different strategies a $\lambda$-term may have an infinitely long
-reduction and a finite sequence of reductions at the same time. 
-\begin{example} \label{ex:omega}
-  Define the following terms
+\begin{proposition}[Determinacy]
+  Each of evaluation strategies is deterministic. 
+\end{proposition}
+\begin{block}{Exercise}\label{ex:omega}
+  Evaluate $\Omega$ and $\mathbf{K}_1\, (\lambda x.\, x)\, \Omega$ respectively 
+  using call-by-value and call-by-name strategy
+  where 
   \begin{align*}
     \Omega &\defeq (\lambda x.\, x\,x)(\lambda x.\,x\,x) \\
     \mathbf{K}_1 & \defeq \lambda x\,y.\;x
   \end{align*}
-  First of all, we observe that $\Omega$ has an infinite chain of reductions:
-  \[
-    \Omega \onereduce (x\;x)\subst{x}{\lambda x.\, x\,x} = \Omega 
-    \onereduce\Omega \onereduce \dots 
-  \]
-  Then, the term $(\mathbf{K}_1\,z)\,\Omega$ has the following
-  chain of reductions:
-  \[
-    (\mathbf{K}_1\,z)\,\Omega
-    \onereduce 
-    (\mathbf{K}_1\,z)\,\Omega
-    \onereduce \dots
-  \]
-  if we always reduce the rightmost argument $\Omega$ first.
-  However, $(\mathbf{K}_1\,z)\,\Omega$ also has a finite chain of reductions:
-  \[
-    (\mathbf{K}_1\,z)\,\Omega
-    \onereduce (\lambda y. z)\,\Omega
-    \onereduce z
-  \]
-  if we adopt the leftmost(-outermost) strategy.
-\end{example}
-In fact, the leftmost-outermost strategy always reduces $\lambda$-terms to its
-``normal form'' if exists:
+\end{block}
+\begin{block}{Homework}
+  Draw and evaluate above $\lambda$-terms in abstract syntax tree
+  with the rightmost-innermost/outermost strategies.
+\end{block}
+\end{frame}
+\begin{frame}[allowframebreaks]{Normalising}
 \begin{definition}
-  Suppose that $M$ is a $\lambda$-term. Then, 
-  \begin{enumerate}[(a)]
-    \item $M$ is a \emph{normal form} if $M$ contains no $\beta$-redex;
-    \item $M$ is called \emph{weakly normalising} if there is a normal form
-      $N$ with $M \reduce N$.
+  \begin{enumerate}
+    \item $M$ is in \emph{normal form} if $M \not\onereduce N$ for any $N$. 
+    \item $M$ is \emph{weakly normalising} if $M \reduce N$ for some $N$ in
+      normal form.
   \end{enumerate}
 \end{definition}
-
-\begin{example}
-  Recall Example~\ref{ex:omega}. 
+%
   \begin{enumerate}
     \item $\Omega$ does not have a normal form.
-    \item $\mathbf{K}_1$ is normal (and thus weakly normalising).
-    \item $(\mathbf{K}_1 z) \Omega$ is weakly normalising.
+    \item $\mathbf{K}_1$ is normal and thus weakly normalising.
+    \item $(\mathbf{K}_1 z)\,\Omega$ is weakly normalising.
   \end{enumerate}
-\end{example}
 
-\begin{theorem}[See {\cite[Theorem 13.2.2]{Barendregt1984a}}]
+\begin{theorem}%[See {\cite[Theorem 13.2.2]{Barendregt1984a}}]
   The leftmost-outermost strategy reduces every weakly
-  normalising $\lambda$-term~$M$ to its normal form $F^n(M)$ for some~$n$.
+  normalising $\lambda$-term~$M$ to its normal form $N$.
 \end{theorem}
 
-As we have seen, different strategies may give different results, so it leads to
-a natural question to ask: do different orders of reductions produce the same
-normal form, if any? 
-
-\subsection{Church-Rosser Theorem}
-To answer the previous question, it suffices to prove the following theorem:
-\begin{theorem}[Church-Rossser Theorem]
-  Given any two terms $N_1$ and $N_2$ with $M \reduce N_1$ and $M\reduce N_2$,
-  there exists $L$ such that
-  \[
-    \xymatrix{
-      & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-      N_1 \ar@{-->}[rd]_{\beta*} & & N_2 \ar@{-->}[ld]^{\beta*} \\
-      & L
-    }
-  \]
-\end{theorem}
-\begin{proof}
-  A complete proof can be found in~\cite[Chapter 4]{Barendregt1984}.
-\end{proof}
-\begin{corollary}[Uniqueness of normal forms]\label{coro:uniqueness-normal}
-  Suppose that $N_1$ and $N_2$ are normal. Then, 
-  \[
-    \xymatrix{
-      & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-      N_1 \ar@{}[r]|{=_\alpha} & N & N_2 \ar@{}[l]|{=_\alpha} \\
-    }
-  \]
-  That is, $N_1$ and $N_2$ are $\alpha$-equivalent.
-\end{corollary}
-
-Since the meaning of a term shall remain the same after reduction, it makes
-sense to identify 
-\[
-  (\lambda x.\, M)\;N
-  \quad\text{and}\quad
-  M\subst{x}{N}
-\]
-where the latter is simply the result of application. Hence, we define the
-$=_\beta$, to be the congruence closure of $\xrightarrow{\beta}$, and we say
-that $M$ is \emph{$\beta$-convertible} to~$N$. For example, 
-\[
-  (\lambda x.\, M)\;N
-  =_\beta
-  M'\subst{x}{N}
-\]
-if $M$ is $\alpha$-equivalent to $M'$;
-$M =_\beta N$ if
-\[
-  M \onereduce M_1 \xleftarrow{\beta1} M_2 \onereduce N
-\]
-To put it differently, $=_\beta$ can defined as follows:
-\begin{multicols}{3}
-\begin{prooftree}
-  \AXC{$M \reduce N$}
-  \UIC{$M =_\beta N$}
-\end{prooftree}
-\begin{prooftree}
-  \AXC{$M =_\beta N$}
-  \UIC{$N =_\beta M$}
-\end{prooftree}
-\begin{prooftree}
-  \AXC{$M =_\beta N$}
-  \AXC{$N =_\beta L$}
-  \BIC{$M =_\beta L$}
-\end{prooftree}
-\end{multicols}
-Two $\lambda$-terms are $\beta$-convertible if they can be connected by
-$\beta$-reductions.
-\begin{corollary} \label{coro:logical-theory}
-  The following statements hold:
-  \begin{enumerate}
-    \item If $M =_\beta N$, then there exists some~$L$ with $M \reduce L$ and $N
-      \reduce L$.
-    \item If $M =_\beta N$ and $N$ is a normal form, then 
-      $M \reduce N$.
-  \end{enumerate}
-\end{corollary}
-\subsection*{Exercise}
-\begin{enumerate}
-  \item Prove
-    Corollary~\ref{coro:uniqueness-normal} \& \ref{coro:logical-theory}.
-  \item Read the paper~\cite[Section 7]{Sestoft2002} for more reduction
-    strategies.
-\end{enumerate}
-\section{Programming in lambda calculus}
-\subsection{Church numerals and arithmetic}
-There is no \emph{built-in} natural number in lambda calculus. However, 
-not only every natural number can be defined as a $\lambda$-term, but also 
-operations, e.g.\ addition, multiplication, and even exponential, on natural
-number can be defined. 
-
-\begin{description}
-  \item[Church numerals]
-  Define $f^1(M) \defeq f(M)$ and $f^{n+1} \defeq f (f^n(M))$. Then, 
-  \[
-    \bc_0 \defeq \lambda f\,x.\, x
-    \quad
-    \bc_{1} \defeq \lambda f\,x.\, f\,x
-    \quad\text{and}\quad
-    \bc_{n} \defeq \lambda f\,x.\, f^{n}\,x
-  \] 
-  \item[Successor]
-    \begin{align*}
-      \mathtt{succ} &\defeq \lambda n\,f\,x.\, f\,(n\,f\,x) \\
-      \mathtt{succ}\;\bc_n &\reduce \bc_{n+1}.
-    \end{align*}
-    for any natural number~$n \in \mathbb{N}$.
-  \item[Predecessor]
-    \begin{align*}
-      \mathtt{pred} & \defeq \lambda n.\,\lambda f.\,\lambda x.\,n\,(\lambda
-      g.\,\lambda h.\,h\,(g\,f))\,
-      (\lambda u.\,x)\,(\lambda u.\,u) \\
-      \mathtt{pred}\;\bc_{0}   & \reduce \bc_{0} \\
-      \mathtt{pred}  \;\bc_{n+1} & \reduce \bc_{n}
-    \end{align*}
-  \item[Addition]
-    \begin{align*}
-      \mathtt{add} & \defeq \lambda n\,m\,f\,x.\; m\;f\;(n\;f\;x)  \\
-      \mathtt{add}\;\bc_{n}\;\bc_{m}\;
-      & \reduce\;\bc_{n + m}
-    \end{align*}
-\end{description}
-
-\begin{example}
-  Evaluate the following terms.
-  \begin{enumerate}
-    \item $\mathtt{add}\;\bc_{0}\;\bc_{1}
-      \reduce \bc_{1}$.
-    \item $\mathtt{add}\;\bc_{1}\;\bc_{1}
-      \reduce \bc_{2}$.
-    \item $\mathtt{add}\;(\mathtt{succ}\;\bc_{0})\;\bc_{1}$.
-    \end{enumerate}
-\end{example}
-
-\begin{description}
-  \item[Conditional]
-    \begin{align*}
-      \mathtt{if}\_\mathtt{then}\_\mathtt{else}\_
-      & \defeq \lambda n\;x\;y.\;n\,(\lambda v.\,y)\,x  \\
-      \mathtt{if} \quad\bc_{0}\quad & \mathtt{then}\quad M\quad\mathtt{else}\quad
-      N  \reduce M \\
-      \mathtt{if} \quad\bc_{n+1}\quad &\mathtt{then}\quad M\quad\mathtt{else}\quad
-      N \reduce N.
-    \end{align*}
-    for any two $\lambda$-terms $M$ and~$N$.
-\end{description}
-
-\subsection{Some combinators and the fixed-point Combinator}
-Here is a list of common combinators:
-\begin{enumerate}
-  \item $\omega \defeq \lambda x.\, x\,x$
-  \item $\Omega \defeq (\lambda x.\, x\,x)\,(\lambda x.\,x\,x)
-    = \omega\,\omega$
-  \item $\mathbf{K}_1 \defeq \lambda x\,y.\, x = \mathtt{T}$, the first projection.
-  \item $\mathbf{K}_2 \defeq \lambda x\,y.\, y = \mathtt{F}$, the second projection.
-  \item $\mathbf{I} \defeq \lambda x.\, x$, known as the \emph{identity}.
-  \item $\mathbf{S}\defeq\lambda f\,g\,x.\, 
-    (f\,x)\,(g\,x)$.
-\end{enumerate}
-\begin{example}[Summation, informally]
-  The summation $\sum_{i = 0}^{n} i$ from $0$ to a given natural number~$n$
-  \emph{is} is usually stated recursively:
-  \[
-    \mathtt{sum}(n) =
-      \begin{cases} 
-       0 & \text{if } n = 0 \\
-       n + \mathtt{sum}(n - 1)  & \text{otherwise}.
-      \end{cases}
-  \]
-  Can we avoid the self-reference? Consider the function
-  $G\colon (\mathbb{N} \to \mathbb{N}) \to (\mathbb{N} \to \mathbb{N})$
-  defined by
-  \begin{equation} \label{eq:summation}
-    (Gf)(n) \defeq
-    \begin{cases}
-       0 & \text{if } n = 0 \\
-       n + f(n - 1)  & \text{otherwise}.
-    \end{cases}
-  \end{equation}
-  Now, assuming that $\mathtt{sum}'$ is a fixed-point of $G$, i.e.\
-  $G(\mathtt{sum}') =\mathtt{sum}'$, we can find that $\mathtt{sum}' =
-  \mathtt{sum}$ by induction. 
-\end{example}
-
-As seen in the example, we can avoid a self-referential definition by taking the
-fixed-point of some higher-order function. It is exactly why lambda calculus so
-powerful as it allows us to obtain the fixed-point of \emph{every}
-$\lambda$-term!
-\begin{proposition}[Curry's paradoxical combinator]
-  Define
-  \[
-    \mathbf{Y} \defeq
-    \lambda f.\, (\lambda x.\, f\,(x\,x))\,(\lambda x.\,f\,(x\,x))
-  \]
-  Then, for every $\lambda$-term~$F$, we have
-  \begin{align*}
-    \mathbf{Y}F
-    & \onereduce \underline{(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))} \\
-    & \onereduce F\,(\underline{(\lambda x.\,F\,(x\,x))\,(\lambda x.\,
-      F\,(x\,x))})
-  \end{align*}
-  where the term $(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))$
-  reoccur as the argument of~$F$ in the last step.
+\begin{definition}
+  For $\lambda$-calculus, a \alert{value} is just a $\lambda$-abstraction. 
+\end{definition}
+\begin{proposition}
+  Under call-by-name and call-by-value strategies, 
+  every value is in normal form.
 \end{proposition}
-\begin{example}[Summation, formally]
-  Using the combinators we have known so far, the equation~\eqref{eq:summation}
-  can be defined as $\lambda$-terms:
-  \begin{align*}
-    G \defeq{} &
-    \lambda f\,n.\, \mathtt{if}\;n\;\mathtt{then}\;\bc_0\;\mathtt{else}\;\;
-    \add\;n\;(f\;(\mathtt{pred}\;n)) \\
-    \mathtt{sum} \defeq{} & \mathbf{Y}G
-  \end{align*}
-  Try to evaluate $\mathtt{sum}$ with some Church numerals.
-\end{example}
-Since the $\mathbf{Y}F$  does not really reduce to $F (\mathbf{Y}F)$ but
-$\mathbf{Y}F =_\beta F(\mathbf{Y}F)$ only, here is anther fixed-point operator
-such that $\Theta F \reduce F(\Theta F)$:
-\begin{proposition}[Turing's fixed-point combinator]
-  Define 
-  \[
-    \Theta \defeq 
-    (\lambda x\,f.\,f\,(x\,x\,f))\;
-    (\lambda x\,f.\,f\,(x\,x\,f))
-  \]
-  Then, 
-  \[
-    \Theta F \reduce F (\Theta F)
-  \]
-\end{proposition}
-\begin{example}[Summation, again!]
-  Now, try Turing's fixed-point combinator with the term $G$ to define
-  $\sum_{i=0}^n i$:
-  \begin{align*}
-    G \defeq{} &
-    \lambda f\,n.\,
-    \mathtt{if}\;n\;\mathtt{then}\;\bc_0\;\mathtt{else}\;\;
-    \add\;n\;(f\,(\mathtt{pred}\;n)) \\
-    \mathtt{sum} \defeq & \Theta\,G \\
-  \end{align*}
-\end{example}
+\end{frame}
 
-In fact, every computable function on natural numbers is definable in terms of
-$\lambda$-terms. Due to the time constrains, we refer the reader
-to~\cite[Chapter 3]{Barendregt1984} for further detail.
-\subsection*{Exercise}
-\begin{enumerate}
-  \item Define the \emph{flip} operation, i.e.\ a $\lambda$-term~$\mathtt{flip}$
-    such that
-    \[
-      \mathtt{flip}\;M\;N\;P
-      \reduce M\;P\;N
-    \]
-  \item Define the pairing $[\,M, N\,]$ of two $\lambda$-terms $M$ and $N$
-    such that
-    \begin{align*}
-      [\,M, N\,]\;\mathbf{K}_1 \reduce M \\
-      [\,M, N\,]\;\mathbf{K}_2 \reduce N.
-    \end{align*}
-  \item Define the multiplication $m \times n$ on Church numerals.
-  \item Define the factorial $n!$ on Church numerals.
-\end{enumerate}
 
-\subsection*{Acknowledgement}
-  I am grateful to Su Horng, Chia-an Yu, and Yu-Hsi Chiang for their suggestions
-  and corrections.
+\begin{frame}{Remark}
+ The definition of capture-avoiding substation is widely adopted, it is still
+ ill-defined.  Recursion is always a total function. Advanced
+ mathematics~\cite{Pitts2013} is needed to resolve this issue.
 
-\bibliographystyle{plain}
-\bibliography{library} 
+  \mode<presentation>{\vfill}
+ Issues with named variables may be lifted by using nameless representation of
+ terms. For example, in de Bruijin's representation every $\lambda$-term 
+ has a canonical form, see \cite[Chapter 6]{Pierce2002}.
+
+  \mode<presentation>{\vfill}
+  In fact, every computable function on natural numbers is definable in terms of
+  $\lambda$-terms. For interested readers, see~\cite[Chapter 3]{Barendregt1984}
+  for further detail. Therefore, $\lambda$-calculus is Turing-complete. 
+\end{frame}
+
+
+\begin{frame}[allowframebreaks]{References}
+  \bibliographystyle{amsalpha}
+  \bibliography{library} 
+\end{frame}
+
 \end{document}

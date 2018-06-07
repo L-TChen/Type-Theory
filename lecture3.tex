@@ -1,42 +1,33 @@
-%! TEX root = lecture3_note.tex
-\title{Lambda Calculus and Types, 3}
-\subtitle{Polymorphic Lambda Calculus}
+%! TEX root = lecture3_slide.tex
+\usepackage{listings}
+\title{Lambda Calculus and Types}
+\subtitle{Parametric Polymorphism}
 \begin{document}
 \begin{frame}
 \maketitle
 \end{frame}
 
-In the second lecture, we have seen that the type $\nat \defeq (\tau \to \tau)
-\to \tau \to \tau$ of natural numbers is not a single type but a
-\emph{collection} of types for each type~$\tau$. This intriguing formulation, in
-fact, shows us how to make $\nat$ a single type: we simply internalise the
-universal quantifier in our type system. That is, we push the universal
-quantifier 
-\begin{quote}
-``For all type $\tau$, ...''
-\end{quote}
-in the metalanguage into our system:
-\[
-  \forall t.\, \sigma(t)
-\]
-where $t$ is a \emph{type variable}. For example, the type of natural numbers
-can be defined as a single type:
-\[
-  \nat \defeq \forall t.\, (t \to t) \to t \to t
-\]
-and the type $\nat_\tau = (\tau \to \tau) \to \tau \to \tau$ becomes an instance
-of $\nat$ with $t$ substituted by~$\tau$.  Simply
-typed lambda calculus extended with this universal type constructor is called
-\emph{System F} introduced by Girard and also called \emph{polymorphic lambda
-  calculus}.
+\begin{frame}[fragile]{Polymorphism}
+  \emph{Abstraction principle~\cite{Pierce2002}}:
+  \begin{quotation}
+    Each significant piece of functionality in a program should be implemented
+    in just one place in the source code. Where similar functions are carried
+    out by distinct pieces of code, it is generally beneficial to combine them
+    into one by abstracting out the varying parts.
+  \end{quotation}
 
-\section{Syntax and typing rules}
-We now present polymorphic lambda calculus \emph{\'a la} Church. For simplicity,
-we do not treat the Curry-style variant. 
-\begin{definition}
+  In Haskell
+  \begin{semiverbatim}
+    head :: [a] -> a
+    head (x:_) = x
+  \end{semiverbatim}
+\end{frame}
+
+\section{System F---Polymorphic Lambda Calculus}
+\begin{frame}{Types}
   Given type variables~$\mathbb{V}$, the set $\type$ of \emph{types} is
-  inductively defined by
-  \begin{multicols}{3}
+  defined by
+  \begin{multicols}{2}
     \begin{prooftree}
       \AXC{$t \in \mathbb{V}$}
       \UIC{$t \in \type$}
@@ -46,6 +37,7 @@ we do not treat the Curry-style variant.
       \AXC{$\tau   \in \type$}
       \BIC{$\sigma \to \tau \in \type$}
     \end{prooftree}
+    \color{red}
     \begin{prooftree}
       \AXC{$\sigma \in \type$}
       \AXC{$t   \in \mathbb{V}$}
@@ -53,12 +45,22 @@ we do not treat the Curry-style variant.
       \BIC{$\forall t.\, \sigma \in \type$}
     \end{prooftree}
   \end{multicols}
-\end{definition}
-As we have defined what the set of  free variables of a $\lambda$-term is, a
-similar definition also extends to types:
+For example, the type $\forall t.\, t \to t$ corresponds to a type variable
+universally quantified in GHC with extension \texttt{RankNType}
+\begin{semiverbatim}
+  forall a. a -> a
+\end{semiverbatim}
+or simply 
+\begin{semiverbatim}
+  a -> a
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}{Free and Bound Variables, again}
 \begin{definition}
   The \emph{free variable} $\FV\colon \type \to \mathcal{P}\mathbb{V}$ of a type
-  is a function defined by
+  is defined by
   \begin{align*}
     \FV(t) & {} = t \\
     \FV(\sigma \to \tau) & {} = \FV(\sigma) \cup \FV(\tau) \\
@@ -70,39 +72,36 @@ similar definition also extends to types:
       \wedge t \in \FV(\sigma) }.
   \]
 \end{definition}
-\begin{example}
-  Assume that $v$, $v_1$ and $v_2$ are type variables.
   \begin{enumerate}
     \item $\FV(t_1) = \{t_1\}$.
     \item $\FV(\forall t.\, (t \to t) \to t \to t) = \emptyset$.
     \item $\FV(x : t_1, y : t_2, z : \forall t.\,t)
       = \{t_1, t_2\}$.
   \end{enumerate}
-\end{example}
-Since the use of a variable in a type is to be substituted by other types, we also
-need to define \emph{substitution over types} accordingly and routinely.
-
-\begin{definition}
+\end{frame}
+\begin{frame}{Capture-Avoiding Substitution for Type}
+  \begin{definition}
   The \emph{(capture-avoidance) substitution} of a type $\rho$ for the free
-  occurrence of a type variable~$t$ is defined inductively as 
+  occurrence of a type variable~$t$ is defined by 
   \begin{align*}
     t\subst{t}{\rho} & = \rho \\
     u\subst{t}{\rho} & = u && \text{if $u \neq t$}\\
     (\sigma\to\tau)\subst{t}{\rho} & =
-    (\sigma\subst{t}{\rho})\to
-    (\tau\subst{t}{\rho}) \\
+    \sigma\subst{t}{\rho}\to
+    \tau\subst{t}{\rho} \\
     (\forall t.\sigma)\subst{t}{\rho} & = \forall t.\sigma \\
     (\forall u.\sigma)\subst{t}{\rho} & = \forall u.\sigma\subst{t}{\rho}
-    && \text{if $u \neq t$ and $u \not\in \FV(\rho)$}
+                                      &&
+    \text{if $u \neq t, u \not\in \FV(\rho)$} 
   \end{align*}
-\end{definition}
+  \end{definition}
+  Recall that $u \not\in \FV(\rho)$ means that $u$ is \emph{fresh} for $\rho$. 
+\end{frame}
 
-Now we proceed with terms in polymorphic lambda calculus. 
-
+\begin{frame}[allowframebreaks]{Typed $\lambda$-terms}
 \begin{definition}
   Given a set~$V$ of variables, a set $\mathbb{V}$ of type variables,
-  the set~$\term$ of $\lambda$-terms is augmented with polymorphism
-  and generated by the following grammar 
+  the set terms for System $F$ is defined by
   \begin{multicols}{2}
     \begin{prooftree}
       \AXC{$x \in V$}
@@ -119,6 +118,7 @@ Now we proceed with terms in polymorphic lambda calculus.
       \AXC{$\tau \in \type$}
       \TIC{$\lambda (x : \tau).\, M \in \term$}
     \end{prooftree}
+    \color{red}
     \begin{prooftree}
       \AXC{$M \in \term$}
       \AXC{$t \in \mathbb{V}$}
@@ -131,22 +131,44 @@ Now we proceed with terms in polymorphic lambda calculus.
     \end{prooftree}
   \end{multicols}
 \end{definition}
-\begin{example} \label{ex:f-terms}
-  Can you see the untyped version of the following terms?
+\framebreak
+GHC with the extension \texttt{ScopedTypeVariables} allows you to use type
+variables. 
+\begin{semiverbatim}
+ f :: forall a. [a] -> [a]
+
+ f = \\(xs :: [a]) -> reverse xs
+\end{semiverbatim}
+GHC with the extension \texttt{TypeApplications} allows you to apply a type
+argument.
+\begin{semiverbatim}
+  Prelude> :t id
+
+  id :: a -> a
+
+  Prelude> :t id @Int
+
+  id @Int :: Int -> Int
+\end{semiverbatim}
+
+\framebreak
+  Can you see the corresponding untyped/simply typed $\lambda$-terms of the
+  following $\lambda$-terms in System F? 
+
   \begin{enumerate}
     \item $\Lambda t.\,\lambda (x : t).\, x$
     \item $\Lambda t.\, \lambda (x : t)(y : t).\, x$
     \item $(\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N$
      where  $M, N$ are terms and $\sigma$ a type.
     \item $\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x)$
-    \end{enumerate}
-\end{example}
+  \end{enumerate}
+System $F$ is more expressive than simply typed lambda calculus.
+\end{frame}
 
-We also extend the typing rules of simply typed lambda calculus to introduce 
-type polymorphism and instantiation with a specific type:
-\begin{definition}[Typing rules]
-  The set of valid judgements in polymorphic lambda calculus is defined
-  inductively as follows:
+\begin{frame}{Typing Rules}
+  
+The typing rule for simply typed lambda calculus are extended to
+accommodate polymorphism: 
   \begin{multicols}{2} 
   \begin{prooftree}
     \AXC{$\phantom{\Gamma}$}
@@ -161,11 +183,11 @@ type polymorphism and instantiation with a specific type:
     \AXC{$\Gamma, x : \sigma \vdash M : \tau$}
     \UIC{$\Gamma \vdash \lambda (x : \sigma).\; M : (\sigma \to \tau)$}
   \end{prooftree}
+  \color{red}
   \begin{prooftree}
-    \AXC{$\Gamma \vdash M : \sigma$}
-    \AXC{$t \not\in \FV(\Gamma)$}
+    \AXC{$\Gamma, t \vdash M : \sigma$}
     \RightLabel{($\forall$-intro)}
-    \BIC{$\Gamma \vdash \Lambda t.\;M : \forall t.\, \sigma$}
+    \UIC{$\Gamma \vdash \Lambda t.\;M : \forall t.\, \sigma$}
   \end{prooftree}
   \begin{prooftree}
     \AXC{$\Gamma \vdash M : \forall v.\, \sigma$}
@@ -173,20 +195,11 @@ type polymorphism and instantiation with a specific type:
     \UIC{$\Gamma \vdash (M\;\tau) : \sigma\subst{v}{\tau}$}
   \end{prooftree}
   \end{multicols}
-\end{definition}
-\begin{example} \label{ex:f-welltyped}
-  The following terms are well-typed:
-  \begin{enumerate}
-    \item ${}\vdash\Lambda t.\,\lambda (x : t).\, x : \forall t.\;t\to t$
-    \item ${}\vdash\Lambda t.\, \lambda (x : t)(y : t).\, x : \forall t.\;t \to t \to t$
-    \item $a : \sigma, b : \sigma
-      \vdash (\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;a\;b
-      : \sigma$
-    \item ${}\vdash\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x) :
-      \forall t.\;(t\to t) \to t\to t$
-    \end{enumerate}
-\end{example}
-We derive the second one and leave others to the reader.
+\end{frame}
+\begin{frame}{Typing Derivation}
+
+The typing judgement ${}\vdash\Lambda t.\, \lambda (x : t)(y : t).\, x : \forall
+t.\;t \to t \to t$ is derivable from the following derivation:
 \begin{prooftree}
   \AXC{}
   \RightLabel{(var)}
@@ -196,200 +209,430 @@ We derive the second one and leave others to the reader.
   \UIC{$\vdash \Lambda t.\,\lambda (x : t)(y : t).\; x :\forall t.\,t \to t \to
     t$}
 \end{prooftree}
+  
+\begin{block}{Exercise}
+  Derive the following judgements:
+  \begin{enumerate}
+    \item ${}\vdash\Lambda t.\,\lambda (x : t).\, x : \forall t.\;t\to t$
+    \item $a : \sigma, b : \sigma
+      \vdash (\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;a\;b
+      : \sigma$
+    \item ${}\vdash\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x) :
+      \forall t.\;(t\to t) \to t\to t$
+    \end{enumerate}
+\end{block}
+\end{frame}
 
-In line with the new syntax, we also need to extend \emph{substitution over
-  terms} and \emph{$\beta$-reduction}. The substitution is rather routine and
-left as an exercise to the reader.  The $\beta$-conversion has an additional
-rule:
+\begin{frame}{Substitution for Term}
+  
+In line with the new syntax, we need to extend \emph{substitution over
+  terms}. Pretty obvious and routine. 
+
+\mode<presentation>{\vfill}
+\begin{block}{Homework}
+  Define \emph{capture-avoiding substitution} for terms of System F. 
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}{Evaluation}
+  
+The $\beta$-conversion has two rules
 \[
-  (\Lambda t.\, M)\;\tau \xrightarrow{\beta} M' \subst{t'}{\tau}
+  (\lambda (x : \tau).\, M)\,N \longrightarrow_{\beta}
+  M\subst{x}{N}
+  \quad\text{and}\quad
+  \color{red} (\Lambda t.\, M)\;\tau \longrightarrow_{\beta} M \subst{t}{\tau}
 \]
-if $(\Lambda t.\, M)$ is $\alpha$-equivalent to $(\Lambda t'.\, M')$
-and $M' \subst{t'}{\tau}$ is defined.
-Then we define the \emph{one-step} $\beta$-reduction similarly.
+The full $\beta$-reduction is a relation on $\lambda$-terms defined by
+\begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$M_1 \longrightarrow_{\beta} M_2$}
+      \UIC{$M_1 \onereduce M_2$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M_1 \onereduce M_2$}
+      \UIC{$\lambda (x:\tau).\, M_1 \onereduce \lambda (x:\tau).\, M_2$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M_1 \onereduce M_2$}
+      \UIC{$M_1\,N \onereduce M_2\,N$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$N_1\onereduce  N_2$}
+      \UIC{$M\,N_1 \onereduce M\,N_2$}
+    \end{prooftree}
+\end{multicols}
+If $M \onereduce N$, then $M$ and $N$ \alert{denotes} the same value. So, 
+\[
+  M =_\beta N
+\]
+where $=_\beta$ is the congruence and equivalence closure of
+$\longrightarrow_\beta$.
+\end{frame}
 
-We can also erase the type information of well-typed terms and reduce it, as if
-untyped. To be precise, we state the erasing map and the result without any
-proof.
+\section{Programming in System F}
+\begin{frame}{Self Application}
+Self-application is not typable in simply typed lambda calculus. 
+  \[
+    \lambda (x : t).\, x\; x
+  \]
+  However, self-application is possible in System F. 
+  \[
+    \lambda (x : \forall t. t\to t).\, x\;(\forall t. t\to t)\;x
+  \]
+  
+\end{frame}
+\begin{frame}[allowframebreaks]{Church Encoding of Bottom Type}
 \begin{definition}
-  The \emph{erasing map} is a function from typed terms in polymorphic lambda
-  calculus to untyped terms in lambda calculus defined inductively 
-  \begin{align*}
-    |x| & = x \\
-    |\lambda (x : \tau).\,M| & = \lambda x.\, |M| \\
-    |(M\;N)| & = (|M|\;|N|) \\
-    |\Lambda t.\, M| & = |M| \\
-    |(M\;\tau)| & = |M|
-  \end{align*}
-\end{definition}
-\begin{theorem}[Preservation Theorem]
-  Within polymorphic lambda calculus, if ${}\vdash M : \sigma$ and $|M|
-  \onereduce N'$, then there exists some typed-term~$N$ with
-  ${}\vdash N : \sigma$ and $|N| = N'$.
-\end{theorem}
-\subsection*{Exercise}
-\begin{enumerate}
-  \item Complete Example~\ref{ex:f-terms}.
-  \item Derive every judgement in Example~\ref{ex:f-welltyped}.
-\end{enumerate}
-\section{Data types in System F}
-Thanks to type polymorphism, the system can now express much more types,
-including the \emph{product type}, the \emph{sum type}, the type of
-\emph{natural number}, the type of \emph{lists}, and even every inductive data
-type.
-\subsection{Empty type}
-The empty type is a type supposed to have no inhabitant, and it can be defined
-as
+The bottom type is a type defined by
 \[
   \bot \defeq \forall t.\,t
 \]
-Note that if there is any term of this type~$\bot$, then we can infer that every
-type has a term:
-\begin{prooftree}
-  \AXC{$\vdash M : \bot$}
-  \UIC{$\vdash M\,\tau : \tau$}
-\end{prooftree}
-Can this be true? We will answer it later.
-\subsection{Sum type}
-The sum type of $\tau$ and $\sigma$ represents the
-``disjoint union'' of two types, defined as
-\[
-  \sigma + \tau \defeq \forall t. (\sigma \to t) \to (\tau \to t) \to t
-\]
-with two ``injections'': The first injection is defined by
-\begin{align*}
-  \vdash {} & \mathtt{inj}_1 \colon \sigma \to \sigma + \tau \\
-  & \mathtt{inj}_1 \defeq \lambda (x : \sigma).\;\Lambda t.\,\lambda (f :
-  \sigma\to t)(g : \tau\to t).\, f\;x 
-\end{align*}
-and similarly the second injection
-\begin{align*}
-  \vdash {} & \mathtt{inj}_2 \colon \tau \to \sigma + \tau \\
-  & \mathtt{inj}_2 \defeq ?
-\end{align*}
-(Find the exact definition of $\mathtt{inj}_2$.)
+\end{definition}
+\begin{block}{Exercise}
+  Does the bottom type contain any inhabitant? Try to define 
+  one in System F and one in Haskell
+  \begin{semiverbatim}
+    contradiction :: forall a. a
 
-With the sum type, we can implement the usual construct \texttt{case}:
-\[
-  \vdash \mathtt{case} : \forall\,\rho.\;(\sigma \to \rho) \to (\tau \to \rho)
-  \to (\sigma + \tau) \to \rho
-\]
-so that $\mathtt{case}\;F\;G$ returns a term of type $\rho$ a term with an input
-of type $\sigma + \tau$, provided that $\vdash F : \sigma\to\rho$ and $\vdash G
-: \tau \to \rho$. Try to find the exact definition of $\mathtt{case}$.
-\subsection{Product type}
-The product type can be defined as
-\[
-  \sigma \times \tau \defeq \forall t. (\sigma \to \tau \to t) \to t
-\]
-with the pairing function
+    contradiction = ?
+  \end{semiverbatim}
+\end{block}
+\end{frame}
+\begin{frame}[allowframebreaks]{Church Encoding of Sum Type}
+
+\begin{definition}
+  The \emph{sum type} (i.e.\ \texttt{Either} in Haskell) is defined by
+  \[
+    \sigma + \tau \defeq \forall t. (\sigma \to t) \to (\tau \to t) \to t
+  \]
+\end{definition}
+It has two injection functions: the first injection is defined by
 \begin{align*}
-  {} \vdash & \lambda (x : \sigma)(y : \tau).\; \left< x, y\right> :
-  \sigma \to \tau \to \sigma
-  \times \tau \\
-  & \left< x, y\right> \defeq \Lambda t.\,\lambda (f : \sigma \to \tau \to t).\,
+  \mathtt{left} & \defeq \lambda (x : \sigma).\;\Lambda t.\,\lambda (f : \sigma\to
+  t)(g : \tau\to t).\, f\;x \\
+  \mathtt{right} & \defeq \;?
+\end{align*}
+\framebreak
+
+With the sum type, we can implement the usual construct \texttt{either}:
+\[
+  \mathtt{either} : \forall\,t.\;(\sigma \to t) \to (\tau \to t)
+  \to (\sigma + \tau) \to t
+\]
+which corresponds to the Haskell function
+{\small
+\begin{semiverbatim}
+  either :: (a -> c) -> (b -> c) -> Either a b -> c
+
+  either f g (Left  a) = f a 
+
+  either f g (Right b) = g b
+\end{semiverbatim}}
+
+\mode<presentation>{\vfill}
+\begin{block}{Exercise}
+  Define the other injection function $\mathtt{right}$.  Define
+  $\mathtt{either}$ in System F.
+\end{block}
+\end{frame}
+
+\begin{frame}{Church Encoding of Product Type}
+\begin{definition}[Product Type]
+  The product type is defined by
+  \[
+    \sigma \times \tau \defeq \forall t. (\sigma \to \tau \to t) \to t
+  \]
+\end{definition}
+The pairing function is defined by
+\begin{align*}
+  \left< \_, \_\right> \defeq \lambda (x : \sigma)(y : \tau).\,\Lambda t.\,\lambda (f : \sigma \to \tau \to t).\,
   f\;x\;y
 \end{align*}
-Try to define projections 
+\begin{block}{Exercise}
+Define projections 
 \[
   \mathtt{proj}_1 : \sigma \times \tau \to \sigma
   \quad\text{and}\quad
   \mathtt{proj}_2 : \sigma\times \tau \to \tau
 \]
-\subsection{Natural numbers}
-Back to Church numerals, we can now define them with a single type:
+\end{block}
+\end{frame}
+\begin{frame}[allowframebreaks]{Church Encoding of Natural Numbers}
+The type of Church numerals is defined by 
 \[
   \nat \defeq \forall t.\, (t\to t)\to t\to t
 \]
   \begin{description}
-    \item[Polymorphic Church numerals]
+    \item[Church numerals]
       \begin{align*}
-        \vdash{} & \bc_n : \nat \\
-        & \bc_n \defeq \Lambda t.\,\lambda (f:t \to t)\,(x:t).\,
+        \bc_n & : \nat \\
+        \bc_n & \defeq \Lambda t.\,\lambda (f:t \to t)\,(x:t).\,
         f^n\;x
       \end{align*}
     \item[Successor]
       \begin{align*}
-        \vdash{} & \suc : \nat \to \nat \\
-        & \suc \defeq \,\lambda (n : \nat).\,\Lambda t.\,\lambda
+        \suc & : \nat \to \nat \\
+        \suc & \defeq \,\lambda (n : \nat).\,\Lambda t.\,\lambda
         (f : t \to t)\,(x:t)\,.\;f\;(n\;t\;f\;x) 
       \end{align*}
     \item[Addition]
       \begin{align*}
-        \vdash{} & \add : \nat \to \nat \to \nat \\
-        & \add \defeq \lambda (n : \nat)\,(m:\nat)\,\Lambda t.\,
-        \lambda (f:t\to t)\,(x: t).\; (m\;t\;f)\;(n\;t\;f\;x) 
+        \add & : \nat \to \nat \to \nat \\
+        \add & \defeq \lambda (n : \nat)\,(m:\nat)\,&& \Lambda t.\, \lambda
+        (f:t\to t)\,(x: t).\\
+        &&& (m\;t\;f)\;(n\;t\;f\;x) 
       \end{align*}
     \item[Multiplication] 
       \begin{align*}
-      \vdash{} & \mul : \nat\to \nat \to\nat\\
-        & \mul \defeq\,?
+       \mul & : \nat\to \nat \to\nat\\
+       \mul & \defeq\,?
       \end{align*}
     \item[Conditional]
       \begin{align*}
-        \vdash {} & \ifz : \forall t.\,\nat \to t \to t \to t \\
-        & \ifz \defeq\,?
+       \ifz & : \forall t.\,\nat \to t \to t \to t \\
+       \ifz & \defeq\,?
       \end{align*}
   \end{description}
-However, polymorphic lambda calculus allows us to define a certain form of
-recursion on Church numerals, called \emph{iterator} or the
-\texttt{fold} function which you have seen in Haskell.
+However, polymorphic lambda calculus allows us to define
+\emph{iterator} over natural numbers or the \texttt{fold} function in Haskell.
 \begin{align*}
-  \vdash{} & \mathtt{fold} : \forall t.\, (t \to t) \to t \to \nat \to t  \\
-  & \mathtt{fold} \defeq \Lambda t.\, \lambda (f : t \to t)(e_0 : t)(n : \nat). 
+  \mathtt{fold} & : \forall t.\, (t \to t) \to t \to \nat \to t  \\
+  \mathtt{fold} & \defeq \Lambda t.\, \lambda (f : t \to t)(e_0 : t)(n : \nat). 
   n\;t\;f\;e_0
 \end{align*}
-where
-\[
-  \mathtt{fold}\;\tau\;f\;e_0\;\bc_0 \reduce e_0
-  \quad\text{and}\quad\mathtt{fold}\;\tau\;f\;e_0\;\bc_{1 + n} \reduce
-  f\;(\mathtt{fold}\;\tau\;f\;e_0\;\bc_n).
-\]
-The addition and multiplication can be redefined as follows:
-\begin{example}
+
+In Haskell, the above $\lambda$-term can be given as
+\begin{semiverbatim}
+  fold :: (a -> a) -> a -> [()] -> a
+
+  fold f e []            = e
+
+  fold f e (():xs) = f () (fold f e xs)
+\end{semiverbatim}
+
+\begin{block}{Exercise}
   Define $\add$ and $\mul$ using $\mathtt{fold}$ and justify your
-  answer.\footnote{
-    Note that, for example, $3 + 7$ is equal to $1 + (1 + (1 + 7))$, and it
-    leads us to the following definition
-    $\add'\defeq \mathtt{fold}\;(\nat \to \nat)\;(\lambda
-    f\;n.\;\suc\;(f\;n))\;(\lambda x.\;x)$. 
-  }
+  answer.
+  
   \begin{enumerate}
     \item $\add'\defeq \;? : \nat\to\nat\to\nat$
     \item $\mul'\defeq \;? : \nat\to\nat\to\nat$
   \end{enumerate}
-  Moreover, show that each of them reduces to the expected Church numerals
-\end{example}
-\subsection{List}
-Finally, the type of list over a type~$\sigma$ can also be defined in
-polymorphic lambda calculus. It is similar to the type of natural numbers:
+\end{block}
+
+\mode<presentation>{\vfill}
+\begin{block}{Homework}
+  Show that
+  \begin{align*}
+    & \mathtt{fold}\;\tau\;f\;e_0\;\bc_0 && =_\beta e_0 \\
+    & \mathtt{fold}\;\tau\;f\;e_0\;\bc_{n + 1} && =_\beta
+    f\;(\mathtt{fold}\;\tau\;f\;e_0\;\bc_n)
+  \end{align*}
+\end{block}
+\framebreak
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Church Encoding of Lists}
+\begin{definition}
+  For any type $\sigma$, the type of lists over $\sigma$ is 
 \[
   \List\,\sigma\defeq \forall t.\, t \to (\sigma \to t \to t) \to t 
 \]
-with ``list constructors'' 
-\begin{enumerate}
-  \item $\mathtt{nil}_\sigma \defeq \Lambda t.\lambda (h : t)(f :
-    \sigma\to t \to t).\, h$
-  \item $\mathtt{cons}_\sigma \defeq \lambda (x : \sigma)(xs : \List\,
-    \sigma).\,\Lambda t.\lambda(h : t)(f : \sigma\to t \to t).f\,x\,(xs\; t\;
-    h\; f)$ which has the type $\sigma \to \List\,\sigma \to  \List\,\sigma$.
-  \end{enumerate}
-\subsection*{Exercise}
+\end{definition}
+with ``list constructors'':
+\[
+  \mathtt{nil}_\sigma \defeq \Lambda t.\lambda (h : t)(f : \sigma\to t \to t).\,
+  h
+\]
+and  
+\[
+  \mathtt{cons}_\sigma \defeq \lambda (x : \sigma)(xs : \List\,
+  \sigma).\,\Lambda t.\lambda(h : t)(f : \sigma\to t \to t).f\,x\,(xs\; t\;
+  h\; f)
+\]
+
+\framebreak
+\begin{block}{Homework}
 \begin{enumerate}
   \item Define $\mathtt{fold}$ over the list type over~$\sigma$.
-  \item Define $\mathtt{length}_{\sigma} : \List \sigma \to \nat$ calculating
+  \item Define $\mathtt{length}_{\sigma} : \List\,\sigma \to \nat$ calculating
     the length of a given list so that
     \[
-      \mathtt{length}\;\mathtt{nil}_\sigma \reduce \bc_0
-      \quad\text{and}\quad
-      \mathtt{length}\;(\mathtt{cons}_\sigma\;x\;xs)
-      \reduce \suc\;(\mathtt{length}\;xs) 
+      \mathtt{length}\;\mathtt{nil}_\sigma =_\beta \bc_0
     \]
-  \item The type of lists we just defined does depend on a specific
-    type~$\sigma$ unnecessarily. Can you generalise it further as well as
-    constructors?
+    and
+    \[
+      \mathtt{length}\;(\mathtt{cons}_\sigma\;x\;xs)
+      =_\beta \suc\;(\mathtt{length}\;xs) 
+    \]
+  \item The above type of lists depends on a specific
+    type~$\sigma$. Generalise it further. 
   \end{enumerate}
+  
+\end{block}
+\framebreak
 
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Abstract Data Type  and Existential Type}
+  Type does not only prevent simple type-mismatch but also help program
+  abstraction, e.g., abstract data types where the implementation detail is
+  invisible to outside. 
+  
+  \begin{example}
+    Roughly speaking, a \emph{stack} is a data structure with two operations:
+    \begin{itemize}
+      \item \texttt{push}
+      \item \texttt{pop}
+    \end{itemize}
+    Any implementation satisfying $\mathtt{pop} \circ (\mathtt{push}\, n\, st) =
+    (n, st)$ can be seen as a stack. 
+  \end{example}
+  \framebreak
+  Such abstraction can be described by an \emph{existential type}.
+  \[
+    \exists t.\, \tau(t)
+    \quad\text{or simply}\quad
+    \exists t.\, \tau
+  \]
+  where $t$ is a type variable and $\tau$ is a type (potentially 
+  containing $t$ as a free variable).
+\mode<presentation>{\vfill}
+  A \emph{witness} of type $\exists t.\, \tau$ is a pair $(\sigma, M)$ of a
+  \emph{type} $\sigma$ and an element $M$ of type $\tau\subst{t}{\sigma}$. 
+
+\mode<presentation>{\vfill}
+  (The typing rule and $\beta$-conversion are omitted here.)
+  \framebreak
+  \begin{example}
+    The type of stacks over natural numbers can be defined by
+    \[
+      \exists t. (t \times \nat \to t) \times (t \to 1 + \nat \times t) 
+    \]
+    \begin{enumerate}
+      \item The first component is the \text{push} function.
+      \item The second component is the \text{pop} function.
+    \end{enumerate}
+\mode<presentation>{\vfill}
+    An instance of a stack is an element $(\sigma, M)$ of the above type
+    \begin{enumerate}
+      \item $\sigma$ is a type
+      \item $\mathtt{proj}_1\, M \colon \sigma \times \nat \to \sigma$
+      \item $\mathtt{proj}_2\, M \colon \sigma \to 1 + \nat \times
+          \sigma$. 
+    \end{enumerate}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]{Encoding of Existential Type in Haskell}
+  A limited form of existential type can be defined by 
+  \begin{semiverbatim}
+    data Exists t where
+      Ex :: t a -> Exists t
+  \end{semiverbatim}
+  and another version for typeclass
+  \begin{semiverbatim}
+    data Exists' c where
+      Ex' :: c a => a -> Exists' c
+  \end{semiverbatim}
+  in GHC with extensions \texttt{GADTs} and \texttt{ConstraintKinds}. 
+
+\mode<presentation>{\vfill}
+  \begin{block}{Exercise}
+    Define the top type $\top$ which contains every typable term.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Encoding of Existential Type in System F}
+  The existential type can also be encoded in System F as 
+  \[
+    \exists t.\, \tau \defeq \forall u.\; (\forall t.\; \tau \to u) \to u
+  \]
+  using continuation passing style.\footnote{Recall that $\exists x.\,\varphi
+  = (\forall x.\, (\varphi \to \bot)) \to \bot$ classically.  }
+\mode<presentation>{\vfill}
+  A witeness $(\sigma, M)$ of $\exists t.\, \tau$ is encoded as
+  \[
+    \Lambda u.\,\lambda (f : \forall t.\, \tau \to u).\, f\;\sigma\;M
+  \]
+
+  \begin{block}{Exercise}
+    Check that the above terms do make sense. How to use a term of some existential
+    type? 
+  \end{block}
+  
+\end{frame}
+\section{Properties of System F}
+\begin{frame}{Type Safety and Normalisation}
+  \begin{theorem}[Preservation]
+    If $\Gamma \vdash M : \sigma$ 
+    and $M \onereduce N$, then
+    $\Gamma \vdash N : \sigma$. 
+  \end{theorem}
+
+  \begin{theorem}[Progress]
+    If ${}\vdash M : \sigma$, then either $M$ is a value or
+    there is $N$ such that $M \onereduce N$. 
+  \end{theorem}
+  The above two properties are proved by induction.
+
+  \begin{theorem}[Normalisation]
+    If $\vdash M : \sigma$, then $M$ terminates. 
+  \end{theorem}
+\end{frame}
+
+\begin{frame}{Type Erasure}
+\begin{definition}
+  The \emph{erasing map} is a function defined by
+  \begin{align*}
+    |x| & = x \\
+    |\lambda (x : \tau).\,M| & = \lambda x.\, |M| \\
+    |M\;N| & = (|M|\;|N|) \\
+    |\Lambda t.\, M| & = |M| \\
+    |M\;\tau| & = |M|
+  \end{align*}
+\end{definition}
+
+\begin{proposition}
+  Within System F, if ${}\vdash M : \sigma$ and $|M|
+  \onereduce N'$, then there exists a well-typed term~$N$ with
+  ${}\vdash N : \sigma$ and $|N| = N'$.
+\end{proposition}
+\end{frame}
+
+
+\begin{frame}{Undecidability of Type Inference}
+  \begin{theorem}
+     It is undecidable whether, given a closed term $M$ of the untyped
+     lambda-calculus, there is a well-typed term $M'$ in System F such that
+     $|M'| = M$.  
+  \end{theorem}
+
+  \begin{description}
+    \item[Arbitrary Rank Polymorphism] $\forall$ can appear
+      anywhere {\small (GHC with \texttt{-XRankNType})}. 
+    \item[Rank-1 Polymorphism]
+      $\forall$ only appear in the outermost position.
+  \end{description}
+  \emph{Hindley-Milner type system} (adopted by Haskell, Standard ML, etc.) only
+  supports rank-1 polymorphism and type inference becomes
+  decidable.\footnote{It is decidable up to rank-$2$ polymorphism.}
+\end{frame}
+
+\begin{frame}{Parametricity}
+  What functions can you write for the following type?
+  \[
+    \Lambda t. t \to t 
+  \]
+
+\mode<presentation>{\vfill}
+  \begin{block}{Homework}
+    Read \cite{Wadler1989} if interested. 
+  \end{block}
+\end{frame}
 %\section{Parametricity}
 %Polymorphism in System F is \emph{parametric} in the sense that every
 %instance is uniformly defined. To put it differently, it cannot depend on any
@@ -435,6 +678,9 @@ with ``list constructors''
 %\subsection*{Exercise}
 
 
-\bibliographystyle{plain}
+\begin{frame}{References}
+\bibliographystyle{amsalpha}
 \bibliography{library} 
+\end{frame}
+
 \end{document}
