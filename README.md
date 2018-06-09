@@ -1,8 +1,14 @@
-# Lecture Note on Introduction to Lambda Calculus and Types for FLOLAC'16
+# Slides on Introduction to Lambda Calculus and Types
+
+## Requirement 
+
+* XeLaTeX 
+* latexmk 
+* Fira Sans Font (optional) 
 
 ## Compiling 
 
-With LaTeX installed, to compile every lecture note just type 
+To compile every lecture note, type
 
 ``make``
 
