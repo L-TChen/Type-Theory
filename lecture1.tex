@@ -365,12 +365,13 @@ of~$\longrightarrow_\alpha$. We say that $M$ and $N$ are
     \onereduce (\lambda y.\, M)\,N
     \onereduce M\subst{y}{N} \onereduce \ldots
   \]
+  Let $\reduce$ denote the reflexive and transitive closure of $\onereduce$. 
 \end{frame}
 
 \section{Programming in Lambda Calculus}
-\begin{frame}[allowframebreaks]{Programming in $\lambda$-calculus}
+\begin{frame}{Church Encoding of Boolean values}
   
-Boolean values and conditional can be encoded as closed $\lambda$-terms. 
+Boolean and conditional can be encoded as combinators.
   
 \begin{description}
   \item[Boolean]
@@ -390,8 +391,9 @@ Boolean values and conditional can be encoded as closed $\lambda$-terms.
     \end{align*}
     for any two $\lambda$-terms $M$ and~$N$.
 \end{description}
+\end{frame}
+\begin{frame}[allowframebreaks]{Church Encoding of Natural Numbers}
 
-\framebreak
   Natural numbers can be encoded as $\lambda$-terms, so can arithmetic operations. 
   \begin{description}
     \item[Church numerals] 
@@ -427,8 +429,9 @@ Boolean values and conditional can be encoded as closed $\lambda$-terms.
         & \mathtt{ifz}\;\bc_{n+1}\;M\;N && \reduce \; N
       \end{align*}
   \end{description}
-  \framebreak
+\end{frame}
 
+\begin{frame}
   Here is a list of common combinators:
 \begin{enumerate}
   \item $\omega \defeq \lambda x.\, x\,x$
@@ -444,7 +447,7 @@ Boolean values and conditional can be encoded as closed $\lambda$-terms.
       \item Define $\mathtt{pred}$. 
       \item Define Boolean operations, i.e.\ $\mathtt{not}$, $\mathtt{and}$,
         and $\mathtt{or}$. 
-      \item Is $\omega$ allowed in Haskell? 
+      \item (*) Is $\omega$ allowed in Haskell? 
     \end{enumerate}
   \end{block}
 \end{frame}
@@ -563,7 +566,6 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 
   \framebreak
 
-  Let $\reduce$ denote the reflexive and transitive closure of $\onereduce$.
 %  \begin{multicols}{2}
 %    \begin{prooftree}
 %      \AXC{\phantom{$M \reduce N$}}

@@ -222,8 +222,8 @@ But, what should $\longrightarrow$ be?
 
 \section{Operational Semantics}
 \begin{frame}{Reduction Relation}
-  Instead of giving the \emph{meaning} of expressions in other languages,
-  arithmetic expressions can be \alert{computed} to other expressions. 
+  Instead of giving the \emph{interpretation} of expressions in other
+  structures, expressions can be \alert{evaluated} within the same language. 
 
   Define a binary relation $\longrightarrow$ between arithmetic expressions by
   \begin{prooftree}
@@ -252,7 +252,7 @@ But, what should $\longrightarrow$ be?
 
 \begin{frame}{Some Reductions}
       $\mathtt{add}\; (\mathtt{succ}\; \mathtt{0})\;
-      (\mathtt{succ}\;(\mathtt{succ}\;\mathtt{0})$
+      (\mathtt{succ}\;(\mathtt{succ}\;\mathtt{0}))$
       \vfill
       $\mathtt{succ}\; (\mathtt{add}\;(\mathtt{succ}\;\mathtt{0})\;
       (\mathtt{succ}\;\mathtt{0}))$
@@ -359,8 +359,8 @@ The reduction relation is deterministic:
 \end{frame}
 
 \begin{frame}{Acknowledgement}
-  I am grateful to \CJKtext{游書泓} (Shu-Hung You), Chia-An Yu, and Yu-Hsi Chiang for their
-  suggestions and corrections.
+  I am grateful to \CJKtext{游書泓} (Shu-Hung You), Chia-An Yu, Yu-Hsi Chiang,
+  \CJKtext{許恆與} for their suggestions and corrections.
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References}
