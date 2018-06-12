@@ -1,4 +1,4 @@
-# Slides on Introduction to Lambda Calculus and Types
+# Introduction to Lambda Calculus and Types
 
 ## Requirement 
 
@@ -8,8 +8,11 @@
 
 ## Compilation
 
-To compile every lecture note, type
+To compile every lecture note, do
 
 ``make``
 
-in a terminal. 
+or to compile specific lecture note, do
+
+``make lecture{0,1,2,3}``
+
