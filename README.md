@@ -6,7 +6,7 @@
 * latexmk 
 * Fira Sans Font (optional) 
 
-## Compiling 
+## Compilation
 
 To compile every lecture note, type
 
