@@ -500,7 +500,7 @@ $G(\mathtt{sum}') =\mathtt{sum}'$, we can show that $\mathtt{sum}' =
   can be defined as $\lambda$-terms:
   \begin{align*}
     G \defeq{} & 
-    \lambda f\,n.\, \mathtt{ifz}\;n\;bc_0\;
+    \lambda f\,n.\, \mathtt{ifz}\;n\;\bc_0\;
     (\add\;n\;(f\;(\mathtt{pred}\;n))) \\
     \mathtt{sum} \defeq{} & \mathbf{Y}G
   \end{align*}
@@ -525,7 +525,7 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 \begin{align*}
   G \defeq{} &
   \lambda f\,n.\,
-  \mathtt{ifz}\;n\;bc_0\;
+  \mathtt{ifz}\;n\;\bc_0\;
   (\add\;n\;(f\,(\mathtt{pred}\;n))) \\
   \mathtt{sum} \defeq\; & \Theta\,G 
 \end{align*}
