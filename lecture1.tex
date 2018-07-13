@@ -52,8 +52,8 @@
       \BIC{$\lambda x.\, M \in \Lambda$}
     \end{prooftree}
 %  \end{multicols}
-\noindent Application is left associative; abstraction is right associative. 
 \end{definition}
+\noindent Application is left associative; abstraction is right associative. 
 \end{frame}
 
 \begin{frame}{Meta-Language and Object-Language}
@@ -125,8 +125,8 @@
     A string possibly annotated with brackets and other delimiters.
   \end{block}
   
-  \begin{block}{Abstract Binding Tree}
-    A tree structure with pointers where each node is an operator 
+  \begin{block}{Abstract Syntax Tree}
+    A tree whose nodes are operations
     with arguments as its sub-trees.
   \end{block}
 
@@ -167,13 +167,13 @@
 %
 \begin{frame}[allowframebreaks]{Naive Substitution}
   \begin{definition}
-    For $x \in V$ and $M \in \Lambda$, the substitution of $x$ for $M$ is
+    For $x \in V$ and $L \in \Lambda$, the substitution of $L$ for $x$ is
     defined by
     \begin{align*}
-      x[x \mapsto M] & = M \\
-      y[x \mapsto M] & = M & \text{if $x \neq y$} \\
+      x[x \mapsto L] & = L \\
+      y[x \mapsto L] & = y & \text{if $x \neq y$} \\
       (M\,N)[x \mapsto L] & = (M[x \mapsto L]\,N[x \mapsto L]) \\
-      (\lambda x.\, M)[y \mapsto N] & = \lambda x.\, M[y \mapsto N] 
+      (\lambda y.\, M)[x \mapsto L] & = \lambda y.\, M[x \mapsto L] 
     \end{align*}
   \end{definition}
     A bound variable may become free. 
@@ -181,15 +181,15 @@
       (\lambda x.\, x)[x \mapsto y] = \lambda x.\, y
     \]
   \begin{definition}
-    For $x \in V$ and $M \in \Lambda$, the substitution
-    of $x$ for $M$ is defined by
+    For $x \in V$ and $L \in \Lambda$, the substitution
+    of $L$ for $x$ is defined by
     \begin{align*}
-      x[x \mapsto M] & = M \\
-      y[x \mapsto M] & = M && \text{if $x \neq y$} \\
+      x[x \mapsto L] & = L \\
+      y[x \mapsto L] & = y && \text{if $x \neq y$} \\
       (M\,N)[x \mapsto L] & = (M[x \mapsto L]\,N[x \mapsto L]) \\
-      (\lambda x.\, M)[y \mapsto N] & = \lambda x.\, M[y \mapsto N] 
+      (\lambda y.\, M)[x \mapsto L] & = \lambda y.\, M[x \mapsto L] 
                                     && \text{if $x \neq y$} \\
-      (\lambda x.\, M)[y \mapsto N] & = \lambda x.\, M
+      (\lambda y.\, M)[y \mapsto L] & = \lambda y.\, M
                                     && \text{if $x = y$} 
     \end{align*}
   \end{definition}
@@ -234,7 +234,7 @@
 \end{frame}
 \begin{frame}{Capture-Avoiding Substitution}
   Capture-avoiding substitution of $L$ for the \alert{free occurrences} of $x$ is a
-  \emph{partial} function from $\lambda$-terms to $\lambda$-terms defined by
+  \textbf{\emph{partial}} function from $\lambda$-terms to $\lambda$-terms defined by
   \begin{align*}
     x\subst{x}{L} & = L \\
     y\subst{x}{L} & = y && \text{if $x \neq y$} \\
@@ -255,8 +255,12 @@
       \begin{multicols}{2}
         \begin{prooftree}
           \AXC{$M_1 \mathrel{R} M_2$}
+          \UIC{$(M_1\,N) \mathrel{R} (M_2\,N)$}
+        \end{prooftree}
+        \begin{prooftree}
+          %\AXC{$M_1 \mathrel{R} M_2$}
           \AXC{$N_1 \mathrel{R} N_2$}
-          \BIC{$(M_1\,N_1) \mathrel{R} (M_2\,N_2)$}
+          \UIC{$(M\,N_1) \mathrel{R} (M\,N_2)$}
         \end{prooftree}
         \begin{prooftree}
           \AXC{$M_1 \mathrel{R}M_2$}
@@ -270,10 +274,10 @@
       containing~$R$. 
   \end{enumerate}
 \end{definition}
-\vfill
-  \begin{block}{Homework}
-    Define congruence closure using inference rules. 
-  \end{block}
+%\vfill
+%  \begin{block}{Homework}
+%    Define congruence closure using inference rules. 
+%  \end{block}
 \end{frame}
 
 \begin{frame}{Renaming of Bound Variables}
@@ -382,15 +386,17 @@ Boolean and conditional can be encoded as combinators.
 
   \item[Conditional]
     \begin{align*}
-      \mathtt{if}\_\mathtt{then}\_\mathtt{else}\_
-      & \defeq \lambda b\;x\;y.\;b\,x\,y  \\
-      \mathtt{if} \quad\mathtt{True} \quad & \mathtt{then}\quad M\quad\mathtt{else}\quad
-      N  \reduce M \\
-      \mathtt{if} \quad\mathtt{False} \quad &\mathtt{then}\quad M\quad\mathtt{else}\quad
-      N \reduce N
+      \mathtt{if} & \defeq \lambda b\;x\;y.\;b\,x\,y  \\
+      \mathtt{if} \;\mathtt{True} \;M\;N &\reduce M \\
+      \mathtt{if} \;\mathtt{False}\;M\;N &\reduce N
     \end{align*}
     for any two $\lambda$-terms $M$ and~$N$.
 \end{description}
+\begin{block}{Exercise}
+  Define Boolean operations, i.e.\ $\mathtt{not}$, $\mathtt{and}$, and
+  $\mathtt{or}$. 
+\end{block}
+
 \end{frame}
 \begin{frame}[allowframebreaks]{Church Encoding of Natural Numbers}
 
@@ -400,6 +406,7 @@ Boolean and conditional can be encoded as combinators.
       \begin{align*}
         &\bc_0 &&\defeq\;&& \lambda f\,x.\, x \\
         &\bc_{1} &&\defeq\;&& \lambda f\,x.\, f\,x \\
+        &\bc_{2} &&\defeq\;&& \lambda f\,x.\, f\,(f\,x) \\
         &\bc_{n+1} &&\defeq\;&& \lambda f\,x.\, f^{n+1}\,(x)
       \end{align*}
       for $n > 0$ where $f^{n+1}(M)  \defeq f (f^n\, M))$.
@@ -409,18 +416,19 @@ Boolean and conditional can be encoded as combinators.
         & \mathtt{succ}\;\bc_n && \reduce\; && \bc_{n+1}
       \end{align*}
       for any natural number~$n \in \mathbb{N}$.
-    \item[Predecessor]
-      \begin{align*}
-        & \mathtt{pred} && \defeq\; && \lambda n.\, \lambda f\,x.\, ? \\
-        & \mathtt{pred}\;\bc_{0}  && \reduce\; && \bc_{0} \\
-        & \mathtt{pred}  \;\bc_{n+1} && \reduce\; && \bc_{n}
-      \end{align*}
     \item[Addition]
       \begin{align*}
         & \mathtt{add} && \defeq\; && \lambda n\,m.\,\lambda f\,x.\;
         m\;f\;(n\;f\;x)  \\ & \mathtt{add}\;\bc_{n}\;\bc_{m}\;
                             && \reduce\; && \bc_{n + m}
       \end{align*}
+  \end{description}
+
+  \begin{block}{Exercise}
+    Evaluate $\mathtt{succ}\,\bc_0$ and $\mathtt{add}\,\bc_{1}\,\bc_{2}$. 
+  \end{block}
+
+  \begin{description}
     \item[Conditional]
       \begin{align*}
         & \mathtt{ifz} && \defeq \; \lambda n\;x\;y.\;n\;(\lambda z.\;y)\;x 
@@ -428,26 +436,32 @@ Boolean and conditional can be encoded as combinators.
         & \mathtt{ifz}\;\bc_0\;M\;N && \reduce \; M \\
         & \mathtt{ifz}\;\bc_{n+1}\;M\;N && \reduce \; N
       \end{align*}
+    \item[Predecessor]
+      \begin{align*}
+        & \mathtt{pred} && \defeq\; && \lambda n.\, \lambda f\,x.\, ? \\
+        & \mathtt{pred}\;\bc_{0}  && \reduce\; && \bc_{0} \\
+        & \mathtt{pred}  \;\bc_{n+1} && \reduce\; && \bc_{n}
+      \end{align*}
   \end{description}
+  \begin{block}{Exercise}
+    Define $\mathtt{pred}$.
+  \end{block}
 \end{frame}
 
 \begin{frame}
   Here is a list of common combinators:
 \begin{enumerate}
-  \item $\omega \defeq \lambda x.\, x\,x$
-  \item $\Omega \defeq (\lambda x.\, x\,x)\,(\lambda x.\,x\,x)
-    = \omega\,\omega$
   \item $\mathbf{I} \defeq \lambda x.\, x$, the \emph{identity}.
   \item $\mathbf{S}\defeq\lambda f\,g\,x.\, 
     (f\,x)\,(g\,x)$.
+  \item $\omega \defeq \lambda x.\, x\,x$
+  \item $\Omega \defeq (\lambda x.\, x\,x)\,(\lambda x.\,x\,x)
+    = \omega\,\omega$
 \end{enumerate}
   \begin{block}{Exercise}
     \begin{enumerate}
-      \item Evaluate $\mathtt{succ}\,\bc_0$ and $\mathtt{add}\,\bc_{1}\,\bc_{2}$. 
-      \item Define $\mathtt{pred}$. 
-      \item Define Boolean operations, i.e.\ $\mathtt{not}$, $\mathtt{and}$,
-        and $\mathtt{or}$. 
-      \item (*) Is $\omega$ allowed in Haskell? 
+      \item $\omega$ allowed in Haskell? 
+      \item Evaluate $\Omega$. 
     \end{enumerate}
   \end{block}
 \end{frame}
@@ -507,6 +521,25 @@ $G(\mathtt{sum}') =\mathtt{sum}'$, we can show that $\mathtt{sum}' =
 \end{example}
   Try to evaluate $\mathtt{sum}$ with, say, $\bc_3$.
 
+\framebreak 
+
+  The recursive function definition is unfolded via the self-replicating
+  behaviour of $\mathbf{Y}$:
+  \begin{align*}
+    & \mathbf{Y}G\;\bc_n \\
+    \reduce &\;G\;(\mathbf{Y}G)\;\bc_n \\
+    \reduce &
+    {\color{red}\mathtt{ifz}\;\bc_n\;\bc_0\;(\add\;\bc_n\;(\mathbf{Y}G\;\bc_{n-1}))}
+    \\
+    \reduce &\;\mathtt{ifz}\;\bc_n\;\bc_0\;(\add\;\bc_n\\
+            & \qquad {\color{red} \mathtt{ifz}\;\bc_{n-1}\;\bc_0\;(\add\;\bc_{n-1}
+  \;(\mathbf{Y}G\;\bc_{n-2}))}) \\
+    \reduce &\;\mathtt{ifz}\;\bc_n\;\bc_0\;(\add\;\bc_n\\
+            & \qquad \mathtt{ifz}\;\bc_{n-1}\;\bc_0\;(\add\;\bc_{n-1} \\
+            & \qquad \qquad {\color{red}\mathtt{ifz}\;\bc_{n-2}\;\bc_0\;(\add\;\bc_{n-2}
+  (\mathbf{Y}G\;\bc_{n-3}))})) \reduce &\;\dots
+  \end{align*}
+  
 \framebreak
 Here is a fixed-point operator such that $\Theta F \reduce F(\Theta F)$.
 \begin{proposition}[Turing's fixed-point combinator]
@@ -542,6 +575,7 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
   \item Define the factorial $n!$ on Church numerals.
 \end{enumerate}
 \end{block}
+
 
 \end{frame}
 \section{Properties of Lambda Calculus}

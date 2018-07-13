@@ -479,7 +479,7 @@ for each type variable as
 \end{block}
 \end{frame}
 
-\begin{frame}{Definability}
+\begin{frame}[allowframebreaks]{Definability}
 %Within simply typed lambda calculus, we wonder how many computable functions can
 %be defined, as it excludes non-terminating $\lambda$-terms. 
   A function $f\colon \mathbb{N}^k \to \mathbb{N}$ is called
@@ -489,7 +489,17 @@ for each type variable as
     F\,\bc_{n_1}\ldots\bc_{n_k} \reduce \bc_{f(n_1, \dots, n_k)}
   \]
   for every sequence $(n_1, n_2, \ldots, n_k) \in \mathbb{N}^k$.
+  Diagrammatically, 
 
+\[
+  \xymatrix{
+    (n_1, n_2, \ldots, n_k) \ar@{|->}[rr] \ar@{|->}[d]_{(\bc_{-})^k} & & f(n_1,
+    n_2, \ldots, n_k) \ar@{|->}[d]^{\bc_{-}}\\
+    (\bc_{n_1}, \bc_{n_2}, \ldots, \bc_{n_k}) \ar@{|->}[rr] & & 
+    F\;\bc_{n_1}\; \bc_{n_2}\; \ldots\;\bc_{n_k}
+    = \bc_{f(n_1, n_2, \ldots, n_k)}
+  }
+\]
 \begin{theorem}[Schwichtenberg~\cite{Schwichtenberg1976}]
   The $\lambda_\to$-definable functions are the class of functions
   of the form $f\colon \mathbb{N}^k \to \mathbb{N}$ closed under compositions
