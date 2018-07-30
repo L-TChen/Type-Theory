@@ -9,26 +9,29 @@
 
  
 \usepackage[british]{babel}
-\mode<article>{\usepackage{mathptmx}}
+%\mode<article>{\usepackage{mathptmx}}
 \mode<article>{\usepackage[a4paper]{geometry}}
-\usepackage{mathrsfs}
+%\usepackage{mathrsfs}
 \usepackage{bussproofs}
+\EnableBpAbbreviations
 \usepackage{multicol}
 
-\EnableBpAbbreviations
 \usepackage{graphicx}
 \usepackage[all,cmtip]{xy}
 
+\mode<article>{\usepackage{fontspec}}
 \mode<article>{\usepackage{hyperref}}
 \mode<article>{\usepackage{microtype}}
 
 \setbeamertemplate{theorems}[numbered]
 \newtheorem{proposition}[theorem]{Proposition}
-%\theoremstyle{remark}
 \newtheorem{convention}[theorem]{Convention}
 \newtheorem{remark}{Remark}[section]
+\theoremstyle{plain}
+\newtheorem*{exercise*}{Exercise}
 
 \newfontfamily\CJKtext{Noto Sans CJK TC DemiLight}
+%\setmainfont{Fira Sans}
 
 \newcommand{\FV}{\mathbf{FV}}
 \newcommand{\BV}{\mathbf{BV}}
@@ -82,8 +85,8 @@
 
 \newcommand {\textplus}{\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}}
 
-\author[L.-T. Chen]{\CJKtext{陳亮廷} Chen, Liang-Ting}
+%\author[L.-T. Chen]{{\CJKtext 陳亮廷} Chen, Liang-Ting}
 \institute{Swansea University, UK}
-\date[FLOLAC'18]{2018 \CJKtext{邏輯、語言與計算暑期研習營} \\
-  Formosan Summer School on \\<all>
+\date[FLOLAC'18]{%2018 {\CJKtext 邏輯、語言與計算暑期研習營} \\
+    12\textsuperscript{th} Formosan Summer School on 
   Logic, Language, and Computation}

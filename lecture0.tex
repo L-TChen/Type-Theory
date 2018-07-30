@@ -187,13 +187,13 @@ But, what should $\longrightarrow$ be?
     \label{thm:recursion}
     Given functions 
     \begin{enumerate}
-      \item $f_0\colon \{*\} \to S$, 
+      \item $f_{\mathtt{0}} \in S$, 
       \item $f_{\mathtt{succ}}\colon S \to S$, 
       \item $f_{\mathtt{add}}\colon S \times S \to S$, 
     \end{enumerate}
     there exists a unique function $f\colon \mathcal{T} \to S$ such that 
     \begin{enumerate}
-      \item $f(\mathtt{0}) = f_{0}(*)$
+      \item $f(\mathtt{0}) = f_{0}$
       \item $f(\mathtt{succ}\,n) = f_{\mathtt{succ}}(f(n))$
       \item $f(\mathtt{add}\,n\,m) = 
         f_{\mathtt{add}}(f(n), f(m))$.
