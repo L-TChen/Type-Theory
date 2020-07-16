@@ -9,9 +9,7 @@
 
  
 \usepackage[british]{babel}
-%\mode<article>{\usepackage{mathptmx}}
 \mode<article>{\usepackage[a4paper]{geometry}}
-%\usepackage{mathrsfs}
 \usepackage{bussproofs}
 \EnableBpAbbreviations
 \usepackage{multicol}
@@ -24,16 +22,17 @@
 \mode<article>{\usepackage{microtype}}
 
 \setbeamertemplate{theorems}[numbered]
+\theoremstyle{plain}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{convention}[theorem]{Convention}
 \newtheorem{remark}{Remark}[section]
-\theoremstyle{plain}
+\theoremstyle{definition}
 \newtheorem*{exercise*}{Exercise}
 
 \newfontfamily\CJKtext{Noto Sans CJK TC DemiLight}
-%\setmainfont{Fira Sans}
 
 \newcommand{\FV}{\mathbf{FV}}
+\newcommand{\Var}{\mathbf{Var}}
 \newcommand{\BV}{\mathbf{BV}}
 \newcommand{\term}{\mathtt{Term}}
 \newcommand{\type}{\mathbb{T}}
@@ -49,7 +48,7 @@
 \makeatother
 
 \newcommand{\op}{\mathrm{op}}
-\newcommand{\subst}[2]{[\,#1\mapsto#2\,]}
+\newcommand{\subst}[2]{[{#1}/{#2}]}
 
 \newcommand{\leftexp}[2]{{\vphantom{#2}}^{#1}{#2}}
 \newcommand{\set}[2]{\{\,#1\mid#2\,\}}
@@ -63,6 +62,7 @@
 
 % Macros for PCF
 \newcommand{\reduce}{\longrightarrow_{\beta*}}
+\newcommand{\parreduce}{\Longrightarrow_{\beta}}
 \newcommand{\onereduce}{\longrightarrow_{\beta1}}
 \newcommand{\nat}{\mathtt{nat}}
 \newcommand{\bool}{\mathtt{bool}}
@@ -85,8 +85,7 @@
 
 \newcommand {\textplus}{\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}}
 
-%\author[L.-T. Chen]{{\CJKtext 陳亮廷} Chen, Liang-Ting}
-\institute{Swansea University, UK}
-\date[FLOLAC'18]{%2018 {\CJKtext 邏輯、語言與計算暑期研習營} \\
-    12\textsuperscript{th} Formosan Summer School on 
-  Logic, Language, and Computation}
+\author[L.-T. Chen]{{\CJKtext 陳亮廷} Chen, Liang-Ting}
+\institute{Institute of Information Science, Academia Sinica}
+\date[FLOLAC'20]{2020 {\CJKtext 邏輯、語言與計算暑期研習營} \\
+    Formosan Summer School on Logic, Language, and Computation}
