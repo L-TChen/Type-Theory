@@ -3,9 +3,9 @@
 \title{Programming Language Theory}
 \subtitle{Untyped Lambda Calculus}
 \begin{document}
-\begin{frame}
-\maketitle
-\end{frame}
+
+{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+\begin{frame}\maketitle\end{frame}}
 
 \begin{frame}[fragile]{Assessment guidelines}
   \begin{description}
@@ -51,7 +51,7 @@
 
 \section{Untyped $\lambda$-Calculus: Statics}
 
-\begin{frame}{Terms of $\lambda$-calculus}
+\begin{frame}{$\lambda$-calculus: Terms}
 
 Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
 \emph{variables}.
@@ -906,7 +906,7 @@ Evaluate
 using the call-by-value and the call-by-name strategy respectively.
 \end{frame}
 
-\begin{frame}{Normalising}
+\begin{frame}{Normalisation}
 \begin{definition}
   \begin{enumerate}
     \item $M$ is in \emph{normal form} if $M \notonereduce N$ for any $N$. 
@@ -930,12 +930,12 @@ using the call-by-value and the call-by-name strategy respectively.
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item Show that $\reduce$ is transitive, i.e.\
+    \item (25\%) Show that $\reduce$ is transitive, i.e.\
       $L \reduce N$ whenever $L \reduce M$ and $M \reduce N$. 
       \textbf{Hint}. By induction on $L \reduce M$.
-    \item Show Lemma~\ref{lem:normal-no-reduction}
-    \item Show Corollary~\ref{coro:uniqueness-normal}
-    \item Show Corollary~\ref{coro:computational-meanting-confluence}.
+    \item (25\%) Show Lemma~\ref{lem:normal-no-reduction}
+    \item (25\%) Show Corollary~\ref{coro:uniqueness-normal}
+    \item (25\%) Show Corollary~\ref{coro:computational-meanting-confluence}.
   \end{enumerate}
 \end{frame}
 %\begin{frame}{Remark}

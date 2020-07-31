@@ -3,11 +3,11 @@
 
 \usepackage{listings}
 \title{Programming Language Theory}
-\subtitle{Primitive recursion, general recursion, and polymorphism}
+\subtitle{Primitive Recursion, General Recursion, and Polymorphism}
 \begin{document}
-\begin{frame}
-\maketitle
-\end{frame}
+
+{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+\begin{frame}\maketitle\end{frame}}
 
 %\begin{frame}[fragile]{Polymorphism}
 %  \emph{Abstraction principle~\cite{Pierce2002}}:
@@ -146,7 +146,7 @@
   \end{block}
 \end{frame}
 
-\section{Fixpoint operator}
+\section{\PCF --- System of Recursive Functions}
 
 \begin{frame}{\textbf{PCF}: $\lambda_\to$ with naturals and general recursion}
   \textbf{T} does not include all computable functions, since all terms terminate eventually. 
@@ -910,7 +910,8 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   \[
     \forall t.\,t \to t 
   \]
-\mode<presentation>{\vfill}
+  Since $t$ is arbitrary, we cannot inspect the content of $t$. What we can do
+  with $t$ is simply return it.
   \begin{theorem}
     Every term $M$ of type $\forall t.\, t \to t$ is \emph{observationally equivalent}%
     \footnote{The notion of observational equivalence is beyond the scope of this lecture.}
@@ -918,9 +919,48 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   \end{theorem}
 \end{frame}
 
-\begin{frame}{Theorems for free}
-  
+\begin{frame}{Parametricity: Theorems for free\footnote{Philip Wadler. 1989. Theorems for free! In \emph{Proceedings of the fourth international conference on Functional programming languages and computer architecture (FPCA ’89)}. ACM, New York, NY, USA, 347–359.}}
+  Assume \textbf{F} extended with the list type~$\List\;\tau$ for $\tau$ and
+  the type $\mathbb{N}$ of naturals, denoted $\mathbf{F}_{\List, \mathbb{N}}$.
+
+  Then $\mathtt{head} \circ \mathtt{map}\; f = f \circ \mathtt{head}$
+      for any $f : \tau \to \sigma$ where $\mathtt{head} : \forall t.\, \List\;t \to t$
+  can be proved by just reading the type of $\mathtt{head}$ and $\mathtt{tail}$!
+  \begin{theorem}
+    For any type $\sigma$ in \textbf{F} (with lists) and $\cdot  \vdash M : \sigma$, then 
+    \[
+      M \sim M : \mathcal{R}_{\sigma, \sigma}
+    \]
+  \end{theorem}
 \end{frame}
+
+%\begin{frame}
+%  $M \sim N : \mathcal{R}_{\sigma, \tau}$ is defined as follows.
+%
+%  \begin{enumerate}
+%    \item $M \sim M : \mathcal{R}_{\mathbb{N}, \mathbb{N}}$ for every $M :
+%      \mathbb{N}$.
+%
+%    \item For any $\mathcal{R}_{\tau, \sigma}$, 
+%      \[
+%        M_i \sim N_i : \mathcal{R}_{\sigma, \tau} \; \text{for any $M_i : \sigma$ and $N_i : \tau$}
+%        \iff 
+%        [ M_1, \dots, M_k ] \sim [ N_1, \dots, N_k ] : \mathcal{R}_{\List\;\sigma, \List\;\tau}
+%      \]
+%
+%    \item For any $\mathcal{R}_{\sigma, \sigma'}$ and $\mathcal{S}_{\tau, \tau'}$,
+%      $M \sim M' : \mathcal{R}_{\sigma, \sigma'} \implies L\; M
+%      \sim L'\;M' : \mathcal{S}_{\tau, \tau'}$ for any $M$ and $M'$
+%      if and only if 
+%      $L \sim L' : \mathcal{R}\to\mathcal{S}_{\sigma \to \tau, \sigma' \to \tau'}$
+%
+%    \item Assume $\mathcal{F}$ which sends $\mathcal{R}_{\sigma, \tau}$ to
+%      $\mathcal{F}\mathcal{R}_{F\sigma, F\tau}$. Then
+%      $f\;\sigma \sim g\;\tau : \mathcal{F}\mathcal{R}$ for all $\mathcal{R}_{\sigma, \tau}$
+%      if and only if $f \sim g : \forall \mathcal{X}_{t, u}.\, {\mathcal{F}\mathcal{X}}_{Ft, Fu}$
+%  \end{enumerate}
+%\end{frame}
+
 %\begin{frame}{System $F_\omega$}
 %  Recall that for $\sigma, \tau \in \type$ the sum type of $\sigma$ and $\tau$
 %  is 
@@ -1019,19 +1059,20 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item Extend {\PCF} with the type $\mathbb{B}$ of boolean values with
+    \item (25\%) Extend {\PCF} with the type $\mathbb{B}$ of boolean values with
       $\mathtt{ifz}(M; N)\;\true =_\beta M$ and $\mathtt{ifz}(M; N)\;\false
       =_\beta N$ including term formation rules, typing rules, and dynamics for
       $\mathbb{B}$.
 
-    \item Define \textbf{pred} in {\textbf{T}} such that $\pred\;\zero =\zero$
+    \item (25\%) Define \textbf{pred} in {\textbf{T}} such that $\pred\;\zero =\zero$
       and $\pred\;(\suc\;n) = n$.
 
-    \item Define \textbf{even} in {\PCF} such that $\mathbf{even}\;n =
+    \item (25\%) Define \textbf{even} in {\PCF} such that $\mathbf{even}\;n =
       \suc\;\zero$ if $n$ is an even number; $\mathbf{even}\;n = \zero$
       otherwise. 
 
-    \item Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list.
+    \item (25\%) Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list.
+    \item (0\%) Read the paper by Wadler (1989).
     
   \end{enumerate}
   
