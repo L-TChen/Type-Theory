@@ -13,6 +13,7 @@
 \usepackage{bussproofs}
 \EnableBpAbbreviations
 \usepackage{multicol}
+\usepackage{centernot}
 
 \usepackage{graphicx}
 \usepackage[all,cmtip]{xy}
@@ -35,7 +36,7 @@
 \newcommand{\Var}{\mathbf{Var}}
 \newcommand{\BV}{\mathbf{BV}}
 \newcommand{\term}{\mathtt{Term}}
-\newcommand{\type}{\mathbb{T}}
+\newcommand{\type}{\mathtt{Type}}
 \newcommand{\reason}[1]{\{\text{\,#1\,}\}}
 \renewcommand{\o}{\circ}
 \newcommand{\mnd}[1]{{\overleftarrow{#1}}}
@@ -72,7 +73,7 @@
 \newcommand{\bc}{\mathbf{c}}
 \newcommand{\add}{\mathtt{add}}
 \newcommand{\mul}{\mathtt{mul}}
-\newcommand{\fix}{\mathtt{Y}}
+\newcommand{\fix}{\mathtt{fix}}
 \newcommand{\natrec}{\mathtt{natrec}}
 \newcommand{\fold}{\mathtt{fold}}
 \newcommand{\suc}{\mathtt{suc}}
@@ -82,6 +83,13 @@
 \newcommand{\zero}{\mathtt{zero}}
 \newcommand{\true}{\mathtt{true}}
 \newcommand{\false}{\mathtt{false}}
+\newcommand{\neutral}{\mathtt{Neutral}}
+\newcommand{\normal}{\mathtt{Normal}}
+
+\newcommand{\PCF}{{\textbf{PCF}}}
+
+\newcommand{\notimplies}{\centernot\implies}
+\newcommand{\notonereduce}{{\centernot\longrightarrow}_{\beta1}}
 
 \newcommand {\textplus}{\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}}
 

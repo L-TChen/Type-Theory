@@ -1,6 +1,6 @@
 %! TEX program = xelatex
 %! TEX root = lecture1_slide.tex
-\title{An Elementary Introduction to Programming Languages}
+\title{Programming Language Theory}
 \subtitle{Untyped Lambda Calculus}
 \begin{document}
 \begin{frame}
@@ -12,7 +12,7 @@
     \item[Deadline] 17:00, 20 Aug
     \item[Assessment] 
       \begin{description}
-        \item[Assignment] (10\% + 10\%)
+        \item[Assignment] (10\% + 10\% + 10\%)
         \item[Exam] (100\%)
       \end{description}
     \item[Email] \texttt{liang.ting.chen.tw(at)gmail(dot)com}
@@ -49,7 +49,7 @@
 %  \mode<presentation>{\vfill}
 %\end{frame}
 
-\section{Syntax and Semantics of Untyped $\lambda$-Calculus}
+\section{Untyped $\lambda$-Calculus: Statics}
 
 \begin{frame}{Terms of $\lambda$-calculus}
 
@@ -63,23 +63,23 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
       \begin{prooftree}
         \AXC{$x \in V$}
         \RightLabel{(var)}
-        \UIC{$x \in \Lambda$}
+        \UIC{$x : \Lambda$}
       \end{prooftree}
 
     \item Function application of $M$ to the argument $N$:
       \begin{prooftree}
-        \AXC{$M \in \Lambda$}
-        \AXC{$N \in \Lambda$}
+        \AXC{$M : \Lambda$}
+        \AXC{$N : \Lambda$}
         \RightLabel{(app)}
-        \BIC{$M \; N \in \Lambda$}
+        \BIC{$M \; N : \Lambda$}
       \end{prooftree}
 
     \item Function abstraction with an argument $x$ and a function body $M$:
       \begin{prooftree}
-        \AXC{$M \in \Lambda$}
+        \AXC{$M : \Lambda$}
         \AXC{$x \in V$}
         \RightLabel{(abs)}
-        \BIC{$\lambda x.\, M \in \Lambda$}
+        \BIC{$\lambda x.\, M : \Lambda$}
       \end{prooftree}
   \end{enumerate}
 \end{definition}
@@ -147,7 +147,7 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
   \alert{Warning}. We apply these rules in our \emph{meta}-language.
 \end{frame}
 
-\begin{frame}{Meta-Language and Object-Language}
+\begin{frame}{Meta-Language and object-language}
   \begin{itemize}
     \item \emph{Meta-language} is the language we use to describe the object of
       study. E.g. English, or naive set theory. 
@@ -161,10 +161,11 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
     \]
   \begin{enumerate}
     \item $\mathtt{id}$ is a symbol different from `$\lambda x.\,x$' in our meta-language.
-    \item $\mathtt{id}$ and $\lambda x.\, x$ are the \emph{same} $\lambda$-term, denoted by
+    \item $\mathtt{id}$ and $\lambda x.\, x$ are \emph{syntactically equivalent}, denoted by
       \[
         \mathtt{id} \equiv \lambda x.\, x
       \]
+      in the object language.
   \end{enumerate}
 \end{frame}
 
@@ -196,17 +197,17 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
   \begin{definition}
     Two $\lambda$-terms $M$ an $N$ are \alert{$\alpha$-equivalent} 
     \[
-      M \equiv_\alpha N
+      M =_\alpha N
     \]
     if variables \emph{bound} by abstractions can be renamed to derive the same term. 
   \end{definition}
   \begin{example}
     \begin{enumerate}
       \item $\lambda x.\, x$ and $\lambda y.\, y$ are distinct $\lambda$-terms but $\lambda x.\, x
-        \equiv_\alpha \lambda y.\, y$. 
-      \item $\lambda x.\, \lambda y.\, y \equiv_\alpha 
+        =_\alpha \lambda y.\, y$. 
+      \item $\lambda x.\, \lambda y.\, y =_\alpha 
         \lambda z.\, \lambda y.\, y$. 
-      \item $\lambda x.\, \lambda y.\, x \mathrel{\not\equiv}_\alpha
+      \item $\lambda x.\, \lambda y.\, x \mathrel{\neq}_\alpha
         \lambda x.\, \lambda y.\, y$. 
     \end{enumerate}
   \end{example}
@@ -214,8 +215,8 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
   
 \end{frame}
 
-\begin{frame}{Informal evaluation}
-  The \alert{evaluation} of $\lambda$-calculus happens in this form only:
+\begin{frame}{Evaluation, informally}
+  The \alert{evaluation} of $\lambda$-calculus happens in this form 
   \[
     \underbrace{(\lambda x.\, M)\,N}_{\beta\text{-redex}} \longrightarrow 
     \underbrace{M\;\subst{N}{x}}_{\text{substitution of $N$ for $x$ in $M$}}
@@ -229,9 +230,6 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
     \item $(\lambda x\, y.\,x)\,y$
     \item $(\lambda y\, y.\,y)\,x$
   \end{enumerate}
-  \mode<presentation>{\vfill}
-  The goal of this part is to define evaluation precisely. 
-
 \end{frame}
 
 \begin{frame}{Equality, equality, equality!}
@@ -251,7 +249,7 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Free and Bound Variables}
+\begin{frame}{Free and bound variables}
 \begin{definition}
   The set $\FV$ of free variables of a term $M$ is defined by
   \begin{align*}
@@ -293,7 +291,7 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
 
 \begin{frame}{Substitution}
    A \alert{substitution} is a process of replacing \emph{free} variables by
-   another terms. 
+   another terms (on the meta-level). 
 
    The name of a variable does not matter but the location does. So, ...
    \begin{enumerate}
@@ -360,7 +358,7 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
   \end{definition}
 \end{frame}
 
-\begin{frame}{Renaming of Bound Variables}
+\begin{frame}{Renaming of bound variables}
 If a variable $y$ is \emph{fresh} for $M$, the bound variable $x$ of~$\lambda
 x.\, M$ can be renamed to~$y$ without changing the meaning. 
   \mode<presentation>{\vfill}
@@ -437,12 +435,13 @@ Which of the following pairs are $\alpha$-equivalent? Why?
   
   $(\lambda y.\,y\;y)\;(\lambda z.\,\lambda x.\, z\;x)$
 \begin{block}{Convention}
-  Terms are equal up to $\alpha$-equivalence of bound variables. 
+  Terms are equal up to $\alpha$-equivalence of bound variables.
 \end{block}
 
-That is, feel free to rename any bound variable whenever convenient.
-  
+Feel free to rename any bound variable whenever convenient.
 \end{frame}
+
+\section{Untyped $\lambda$-Calculus: Dynamics}
 %
 %
 %\begin{frame}{$\eta$-conversion}
@@ -508,9 +507,9 @@ That is, feel free to rename any bound variable whenever convenient.
 \end{definition}
   $M \reduce M'$ denotes there are finitely many $M_i$ such that 
   \[
-    M_0 \onereduce M_1 \onereduce \dots M_i \dots \onereduce N 
+    M_0 \onereduce M_1 \onereduce \dots M_i \dots \onereduce M' 
   \]
-  with $M = M_0$ and $M_n = N$ (where $n$ can be $0$). 
+  with $M = M_0$ and $M_n = M'$ (where $n$ can be $0$). 
 \end{frame}
 
 \begin{frame}{$\alpha$-conversion during $\beta$-conversion}
@@ -566,7 +565,7 @@ That is, feel free to rename any bound variable whenever convenient.
 
 
 \section{Programming in Lambda Calculus}
-\begin{frame}{Church Encoding of Boolean values}
+\begin{frame}{Church encoding of boolean values}
   
 Boolean and conditional can be encoded as combinators.
   
@@ -587,7 +586,7 @@ Boolean and conditional can be encoded as combinators.
 \end{description}
 
 \end{frame}
-\begin{frame}[allowframebreaks]{Church Encoding of Natural Numbers}
+\begin{frame}[allowframebreaks]{Church Encoding of natural numbers}
 
   Natural numbers can be encoded as $\lambda$-terms, so can arithmetic operations. 
   \begin{description}
@@ -608,7 +607,7 @@ Boolean and conditional can be encoded as combinators.
     \item[Addition]
       \begin{align*}
         & \mathtt{add} && \defeq\; && \lambda n\,m.\,\lambda f\,x.\;
-        m\;f\;(n\;f\;x)  \\ & \mathtt{add}\;\bc_{n}\;\bc_{m}\;
+        n\;f\;(m\;f\;x)  \\ & \mathtt{add}\;\bc_{n}\;\bc_{m}\;
                             && \reduce\; && \bc_{n + m}
       \end{align*}
   \end{description}
@@ -781,15 +780,11 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 \end{frame}
 
 \begin{frame}{Normal form}
-  $M$ is in \emph{normal form} if $M \not\onereduce$. 
+  $M$ is in \emph{normal form} if $M \notonereduce$. 
 
-  \begin{lemma}
+  \begin{lemma}\label{lem:normal-no-reduction}
     Suppose that $M$ is in normal form. Then 
-    \[
-      M \onereduce N
-      \implies M =_\alpha N
-    \]
-    
+      $M \reduce N \implies M =_\alpha N$.
   \end{lemma}
 
   \begin{corollary}[Uniqueness of normal forms]\label{coro:uniqueness-normal}
@@ -837,7 +832,7 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 %\end{block}
 \end{frame}
 
-\begin{frame}[allowframebreaks]{Evaluation Strategies}
+\begin{frame}[allowframebreaks]{Evaluation strategies}
 An evaluation strategy is a procedure of selecting $\beta$-redexes
 to reduce. It is a subset $\longrightarrow_{\mathrm{ev}}$ of the full
 $\beta$-reduction $\onereduce$.
@@ -848,7 +843,7 @@ $\beta$-reduction $\onereduce$.
 \end{description}
 
 \begin{description}
-  \item[the leftmost-outermost strategy] reduces the leftmost outermost
+  \item[the leftmost-outermost (\emph{normal order}) strategy] reduces the leftmost outermost
     $\beta$-redex in a $\lambda$-term first. For example, 
     \begin{align*}
       & 
@@ -862,7 +857,7 @@ $\beta$-reduction $\onereduce$.
       \lambda x.\, \underline{(\lambda y.\, y\,y)}\quad
       \underline{\vphantom{(\lambda}x} \\
       \onereduce & (\lambda x.\, x\,x) \\
-      \not\onereduce
+      \notonereduce
     \end{align*}
   \item[the leftmost-innermost strategy] reduces the leftmost innermost
     $\beta$-redex in a $\lambda$-term first. For example, 
@@ -875,7 +870,7 @@ $\beta$-reduction $\onereduce$.
         y)}\;\;\underline{\vphantom{(\lambda}x}) \\
       \onereduce & \underline{(\lambda x.\,x)}\;\;\underline{(\lambda x.\, x\,x)} \\
       \onereduce & (\lambda x.\, x\, x) \\
-      \not\onereduce
+      \notonereduce
     \end{align*}
   \item[the rightmost-innermost/outermost strategy]
     are defined similarly where $\lambda$-terms are reduced from right to left
@@ -896,8 +891,6 @@ $\beta$-reduction $\onereduce$.
   Each of evaluation strategies is deterministic, i.e.\ 
   if $M \onereduce N_1$ and $M \onereduce N_2$ then $N_1 = N_2$.
 \end{proposition}
-  \mode<presentation>{\vfill}
-We will see the modern approach to evaluation strategies later.
 \end{frame}
 
 \begin{frame}{Exercise}
@@ -913,10 +906,10 @@ Evaluate
 using the call-by-value and the call-by-name strategy respectively.
 \end{frame}
 
-\begin{frame}[allowframebreaks]{Normalising}
+\begin{frame}{Normalising}
 \begin{definition}
   \begin{enumerate}
-    \item $M$ is in \emph{normal form} if $M \not\onereduce N$ for any $N$. 
+    \item $M$ is in \emph{normal form} if $M \notonereduce N$ for any $N$. 
     \item $M$ is \emph{weakly normalising} if $M \reduce N$ for some $N$ in
       normal form.
   \end{enumerate}
@@ -928,27 +921,21 @@ using the call-by-value and the call-by-name strategy respectively.
     \item $\mathbf{K}_1\;z\; \Omega$ is weakly normalising.
   \end{enumerate}
 
-\begin{definition}
-  A \alert{value} is just a $\lambda$-abstraction (for untyped $\lambda$-calculus). 
-\end{definition}
-
-\begin{theorem}%[See {\cite[Theorem 13.2.2]{Barendregt1984a}}]
-  The leftmost-outermost strategy reduces every weakly
-  normalising $\lambda$-term~$M$ to its value.
+\begin{theorem}
+  The normal order strategy reduces every weakly
+  normalising term~$M$ to a normal form.
 \end{theorem}
 
-\begin{proposition}
-  Under call-by-name and call-by-value strategies, 
-  every value is in normal form.
-\end{proposition}
 \end{frame}
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item Prove Corollary~\ref{coro:uniqueness-normal}
-    \item Prove Corollary~\ref{coro:computational-meanting-confluence}.
-    \item Evaluate $1!$ in $\lambda$-calculus
-      using Church numerals and the factorial $n!$ you defined during the exercise session.
+    \item Show that $\reduce$ is transitive, i.e.\
+      $L \reduce N$ whenever $L \reduce M$ and $M \reduce N$. 
+      \textbf{Hint}. By induction on $L \reduce M$.
+    \item Show Lemma~\ref{lem:normal-no-reduction}
+    \item Show Corollary~\ref{coro:uniqueness-normal}
+    \item Show Corollary~\ref{coro:computational-meanting-confluence}.
   \end{enumerate}
 \end{frame}
 %\begin{frame}{Remark}

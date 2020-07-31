@@ -1,0 +1,1045 @@
+%! TEX program = xelatex
+%! TEX root = lecture3_slide.tex
+
+\usepackage{listings}
+\title{Programming Language Theory}
+\subtitle{Primitive recursion, general recursion, and polymorphism}
+\begin{document}
+\begin{frame}
+\maketitle
+\end{frame}
+
+%\begin{frame}[fragile]{Polymorphism}
+%  \emph{Abstraction principle~\cite{Pierce2002}}:
+%  \begin{quotation}
+%    Each significant piece of functionality in a program should be implemented
+%    in just one place in the source code. Where similar functions are carried
+%    out by distinct pieces of code, it is generally beneficial to combine them
+%    into one by abstracting out the varying parts.
+%  \end{quotation}
+%
+%  In Haskell
+%  \begin{semiverbatim}
+%    head :: [a] -> a
+%    head (x:_) = x
+%  \end{semiverbatim}
+%\end{frame}
+
+\section{G\"odel's \textbf{T}: Simply typed lambda calculus with naturals}
+\begin{frame}{The limit of $\lambda_\to$}
+  Can you write this in $\lambda_\to$ using Church numerals?
+  \begin{align*}
+    \mathtt{sum}(0)     & = 0 \\
+    \mathtt{sum}(1 + n) & = (1 + n) + f(n)
+  \end{align*}
+  if not definable in $\lambda_\to$, since fixpoint operator is not allowed any more. 
+
+  But, $\mathtt{sum}$ is definable via \emph{primitive recursion}:
+  for some $c$ and function $g$
+  \begin{align*}
+    \mathtt{rec}(0, c, g(x, y))       &= c \\
+    \mathtt{rec}(1 + n, c, g(x, y))   &= g(n, \mathtt{rec}(n, c, g(x, y)))
+  \end{align*}
+
+  $\lambda_\to$ with primitive recursion is called G\"odel's \textbf{T}.
+\end{frame}
+
+\begin{frame}{\textbf{T}: Types and terms}
+  \begin{definition}[Types]
+    \begin{multicols}{2}
+      \begin{prooftree}
+        \AXC{$B \in \mathbb{V}$}
+        \RightLabel{(tvar)}
+        \UIC{$B : \type$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$\vphantom{B}$}
+        \RightLabel{(nat)}
+        \UIC{$\mathbb{N} : \type$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$\sigma : \type$}
+        \AXC{$\tau   : \type$}
+        \RightLabel{(fun)}
+        \BIC{$\sigma \to \tau : \type$}
+      \end{prooftree}
+    \end{multicols}
+  \end{definition}
+  \begin{definition}[Terms]
+    Additional term formation rules are added to $\lambda_\to$ as follows.
+    \begin{multicols}{2}
+      \begin{prooftree}
+        \AXC{$\vphantom{M}$}
+        \UIC{$\zero : \term_{\textbf{T}}$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$M$}
+        \UIC{$\suc\;M : \term_{\textbf{T}}$}
+      \end{prooftree}
+    \end{multicols}
+      \begin{prooftree}
+        \AXC{$L : \term_{\textbf{T}}$}
+        \AXC{$M : \term_{\textbf{T}}$}
+        \AXC{$N : \term_{\textbf{T}}$}
+        \AXC{$x \in V$}
+        \AXC{$y \in V$}
+        \QuinaryInfC{$\mathtt{rec}(M; x.\,y.\,N)\; L : \term_{\textbf{T}}$}
+      \end{prooftree}
+  \end{definition}
+\end{frame}
+
+\begin{frame}{\textbf{T}: Typing rules}
+  \begin{definition}
+    Additional term typing rules are added to $\lambda_\to$ as follows.
+    \begin{multicols}{2}
+      \begin{prooftree}
+        \AXC{$\vphantom{\Gamma}$}
+        \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$\Gamma \vdash M : \mathbb{N}$}
+        \UIC{$\Gamma \vdash \suc\;M : \mathbb{N}$}
+      \end{prooftree}
+    \end{multicols}
+    \begin{prooftree}
+      \AXC{$\Gamma \vdash L : \mathbb{N}$}
+      \AXC{$\Gamma \vdash M : \tau$}
+      \AXC{$\Gamma, x : \mathbb{N}, y : \tau \vdash N : \tau$}
+      \TrinaryInfC{$\Gamma \vdash \mathtt{rec}(M; x.\,y.\,N)\;L : \tau$}
+    \end{prooftree}
+  \end{definition}
+  \begin{itemize}
+    \item Substitution for \textbf{T} is defined similarly.
+    \item Substitution respects typing judgements, i.e.\ 
+      $\Gamma \vdash N : \tau$ and $\Gamma, x : \tau \vdash M : \sigma$, then 
+      $\Gamma \vdash M\subst{N}{x} : \sigma$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{T}: Dynamics}
+  $\beta$-conversion for \textbf{T} is extended with two rules
+  \begin{align*}
+    \mathtt{rec}(M, x.\,y.\, N)\;\zero & \longrightarrow_\beta M \\
+    \mathtt{rec}(M, x.\,y.\, N)\;\suc\;L & \longrightarrow_\beta N\subst{L , \mathtt{rec}(M; x.\,y.\,N)\;L}{x, y}
+  \end{align*}
+  Similarly, a $\beta$-reduction $\onereduce$ extends $\longrightarrow_\beta$ to all parts of a term and $\reduce$ indicates finitely many $\beta$-reductions.
+  
+  \mode<presentation>{\vfill}
+  \begin{theorem}
+    \textbf{T} enjoys the strong and weak normalisation properties as well as type safety.
+  \end{theorem}
+\end{frame}
+
+\begin{frame}{Example: Addition and summation}
+  $\mathtt{add} : \mathbb{N} \to \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
+  \[
+    \lambda n.\,\lambda m.\,\mathtt{rec}\;(m; x.\,y.\, \suc\;y)\;n\;m
+  \]
+
+  $\mathtt{sum} : \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
+  \[
+    \lambda n.\, \mathtt{rec}\;(\zero; x.\,y.\, \add\;(\suc\;x)\;y)\;n
+  \]
+\mode<presentation>{\vfill}
+  \begin{block}{Exercise}
+    Evaluate $\mathtt{sum}\;(\suc\;\zero)$.
+  \end{block}
+\end{frame}
+
+\section{Fixpoint operator}
+
+\begin{frame}{\textbf{PCF}: $\lambda_\to$ with naturals and general recursion}
+  \textbf{T} does not include all computable functions, since all terms terminate eventually. 
+  Programming language in reality allows us to do \emph{general recursion}
+  including \emph{infinite loops}. 
+
+  \mode<presentation>{\vfill}
+  What to do if we want type and general recursion at the same time?
+  \mode<presentation>{\vfill}
+\end{frame}
+
+\begin{frame}{\textbf{PCF}: Types and terms}
+  \begin{definition}[Types]
+    \textbf{PCF} has the same class of types as \textbf{T}.
+  \end{definition}
+  \begin{definition}[Terms]
+    Additional term formation rules are added to $\lambda_\to$ as follows.
+    \begin{multicols}{2}
+      \begin{prooftree}
+        \AXC{$\vphantom{M}$}
+        \UIC{$\zero : \term_{\PCF}$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$M : \term_{\PCF}$}
+        \UIC{$\suc\;M : \term_{\PCF}$}
+      \end{prooftree}
+    \end{multicols}
+      \begin{prooftree}
+      \color{red}
+        \AXC{$L : \term_{\PCF}$}
+        \AXC{$M : \term_{\PCF}$}
+        \AXC{$N : \term_{\PCF}$}
+        \AXC{$x \in V$}
+        \QuaternaryInfC{$\ifz(M; x.\,N)\; L$}
+      \end{prooftree}
+      \begin{prooftree}
+      \color{red}
+        \AXC{$M : \term_{\PCF}$}
+        \AXC{$x \in V$}
+        \BIC{$\fix\,x.\,M : \term_{\PCF}$}
+      \end{prooftree}
+  \end{definition}
+\end{frame}
+
+\begin{frame}{\textbf{PCF}: Typing rules}
+  \begin{definition}
+    Additional term typing rules are added to $\lambda_\to$ as follows.
+    \begin{multicols}{2}
+      \begin{prooftree}
+        \AXC{$\vphantom{\Gamma}$}
+        \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$\Gamma \vdash M : \mathbb{N}$}
+        \UIC{$\Gamma \vdash \suc\;M : \mathbb{N}$}
+      \end{prooftree}
+    \end{multicols}
+    \begin{prooftree}
+      \color{red}
+      \AXC{$\Gamma \vdash L : \mathbb{N}$}
+      \AXC{$\Gamma \vdash M : \tau$}
+      \AXC{$\Gamma, x : \mathbb{N} \vdash N : \tau$}
+      \TrinaryInfC{$\Gamma \vdash \ifz(M; x.\,N)\;L : \tau$}
+    \end{prooftree}
+    \begin{prooftree}
+      \color{red}
+      \AXC{$\Gamma, x : \tau \vdash M : \tau$}
+      \UIC{$\Gamma \vdash \fix\,x.\,M : \tau$}
+    \end{prooftree}
+  \end{definition}
+  \begin{itemize}
+    \item Substitution for \textbf{PCF} is defined similarly.
+    \item Substitution respects typing judgements, i.e.\ 
+      $\Gamma \vdash N : \tau$ and $\Gamma, x : \tau \vdash M : \sigma$, then 
+      $\Gamma \vdash M\subst{N}{x} : \sigma$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{PCF}: Dynamics}
+  $\beta$-conversion for \textbf{PCF} is extended with three rules
+  \begin{align*}
+    \fix\,x.\,M & \longrightarrow_\beta M\subst{\fix\,x.\,M}{x} \\
+    \ifz(M; x.\, N)\;\zero & \longrightarrow_\beta M \\
+    \ifz(M; x.\, N)\;(\suc M) & \longrightarrow_\beta N\subst{M}{x}
+  \end{align*}
+  Similarly, a $\beta$-reduction $\onereduce$ extends $\longrightarrow_\beta$ to all parts of a term and $\reduce$ indicates finitely many $\beta$-reductions.
+  
+  \mode<presentation>{\vfill}
+  \begin{theorem}
+    \textbf{PCF} enjoys type safety. 
+  \end{theorem}
+\end{frame}
+
+\begin{frame}{Example}
+  An term which never terminates can be defined easily.
+  \begin{align*}
+             & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
+    \equiv{} & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
+    \equiv{} & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
+    \equiv{} & \dots
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Example: Predecessor and negation}
+  \[
+    \pred \defeq \lambda n : \mathbb{N}.\,\ifz(\zero; x.\, x)\;n : \mathbb{N} \to \mathbb{N}
+  \]
+  \[
+    \mathtt{not} \defeq \lambda n : \mathbb{N}.\, \ifz(\suc\;\zero; x.\, \zero) : \mathbb{N} \to \mathbb{N}
+  \]
+  \begin{block}{Exercise}
+    Evaluate the following terms to their normal forms.
+    \begin{enumerate}
+      \item $\pred\;\zero$
+      \item $\pred\;(\suc\;\suc\;\suc\;\zero)$
+      \item $\mathtt{not}\;(\suc\;\suc\;\zero)$
+    \end{enumerate}
+    
+  \end{block}
+\end{frame}
+
+\section{\textbf{F} --- Polymorphic Typed Lambda Calculus}
+\begin{frame}{Polymorphic types}
+    Given type variables~$\mathbb{V}$, $\tau : \type$ is defined by
+    defined by
+      \begin{prooftree}
+        \AXC{$t \in \mathbb{V}$}
+        \RightLabel{(tvar)}
+        \UIC{$t : \type$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$\sigma : \type$}
+        \AXC{$\tau   : \type$}
+        \RightLabel{(fun)}
+        \BIC{$\sigma \to \tau : \type$}
+      \end{prooftree}
+      \begin{prooftree}
+        \AXC{$\sigma : \type$}
+        \AXC{$t   \in \mathbb{V}$}
+        \RightLabel{(poly)}
+        \BIC{$\forall t.\, \sigma : \type$}
+      \end{prooftree}
+  where $t$ may or may not appear in~$\sigma$.
+
+  The polymorphic type $\forall t.\, \sigma$ provides a generic type for every
+  instance $\sigma[\tau/t]$ whenever $t$ is instantiated by an actual type $\tau$.
+
+%For example, the type $\forall t.\, t \to t$ corresponds to a type variable
+%universally quantified in GHC with extension \texttt{RankNType}
+%\begin{semiverbatim}
+%  forall a. a -> a
+%\end{semiverbatim}
+%or simply 
+%\begin{semiverbatim}
+%  a -> a
+%\end{semiverbatim}
+\end{frame}
+
+\begin{frame}{Examples}
+
+  \begin{itemize}
+    \item $\mathtt{id} : \forall t.\, t \to t$
+
+    \item $\mathtt{proj}_1 : \forall t.\,\forall u.\, t \to u \to t$
+
+    \item $\mathtt{proj}_2 : \forall t.\,\forall u.\, t \to u \to u$
+
+    \item $\mathtt{length} : \forall t.\, \List\;t \to \nat$
+
+    \item $\mathtt{singleton} : \forall t. t \to \List(t)$
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}{Free and bound variables, again}
+\begin{definition}
+  The \emph{free variable} $\FV(\tau)$ of $\tau$ is defined inductively by
+  \begin{align*}
+    \FV(t) & {} = t \\
+    \FV(\sigma \to \tau) & {} = \FV(\sigma) \cup \FV(\tau) \\
+    \FV(\forall t.\, \sigma) & {} = \FV(\sigma) - \{t\}
+  \end{align*}
+  For convenience, the function extends to contexts:
+  \[
+    \FV(\Gamma) = \set{ t \in \mathbb{V}}{ \exists (x : \sigma) \in \Gamma
+      \wedge t \in \FV(\sigma) }.
+  \]
+\end{definition}
+  \begin{enumerate}
+    \item $\FV(t_1) = \{t_1\}$.
+    \item $\FV(\forall t.\, (t \to t) \to t \to t) = \emptyset$.
+    \item $\FV(x : t_1, y : t_2, z : \forall t.\,t)
+      = \{t_1, t_2\}$.
+  \end{enumerate}
+\end{frame}
+\begin{frame}{Capture-avoiding substitution for type}
+  \begin{definition}
+  The \emph{(capture-avoidance) substitution} of a type $\rho$ for the free
+  occurrence of a type variable~$t$ is defined by 
+  \begin{align*}
+    t\subst{\rho}{t} & = \rho \\
+    u\subst{\rho}{t} & = u && \text{if $u \neq t$}\\
+    (\sigma\to\tau)\subst{\rho}{t} & =
+    \sigma\subst{\rho}{t} \to
+    \tau\subst{\rho}{t} \\
+    (\forall t.\sigma)\subst{\rho}{t} & = \forall t.\sigma \\
+    (\forall u.\sigma)\subst{\rho}{t} & = \forall u.\sigma\subst{\rho}{t}
+                                      &&
+    \text{if $u \neq t, u \not\in \FV(\rho)$} 
+  \end{align*}
+  \end{definition}
+  Recall that $u \not\in \FV(\rho)$ means that $u$ is \emph{fresh} for $\rho$. 
+\end{frame}
+
+\begin{frame}{Typed terms}
+\begin{definition}
+  On top of $\lambda_\to$, \textbf{F} has additional term formation rules as follows.
+    \begin{prooftree}
+      \AXC{$M : \term_F$}
+      \AXC{$t : \mathbb{V}$}
+      \RightLabel{(gen)}
+      \BIC{$\Lambda\, t.\; M : \term_F$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M : \term_F$}
+      \AXC{$\tau : \type$}
+      \RightLabel{(inst)}
+      \BIC{$M\;\tau : \term_F$}
+    \end{prooftree}
+\end{definition}
+
+  \begin{enumerate}
+    \item $\Lambda t.\, M$ for type abstraction, or \emph{generalisation}.
+    \item $M\;\tau$ for type application, or \emph{instantiation}.
+  \end{enumerate}
+%\framebreak
+%GHC with the extension \texttt{ScopedTypeVariables} allows you to use type
+%variables. 
+%\begin{semiverbatim}
+% f :: forall a. [a] -> [a]
+%
+% f = \\(xs :: [a]) -> reverse xs
+%\end{semiverbatim}
+%GHC with the extension \texttt{TypeApplications} allows you to apply a type
+%argument.
+%\begin{semiverbatim}
+%  Prelude> :t id
+%
+%  id :: a -> a
+%
+%  Prelude> :t id @Int
+%
+%  id @Int :: Int -> Int
+%\end{semiverbatim}
+%
+%\framebreak
+%  Can you see the corresponding untyped/simply typed $\lambda$-terms of the
+%  following $\lambda$-terms in System F? 
+%
+%  \begin{enumerate}
+%    \item $\Lambda t.\,\lambda (x : t).\, x$
+%    \item $\Lambda t.\, \lambda (x : t)(y : t).\, x$
+%    \item $(\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N$
+%     where  $M, N$ are terms and $\sigma$ a type.
+%    \item $\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x)$
+%  \end{enumerate}
+%System $F$ is more expressive than simply typed lambda calculus.
+\end{frame}
+\begin{frame}{Example}
+  Suppose $\mathtt{length} : \forall t.\,\List\;t \to \nat$. 
+
+  Then, 
+  \begin{enumerate}
+    \item $\mathtt{length}\;\nat$
+    \item $\mathtt{length}\;\bool$
+    \item $\mathtt{length}\;(\nat \to \nat)$
+  \end{enumerate}
+  are instances of $\mathtt{length}$ with types
+  \begin{enumerate}
+     \item $\List\; \nat \to \nat$
+     \item $\List\;\bool \to \nat$
+     \item $\List\;(\nat \to \nat) \to \nat$
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{System F: Typing judgement}
+  A \emph{type context} is a sequence of pairs of type variable and a type
+  \[
+    t : \tau
+  \]
+
+  \textbf{F} has two kinds of typing judgements.
+  \begin{itemize}
+    \item $\Delta \vdash \tau$ for $\tau$ for a valid type under the type context $\Delta$
+    \item $\Delta; \Gamma \vdash M : \tau$ for a well-typed term under the context $\Gamma$ and the type context~$\Delta$.
+  \end{itemize}
+  For example,
+    \[
+      t : \tau_1 \vdash t \to t
+    \]
+    is a judgement saying that $t \to $ is a valid type under the type context $(t : \tau_1)$.
+
+    Then, we have to \emph{justify} why this judgement holds.
+\end{frame}
+
+\begin{frame}{System F: Type formation}
+  The justification of $\Delta \vdash \tau$ is constructed inductively by following rules.
+  \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$t \in \Delta$}
+      \UIC{$\Delta \vdash t$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$\Delta \vdash \tau_1$}
+      \AXC{$\Delta \vdash \tau_2$}
+      \BIC{$\Delta \vdash \tau_1 \to \tau_2$}
+    \end{prooftree}
+    \columnbreak
+    \begin{prooftree}
+      \AXC{$\Delta, t \vdash \tau$}
+      \UIC{$\Delta \vdash \forall t.\, \tau$}
+    \end{prooftree}
+  \end{multicols}
+
+  \begin{block}{Exercise}
+    Derive the judgement 
+    \[
+        t : \tau \vdash t \to t
+    \]
+  \end{block}
+\end{frame}
+
+\begin{frame}{System F: Typing rules}
+  
+  The justification of $\Delta; \Gamma \vdash M : \sigma$ is defined inductively by following rules.
+  \begin{multicols}{2} 
+  \begin{prooftree}
+    \AXC{$x : \sigma \in \Gamma$}
+    \UIC{$\Delta ; \Gamma \vdash x : \sigma$}
+  \end{prooftree}
+  \begin{prooftree}
+    \AXC{$\Delta; \Gamma \vdash M : \sigma \to \tau$}
+    \AXC{$\Delta; \Gamma \vdash N : \sigma$}
+    \BIC{$\Delta; \Gamma \vdash M\;N : \tau$}
+  \end{prooftree}
+  \begin{prooftree}
+    \AXC{{\color{red}$\Delta \vdash \sigma$}}
+    \AXC{$\Delta; \Gamma, x : \sigma \vdash M : \tau$}
+    \BIC{$\Delta; \Gamma \vdash \lambda x : \sigma.\; M : \sigma \to \tau$}
+  \end{prooftree}
+  \color{red}
+  \begin{prooftree}
+    \AXC{$\Delta, t; \Gamma \vdash M : \sigma$}
+    \RightLabel{($\forall$-intro)}
+    \UIC{$\Delta; \Gamma \vdash \Lambda t.\;M : \forall t.\, \sigma$}
+  \end{prooftree}
+  \begin{prooftree}
+    \AXC{$\Delta; \Gamma \vdash M : \forall t.\, \sigma$}
+    \AXC{$\Delta \vdash \tau$}
+    \RightLabel{($\forall$-elim)}
+    \BIC{$\Delta; \Gamma \vdash M\;\tau : \sigma\subst{\tau}{t}$}
+  \end{prooftree}
+  \end{multicols}
+
+  For convenience, 
+  $\vdash M : \tau$ stands for $\cdot ; \cdot \vdash M : \tau$.
+
+\end{frame}
+
+\begin{frame}{Typing derivation}
+
+The typing judgement ${}\vdash\Lambda t.\, \Lambda u.\, \lambda (x : t)(y : u).\, x : \forall
+t.\;t \to u \to t$ is derivable from the following derivation:
+\begin{prooftree}
+  \AXC{$t \in t , u$}
+  \UIC{$t , u \vdash t$}
+  \AXC{$u \in t , u$}
+  \UIC{$t , u \vdash u$}
+  \AXC{$x : t \in (x : t, y : u)$}
+  \UIC{$t , u ; x : t, y : u \vdash x : t$}
+  \BIC{$t , u ; x : t \vdash \lambda (y : u).\; x : u \to t$}
+  \BIC{$t , u ; \cdot \vdash \lambda (x : t)(y : u).\; x : t \to u \to t$}
+  \UIC{$t ; \cdot \vdash \Lambda u.\,\lambda (x : t)(y : u).\; x :\forall u.\,t \to u \to
+    t$}
+  \UIC{$\vdash \Lambda t.\, \Lambda u.\, \lambda (x : t)(y : u).\; x : \forall t.\,\forall u.\,
+  t \to u \to t$}
+\end{prooftree}
+  
+\end{frame}
+
+\begin{frame}{Exercise}
+  Derive the following judgements:
+  \begin{enumerate}
+    \item ${}\vdash\Lambda t.\,\lambda (x : t).\, x : \forall t.\;t\to t$
+    \item $\sigma ; a : \sigma
+      \vdash (\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;a
+      : \sigma \to \sigma$
+    \item ${}\vdash\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x) :
+      \forall t.\;(t\to t) \to t\to t$
+    \end{enumerate}
+  Hint. \textbf{F} is syntax-directed, so the type inversion holds. 
+  
+\end{frame}
+
+\begin{frame}{System F: $\beta$-reduction}
+  
+The $\beta$-conversion has two rules
+\[
+  (\lambda (x : \tau).\, M)\,N \longrightarrow_{\beta}
+  M\subst{x}{N}
+  \quad\text{and}\quad
+  \color{red} (\Lambda t.\, M)\;\tau \longrightarrow_{\beta} M \subst{\tau}{t}
+\]
+
+For example, 
+\[
+  (\Lambda t.\lambda x : t.\, x)\; \tau\; a
+  \longrightarrow_\beta 
+  (\lambda x : t.\, x)\subst{\tau}{t}\;a
+  \equiv 
+  (\lambda x : \tau.\, x)\;a
+  \longrightarrow_\beta 
+  x\subst{a}{x}
+  \equiv a
+\]
+
+Similarly, $\beta$-conversion extends to subterms of a given term, introducing symbols $\onereduce$ and $\reduce$ in the same way.
+\end{frame}
+
+%\begin{frame}{System F: Evaluation}
+%  
+%The full $\beta$-reduction is a relation on $\lambda$-terms defined by
+%\begin{multicols}{2}
+%    \begin{prooftree}
+%      \AXC{$M_1 \longrightarrow_{\beta} M_2$}
+%      \UIC{$M_1 \onereduce M_2$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M_1 \onereduce M_2$}
+%      \UIC{$\lambda (x:\tau).\, M_1 \onereduce \lambda (x:\tau).\, M_2$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{{\color{red}$M_1 \onereduce M_2$}}
+%      \UIC{{\color{red}$\Lambda t.\, M_1 \onereduce \Lambda t.\, M_2$}}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M_1 \onereduce M_2$}
+%      \UIC{$M_1\,N \onereduce M_2\,N$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$N_1\onereduce  N_2$}
+%      \UIC{$M\,N_1 \onereduce M\,N_2$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{{\color{red}$M_1 \onereduce M_2$}}
+%      \UIC{{\color{red}$M_1\,\tau \onereduce M_2\,\tau$}}
+%    \end{prooftree}
+%\end{multicols}
+%If $M \onereduce N$, then $M$ and $N$ \alert{denotes} the same value. So, 
+%\[
+%  M =_\beta N
+%\]
+%where $=_\beta$ is the congruence and equivalence closure of
+%$\longrightarrow_\beta$.
+%\end{frame}
+
+\begin{frame}{Self application}
+Self-application is not typable in simply typed lambda calculus. 
+  \[
+    \lambda (x : t).\, x\; x
+  \]
+  However, self-application is possible in System F. 
+  \[
+    \lambda (x : \forall t. t\to t).\, x\;(\forall t. t\to t)\;x
+  \]
+\mode<presentation>{\vfill}
+  \begin{block}{Exercise}
+    Instantiate the first $t$ with the type $\forall t.\, t \to t$.  
+  \end{block}
+\end{frame}
+
+\begin{frame}{Sum type}
+
+\begin{definition}
+  The \emph{sum type} is defined by
+  \[
+    \sigma + \tau \defeq \forall t. (\sigma \to t) \to (\tau \to t) \to t
+  \]
+\end{definition}
+It has two injection functions: the first injection is defined by
+\begin{align*}
+  \mathtt{left}_{\sigma + \tau} & \defeq \lambda (x : \sigma).\;\Lambda t.\,\lambda (f : \sigma\to
+  t)(g : \tau\to t).\, f\;x \\
+  \mathtt{right}_{\sigma + \tau} & \defeq \lambda (y : \tau).\;\Lambda t.\,\lambda (f : \sigma\to
+  t)(g : \tau\to t).\, g\;y
+\end{align*}
+
+%With the sum type, we can implement the usual construct \texttt{either}:
+%\[
+%  \mathtt{either} : \forall\,t.\;(\sigma \to t) \to (\tau \to t)
+%  \to (\sigma + \tau) \to t
+%\]
+%which corresponds to the Haskell function
+%{\small
+%\begin{semiverbatim}
+%  either :: (a -> c) -> (b -> c) -> Either a b -> c
+%
+%  either f g (Left  a) = f a 
+%
+%  either f g (Right b) = g b
+%\end{semiverbatim}}
+
+\mode<presentation>{\vfill}
+\begin{block}{Exercise}
+  Define 
+  \[
+    \mathtt{either} : \forall u.\, (\sigma \to u) \to (\tau \to u) \to (\sigma + \tau \to u) \to u 
+  \] 
+\end{block}
+\end{frame}
+
+\begin{frame}{Product type}
+\begin{definition}[Product Type]
+  The product type is defined by
+  \[
+    \sigma \times \tau \defeq \forall t. (\sigma \to \tau \to t) \to t
+  \]
+\end{definition}
+The pairing function is defined by
+\begin{align*}
+  \left< \_, \_\right> \defeq \lambda (x : \sigma)(y : \tau).\,\Lambda t.\,\lambda (f : \sigma \to \tau \to t).\,
+  f\;x\;y
+\end{align*}
+\begin{block}{Exercise}
+Define projections 
+\[
+  \mathtt{proj}_1 : \sigma \times \tau \to \sigma
+  \quad\text{and}\quad
+  \mathtt{proj}_2 : \sigma\times \tau \to \tau
+\]
+\end{block}
+\end{frame}
+\begin{frame}[allowframebreaks]{Natural Numbers}
+The type of Church numerals is defined by 
+\[
+  \nat \defeq \forall t.\, (t\to t)\to t\to t
+\]
+  \begin{description}
+    \item[Church numerals]
+      \begin{align*}
+        \bc_n & : \nat \\
+        \bc_n & \defeq \Lambda t.\,\lambda (f:t \to t)\,(x:t).\,
+        f^n\;x
+      \end{align*}
+    \item[Successor]
+      \begin{align*}
+        \suc & : \nat \to \nat \\
+        \suc & \defeq \,\lambda (n : \nat).\,\Lambda t.\,\lambda
+        (f : t \to t)\,(x:t)\,.\;f\;(n\;t\;f\;x) 
+      \end{align*}
+    \item[Addition]
+      \begin{align*}
+        \add & : \nat \to \nat \to \nat \\
+        \add & \defeq \lambda (n : \nat)\,(m:\nat)\,&& \Lambda t.\, \lambda
+        (f:t\to t)\,(x: t).\\
+        &&& (m\;t\;f)\;(n\;t\;f\;x) 
+      \end{align*}
+    \item[Multiplication] 
+      \begin{align*}
+       \mul & : \nat\to \nat \to\nat\\
+       \mul & \defeq\,?
+      \end{align*}
+    \item[Conditional]
+      \begin{align*}
+       \ifz & : \forall t.\,\nat \to t \to t \to t \\
+       \ifz & \defeq\,?
+      \end{align*}
+  \end{description}
+However, polymorphic lambda calculus allows us to define
+\emph{iterator} over natural numbers like \texttt{fold} in Haskell.
+\begin{align*}
+  \mathtt{fold}_{\nat} & : \forall t.\, (t \to t) \to t \to \nat \to t  \\
+  \mathtt{fold}_{\nat} & \defeq \Lambda t.\, \lambda (f : t \to t)(e_0 : t)(n : \nat). 
+  n\;t\;f\;e_0
+\end{align*}
+
+%In Haskell, the above $\lambda$-term can be given as
+%\begin{semiverbatim}
+%  fold :: (a -> a) -> a -> [()] -> a
+%
+%  fold f e []            = e
+%
+%  fold f e (():xs) = f () (fold f e xs)
+%\end{semiverbatim}
+%
+\begin{block}{Exercise}
+  Define $\add$ and $\mul$ using $\mathtt{fold}_{\nat}$ and justify your
+  answer.
+  
+  \begin{enumerate}
+    \item $\add'\defeq \;? : \nat\to\nat\to\nat$
+    \item $\mul'\defeq \;? : \nat\to\nat\to\nat$
+  \end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}{Lists}
+\begin{definition}
+  For any type $\sigma$, the type of lists over $\sigma$ is 
+\[
+  \List\,\sigma\defeq \forall t.\, t \to (\sigma \to t \to t) \to t 
+\]
+\end{definition}
+with ``list constructors'':
+\[
+  \mathtt{nil}_\sigma \defeq \Lambda t.\lambda (h : t)(f : \sigma\to t \to t).\,
+  h
+\]
+and  
+\[
+  \mathtt{cons}_\sigma \defeq \lambda (x : \sigma)(xs : \List\,
+  \sigma).\,\Lambda t.\lambda(h : t)(f : \sigma\to t \to t).f\,x\,(xs\; t\;
+  h\; f)
+\]
+of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
+
+
+\end{frame}
+
+%\begin{frame}[allowframebreaks]{Existential Type}
+%  Abstraction can be described by an \emph{existential type}.
+%  \[
+%    \exists t.\, \tau
+%  \]
+%  where $\tau$ is a type in which $t$ may appear as a free variable.
+%  A term $(\sigma, M)$ of type $\exists t.\, \tau$ consists of a \emph{type}
+%  $\sigma$ and a term $M$ of type $\tau\subst{t}{\sigma}$. 
+%
+%
+%  \begin{example}
+%    A \emph{stack} is a data structure with two operations:
+%    \begin{itemize}
+%      \item \texttt{push}
+%      \item \texttt{pop}
+%    \end{itemize}
+%    Any implementation satisfying $\mathtt{pop} \circ (\mathtt{push}\, n\, st) =
+%    (n, st)$ can be seen as a stack. 
+%  \end{example}
+%
+%  \begin{example}
+%    The type of stacks over natural numbers can be defined by
+%    \[
+%      \exists t. (t \times \nat \to t) \times (t \to 1 + \nat \times t) 
+%    \]
+%    \begin{enumerate}
+%      \item The first component is the \text{push} function.
+%      \item The second component is the \text{pop} function.
+%    \end{enumerate}
+%    An instance of a stack is an element $(\sigma, M)$ of the above type
+%    \begin{enumerate}
+%      \item $\sigma$ is a type
+%      \item $\mathtt{proj}_1\, M \colon \sigma \times \nat \to \sigma$
+%      \item $\mathtt{proj}_2\, M \colon \sigma \to 1 + \nat \times
+%          \sigma$. 
+%    \end{enumerate}
+%  \end{example}
+%\end{frame}
+%
+%%\begin{frame}[fragile]{Encoding of Existential Type in Haskell}
+%%  A limited form of existential type can be defined by 
+%%  \begin{semiverbatim}
+%%    data Exists t where
+%%      Ex :: t a -> Exists t
+%%  \end{semiverbatim}
+%%  and another version for typeclass
+%%  \begin{semiverbatim}
+%%    data Exists' c where
+%%      Ex' :: c a => a -> Exists' c
+%%  \end{semiverbatim}
+%%  in GHC with extensions \texttt{GADTs} and \texttt{ConstraintKinds}. 
+%%
+%%\mode<presentation>{\vfill}
+%%  \begin{block}{Exercise}
+%%    Define the top type $\top$ which contains every typable term.
+%%  \end{block}
+%%\end{frame}
+%
+%\begin{frame}{Encoding of Existential Type in System F}
+%  The existential type can also be encoded in System F as 
+%  \[
+%    \exists t.\, \tau \defeq \forall u.\; (\forall t.\; \tau \to u) \to u
+%  \]
+%%  using continuation passing style.\footnote{Recall that $\exists x.\,\varphi
+%%  = (\forall x.\, (\varphi \to \bot)) \to \bot$ classically.  }
+%\mode<presentation>{\vfill}
+%  A witeness $(\sigma, M)$ of $\exists t.\, \tau$ is encoded as
+%  \[
+%    \Lambda u.\,\lambda (f : \forall t.\, \tau \to u).\, f\;\sigma\;M
+%  \]
+%
+%  \begin{block}{Exercise}
+%    Check that the above terms do make sense. How to use a term of some existential
+%    type? 
+%  \end{block}
+%  
+%\end{frame}
+
+\begin{frame}{Type safety and normalisation}
+  \begin{theorem}[Type safety]
+    Suppose $\vdash M : \sigma$. Then, 
+    \begin{enumerate}
+      \item $M \onereduce N$ implies $\vdash N : \sigma$; 
+      \item $M$ is in normal form or there exists $N$ such that $M \onereduce N$
+    \end{enumerate}
+  \end{theorem}
+  Type safety is proved by induction on the derivation of $\vdash M : \sigma$.
+
+  \begin{theorem}[Normalisation properties]
+    \textbf{F} enjoys the weak and strong normalisation properties.
+  \end{theorem}
+\end{frame}
+
+\begin{frame}{Type erasure}
+\begin{definition}
+  The \emph{erasing map} is a function defined by
+  \begin{align*}
+    |x| & = x \\
+    |\lambda (x : \tau).\,M| & = \lambda x.\, |M| \\
+    |M\;N| & = (|M|\;|N|) \\
+    |\Lambda t.\, M| & = |M| \\
+    |M\;\tau| & = |M|
+  \end{align*}
+\end{definition}
+
+\begin{proposition}
+  Within System F, if ${}\vdash M : \sigma$ and $|M|
+  \onereduce N'$, then there exists a well-typed term~$N$ with
+  ${}\vdash N : \sigma$ and $|N| = N'$.
+\end{proposition}
+\end{frame}
+
+\begin{frame}{Undecidability of type inference}
+  \begin{theorem}
+     It is undecidable whether, given a closed term $M$ of the untyped
+     lambda-calculus, there is a well-typed term $M'$ in System F such that
+     $|M'| = M$.  
+  \end{theorem}
+
+  \begin{description}
+    \item[Arbitrary Rank Polymorphism] $\forall$ can appear
+      anywhere {\small (GHC with \texttt{-XRankNType})}. 
+    \item[Rank-1 Polymorphism]
+      $\forall$ only appear in the outermost position.
+  \end{description}
+  \emph{Hindley-Milner type system} adapted by Haskell 98, Standard ML, etc.
+  supports only rank-1 polymorphism, so type inference is still decidable.
+\end{frame}
+
+\begin{frame}{Parametricity}
+  What functions can you write for the following type?
+  \[
+    \forall t.\,t \to t 
+  \]
+\mode<presentation>{\vfill}
+  \begin{theorem}
+    Every term $M$ of type $\forall t.\, t \to t$ is \emph{observationally equivalent}%
+    \footnote{The notion of observational equivalence is beyond the scope of this lecture.}
+      to $\Lambda t.\, \lambda x : t.\, x$. 
+  \end{theorem}
+\end{frame}
+
+\begin{frame}{Theorems for free}
+  
+\end{frame}
+%\begin{frame}{System $F_\omega$}
+%  Recall that for $\sigma, \tau \in \type$ the sum type of $\sigma$ and $\tau$
+%  is 
+%  \[
+%    \sigma + \tau \defeq \forall t. (\sigma \to t) \to (\tau \to t) \to t
+%  \]
+%  Can we internalise this \alert{type construction}? 
+%  \vfill
+%  \alert{\emph{Kinds}} are like \emph{classes} in set theory:
+%  \begin{enumerate}
+%    \item $*$ : the kind of types 
+%    \item $* \Rightarrow *$ : the kind of type operators, e.g., 
+%      $a \mapsto [a]$ 
+%    \item \ldots 
+%  \end{enumerate}
+%  System $F_\omega$ is an extension of System $F$ with type-level functions and
+%  kinds. See \cite{Pierce2002} for further detail. 
+%\end{frame}
+%
+%\begin{frame}[allowframebreaks]{Impredicativity}
+%  A definition is \alert{\emph{impredicative}} if it has a quantifier whose
+%  domain includes itself (which is being defined). 
+%  \begin{block}{Russell's Paradox}
+%    \[
+%      R \defeq \set{x}{ x \not\in x }
+%    \]
+%  \end{block}
+%  Recall the self-application ...
+%  \[
+%    (\Lambda t.\,\lambda (x: t). x)\;{\color{red}(\forall t.\,t \to t)}\;
+%    (\Lambda t.\, \lambda (x: t). x) 
+%  \]
+%  which is actually impredicative! 
+%  This form of polymorphism is called \alert{\emph{impredicative polymorphism}}. 
+%  \begin{block}{Girard's Paradox}
+%    An encoding of Russell's paradox in extensions of
+%    System F. 
+%  \end{block}
+%
+%  Martin-L\"of's type theory (on which Agda is based) was inconsistent, as it
+%  included an axiom\footnote{It is only a simplified story...}:
+%  \[
+%    \mathsf{Set} : \mathsf{Set}
+%  \]
+%
+%  \begin{block}{Inconsistency of Haskell}
+%    Impredicativity $+$ Injectivity $+$ Type Case Analysis
+%    $=$ Inconsistency (Russell paradox)
+%    \footnote{\url{http://okmij.org/ftp/Haskell/impredicativity-bites.html}}
+%    
+%  \end{block}
+%\end{frame}
+%\section{Parametricity}
+%Polymorphism in System F is \emph{parametric} in the sense that every
+%instance is uniformly defined. To put it differently, it cannot depend on any
+%specific type. It is different from the \emph{ad hoc} polymorphism adopted in
+%programming languages like C++ where programmers are allowed to give a
+%specific implementation for some type.
+%
+%Why is a uniform definition important? Not only we can assure ourselves that a
+%polymorphic function has a uniform result for each instance, but also it
+%automatically satisfies certain properties which only depends on its type (not
+%its instance).
+%
+%In the end of this lecture, we state a powerful result informally, originally
+%called \emph{Abstraction Theorem} by Reynolds~\cite{Reynolds1983} and nowadays
+%known as \emph{parametricity}. After that, we apply this theorem to characterise
+%some data types introduced so far.
+%
+%\begin{proposition}
+%  Let $\sigma$ be a type without any free variable and $\sigma^+$ the relation
+%  on~$\sigma$ lifted from~$\sigma$ (defined below). Then, 
+%  \[
+%    \vdash F : \sigma
+%    \implies (F, F) \in \sigma^+.
+%  \]
+%\end{proposition}
+%
+%To decode this proposition, we introduce a new notation: a relation $R_\sigma
+%\subset \sigma_1 \times \sigma_2$ is denoted by $R_\sigma\colon \sigma_1
+%\not\to\sigma_2$. For each type in System F, we define its lifted relation
+%$\sigma^+$
+%\begin{definition}
+%  For each type formation (construct), we define its corresponding formation of
+%  relations 
+%  \begin{enumerate}
+%    \item For $f_i:\sigma_i \to \tau_i$, $(f_1, f_2) \in R_\sigma \to S_\tau$ if
+%      and only if for every $(M_1, M_2) \in R_\Sigma$ we have $(f_1\;M_1,
+%      f_2\;M_2) \in S_\tau$.
+%  \end{enumerate}
+%\end{definition}
+%
+%
+%
+%\subsection*{Exercise}
+
+\begin{frame}{Homework}
+  \begin{enumerate}
+    \item Extend {\PCF} with the type $\mathbb{B}$ of boolean values with
+      $\mathtt{ifz}(M; N)\;\true =_\beta M$ and $\mathtt{ifz}(M; N)\;\false
+      =_\beta N$ including term formation rules, typing rules, and dynamics for
+      $\mathbb{B}$.
+
+    \item Define \textbf{pred} in {\textbf{T}} such that $\pred\;\zero =\zero$
+      and $\pred\;(\suc\;n) = n$.
+
+    \item Define \textbf{even} in {\PCF} such that $\mathbf{even}\;n =
+      \suc\;\zero$ if $n$ is an even number; $\mathbf{even}\;n = \zero$
+      otherwise. 
+
+    \item Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list.
+    
+  \end{enumerate}
+  
+\end{frame}
+
+%\begin{frame}{References}
+%\bibliographystyle{amsalpha}
+%\bibliography{library} 
+%\end{frame}
+
+\end{document}

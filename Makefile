@@ -1,14 +1,16 @@
-tex = latexmk -pdfxe # -outdir="./output"
+outdir  = output
 
-lectures = lecture0 lecture1 lecture2 lecture3 
+tex = latexmk -xelatex -outdir=$(outdir)
+
+lectures = lecture1 lecture2 lecture3 
 
 all: $(lectures)
 
 $(lectures):
 #	$(tex) $@_note.tex
 #	mv $@_note.pdf pdf
-	$(tex) $@_slide.tex
-	mv $@_slide.pdf pdf
+	cd tex/ && $(tex) $@_slide
+	cp tex/$(outdir)/$@_slide.pdf pdf
 
 clean:
-	latexmk -C
+	latexmk -outdir=$(outdir) -C
