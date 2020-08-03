@@ -1,10 +1,10 @@
 %! TEX program = xelatex
 %! TEX root = lecture1_slide.tex
 \title{Programming Language Theory}
-\subtitle{Untyped Lambda Calculus}
+\subtitle{Untyped $\lambda$-Calculus}
 \begin{document}
 
-{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{image.png}}
 \begin{frame}\maketitle\end{frame}}
 
 \begin{frame}[fragile]{Assessment guidelines}
@@ -56,30 +56,29 @@
 Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
 \emph{variables}.
 \begin{definition}[Syntax of $\lambda$-calculus]
-   The set~$\Lambda$ of \alert{$\lambda$-terms} is defined
-  by
+  The formation $M : \term_\lambda$ is defined by
   \begin{enumerate}
     \item Variable:
       \begin{prooftree}
         \AXC{$x \in V$}
         \RightLabel{(var)}
-        \UIC{$x : \Lambda$}
+        \UIC{$x : \term_\lambda$}
       \end{prooftree}
 
     \item Function application of $M$ to the argument $N$:
       \begin{prooftree}
-        \AXC{$M : \Lambda$}
-        \AXC{$N : \Lambda$}
+        \AXC{$M : \term_\lambda$}
+        \AXC{$N : \term_\lambda$}
         \RightLabel{(app)}
-        \BIC{$M \; N : \Lambda$}
+        \BIC{$M \; N : \term_\lambda$}
       \end{prooftree}
 
     \item Function abstraction with an argument $x$ and a function body $M$:
       \begin{prooftree}
-        \AXC{$M : \Lambda$}
+        \AXC{$M : \term_\lambda$}
         \AXC{$x \in V$}
         \RightLabel{(abs)}
-        \BIC{$\lambda x.\, M : \Lambda$}
+        \BIC{$\lambda x.\, M : \term_\lambda$}
       \end{prooftree}
   \end{enumerate}
 \end{definition}
@@ -147,21 +146,22 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
   \alert{Warning}. We apply these rules in our \emph{meta}-language.
 \end{frame}
 
-\begin{frame}{Meta-Language and object-language}
+\begin{frame}{Meta-language and object-language}
   \begin{itemize}
     \item \emph{Meta-language} is the language we use to describe the object of
       study. E.g. English, or naive set theory. 
     \item \emph{Object-language} is the object of study. E.g., arithmetic
-      expressions, $\lambda$-terms, etc.
+      expressions and $\lambda$-terms.
   \end{itemize}
-  As \emph{naming} a function is not allowed in $\lambda$-calculus, we do so
-  in the meta-language:
+  \emph{Naming} a function is not supported in $\lambda$-calculus, so
+  the following
     \[
       \mathtt{id} \defeq \lambda x.\, x
     \]
+  happens in the meta-language. 
   \begin{enumerate}
-    \item $\mathtt{id}$ is a symbol different from `$\lambda x.\,x$' in our meta-language.
-    \item $\mathtt{id}$ and $\lambda x.\, x$ are \emph{syntactically equivalent}, denoted by
+    \item $\mathtt{id}$ is a symbol different from `$\lambda x.\,x$' in the meta-language.
+    \item $\mathtt{id}$ and $\lambda x.\, x$ are \emph{syntactically equivalent} denoted by
       \[
         \mathtt{id} \equiv \lambda x.\, x
       \]
@@ -195,7 +195,7 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
 
 \begin{frame}{$\alpha$-equivalence, informally}
   \begin{definition}
-    Two $\lambda$-terms $M$ an $N$ are \alert{$\alpha$-equivalent} 
+    Two terms $M$ an $N$ are \alert{$\alpha$-equivalent} 
     \[
       M =_\alpha N
     \]
@@ -289,6 +289,8 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
   \end{itemize}
 \end{frame}
 
+\section{Untyped $\lambda$-Calculus: Substitution}
+
 \begin{frame}{Substitution}
    A \alert{substitution} is a process of replacing \emph{free} variables by
    another terms (on the meta-level). 
@@ -310,7 +312,7 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
   
 \begin{frame}{Naive substitution I}
   \begin{definition}
-    For $x \in V$ and $L \in \Lambda$, the substitution of $L$ for $x$ is
+    For $x \in V$ and $L : \term_\lambda$, the substitution of $L$ for $x$ is
     defined by
     \begin{align*}
       x\subst{L}{x} & = L \\
@@ -326,7 +328,7 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
 \end{frame}
 \begin{frame}{Naive substitution II}
   \begin{definition}
-    For $x \in V$ and $L \in \Lambda$, the substitution
+    For $x \in V$ and $L : \term_\lambda$, the substitution
     of $L$ for $x$ is defined by
     \begin{align*}
       x\subst{L}{x} & = L \\
@@ -345,7 +347,7 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
 
 \begin{frame}{Capture-avoiding substitution}
   Capture-avoiding substitution of $L$ for the \alert{free occurrences} of $x$ is a
-  \emph{partial} function $(\cdot)\subst{L}{x}\colon \Lambda \to \Lambda$ defined by
+  \emph{partial} function $(\cdot)\subst{L}{x}\colon \term_\lambda \to \term_\lambda$ defined by
   \begin{align*}
     x\subst{L}{x} & = L \\
     y\subst{L}{x} & = y && \text{if $x \neq y$} \\
@@ -564,7 +566,7 @@ Feel free to rename any bound variable whenever convenient.
 \end{frame}
 
 
-\section{Programming in Lambda Calculus}
+\section{Programming in $\lambda$-Calculus}
 \begin{frame}{Church encoding of boolean values}
   
 Boolean and conditional can be encoded as combinators.
@@ -743,11 +745,11 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 \end{frame}
 
 
-\section{Properties of Lambda Calculus}
+\section{Properties of $\lambda$-Calculus}
 
 \begin{frame}
   \begin{example}
-    Suppose $M \in \Lambda$ and $y \not\in \FV(M)$. 
+    Suppose $M : \term_\lambda$ and $y \not\in \FV(M)$. 
     Then, consider 
     \[
       (\lambda y.\, M)\, ((\lambda x.\, x\,x)(\lambda x.\, x\, x))
@@ -782,12 +784,13 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 \begin{frame}{Normal form}
   $M$ is in \emph{normal form} if $M \notonereduce$. 
 
-  \begin{lemma}\label{lem:normal-no-reduction}
+  \begin{lemma}
     Suppose that $M$ is in normal form. Then 
       $M \reduce N \implies M =_\alpha N$.
+  \label{lem:normal-no-reduction}%
   \end{lemma}
 
-  \begin{corollary}[Uniqueness of normal forms]\label{coro:uniqueness-normal}
+  \begin{corollary}[Uniqueness of normal forms]
     Suppose that $N_1$ and $N_2$ are in normal form. Then, 
     \[
       \xymatrix{
@@ -795,12 +798,13 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
         N_1 \ar@{}[r]|{=_{\alpha}} & N & N_2 \ar@{}[l]|{=_\alpha} \\
       }
     \]
+    \label{coro:uniqueness-normal}%
   \end{corollary}
 \end{frame}
 
 \begin{frame}{Computationally equal terms have a confluent term}
 
-  \begin{corollary}\label{coro:computational-meanting-confluence}
+  \begin{corollary}
     If $M =_\beta N$, then there exists $L$ satisfying
   \[
     \xymatrix{
@@ -808,6 +812,7 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
       & L
     }
   \]
+  \label{coro:computational-meanting-confluence}
   \end{corollary}
   \begin{proof}[Proof sketch]
     By induction on the derivation of $M =_\beta N$. 
@@ -844,7 +849,7 @@ $\beta$-reduction $\onereduce$.
 
 \begin{description}
   \item[the leftmost-outermost (\emph{normal order}) strategy] reduces the leftmost outermost
-    $\beta$-redex in a $\lambda$-term first. For example, 
+    $\beta$-redex in a term first. For example, 
     \begin{align*}
       & 
       \underline{(\lambda x.\, (\lambda y.\, y)\,x)}\quad
@@ -860,7 +865,7 @@ $\beta$-reduction $\onereduce$.
       \notonereduce
     \end{align*}
   \item[the leftmost-innermost strategy] reduces the leftmost innermost
-    $\beta$-redex in a $\lambda$-term first. For example, 
+    $\beta$-redex in a term first. For example, 
     \begin{align*}
       & (\lambda x.\, \underline{(\lambda y.\,
         y)}\;\;\underline{\vphantom{(\lambda} x})\,
@@ -873,7 +878,7 @@ $\beta$-reduction $\onereduce$.
       \notonereduce
     \end{align*}
   \item[the rightmost-innermost/outermost strategy]
-    are defined similarly where $\lambda$-terms are reduced from right to left
+    are defined similarly where terms are reduced from right to left
     instead.
 \end{description}
 \end{frame}
@@ -881,9 +886,9 @@ $\beta$-reduction $\onereduce$.
 \begin{frame}{CBV versus CBN}
 \begin{description}
   \item[Call-by-value strategy]
-    rightmost-outermost but not under any $\lambda$-abstraction
+    rightmost-outermost but not under any abstraction
   \item[Call-by-name strategy]
-    leftmost-outermost but not under any $\lambda$-abstraction
+    leftmost-outermost but not under any abstraction
 \end{description}
 
   \mode<presentation>{\vfill}
@@ -916,14 +921,14 @@ using the call-by-value and the call-by-name strategy respectively.
 \end{definition}
 %
   \begin{enumerate}
-    \item $\Omega$ does not have a normal form.
+    \item $\Omega$ is not weakly normalising.
     \item $\mathbf{K}_1$ is normal and thus weakly normalising.
     \item $\mathbf{K}_1\;z\; \Omega$ is weakly normalising.
   \end{enumerate}
 
 \begin{theorem}
   The normal order strategy reduces every weakly
-  normalising term~$M$ to a normal form.
+  normalising term to a normal form.
 \end{theorem}
 
 \end{frame}
@@ -945,12 +950,12 @@ using the call-by-value and the call-by-name strategy respectively.
 %
 %  \mode<presentation>{\vfill}
 % Issues with named variables may be lifted by using nameless representation of
-% terms. For example, in de Bruijin's representation every $\lambda$-term 
+% terms. For example, in de Bruijin's representation every term 
 % has a canonical form, see \cite[Chapter 6]{Pierce2002}.
 %
 %  \mode<presentation>{\vfill}
 %  In fact, every computable function on natural numbers is definable in terms of
-%  $\lambda$-terms. For interested readers, see~\cite[Chapter 3]{Barendregt1984}
+%  terms. For interested readers, see~\cite[Chapter 3]{Barendregt1984}
 %  for further detail. Therefore, $\lambda$-calculus is Turing-complete. 
 %\end{frame}
 

@@ -5,10 +5,10 @@
 \subtitle{Higher-Order Functions}
 \begin{document}
 
-{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{image.png}}
 \begin{frame}\maketitle\end{frame}}
 
-\section{Simply Typed Lambda Calculus $\lambda_\to$: Statics}
+\section{Simply Typed $\lambda$-Calculus: Statics}
 
 \begin{frame}{Typing judgement}
   A \alert{typing judgement} is of the form
@@ -229,21 +229,21 @@ It is also known as the \alert{implicit typing} system since the typing informat
 
 \begin{frame}{Explicit typing: Typed terms}
 \begin{definition}[Typed terms]
-  The set $\Lambda_\mathbb{T}$ of typed terms is defined by
+  The formation $M : \term_{\lambda_\to}$ of typed terms is defined by
     \begin{prooftree}
       \AXC{$x \in V$}
-      \UIC{$x : \Lambda_\T$}
+      \UIC{$x : \term_{\lambda_\to}$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$M : \Lambda_\T$}
-      \AXC{$N : \Lambda_\T$}
-      \BIC{$M\, N : \Lambda_\T$}
+      \AXC{$M : \term_{\lambda_\to}$}
+      \AXC{$N : \term_{\lambda_\to}$}
+      \BIC{$M\, N : \term_{\lambda_\to}$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$M : \Lambda_\T$}
+      \AXC{$M : \term_{\lambda_\to}$}
       \AXC{$x \in V$}
       \AXC{$\tau : \type$}
-      \TIC{$\lambda \alert{x:\tau}.\; M : \Lambda_\T$}
+      \TIC{$\lambda {\color{red}x:\tau}.\; M : \term_{\lambda_\to}$}
     \end{prooftree}
 \end{definition}
 \end{frame}
@@ -312,7 +312,7 @@ It is also known as the \alert{implicit typing} system since the typing informat
 
 
 \begin{frame}{Type erasure}
-  An \emph{erasing map} $|-|\colon \Lambda_\T \to \Lambda$ is defined by
+  An \emph{erasing map} $|-|\colon \term_{\lambda_\to} \to \term_{\lambda}$ is defined by
   \begin{align*}
     |x| & = x \\
     |M\; N| & = |M|\;|N| \\
@@ -326,7 +326,7 @@ It is also known as the \alert{implicit typing} system since the typing informat
 \end{frame}
 \begin{frame}{From typed terms to untyped and back}
 \begin{proposition}
-  Let $M$ and $N$ be typed $\lambda$-terms in~$\Lambda_\T$. Then, 
+  Let $M$ and $N$ be typed $\lambda$-terms in~$\term_{\lambda_\to}$. Then, 
   \begin{align*}
     \Gamma  \vdash M : \sigma & \text{ implies } \Gamma \vdash |M| :
     \sigma \\ 
@@ -335,13 +335,13 @@ It is also known as the \alert{implicit typing} system since the typing informat
 \end{proposition}
 
 \begin{proposition}
-  Let $M$ and $N$ be $\lambda$-terms in~$\Lambda$. Then, 
+  Let $M$ and $N$ be $\lambda$-terms in~$\term_{\lambda}$. Then, 
   \begin{enumerate}
-    \item If $\Gamma \vdash M : \sigma$, then there is $M' \in \Lambda_{\mathbb{T}}$ with 
+  \item If $\Gamma \vdash M : \sigma$, then there is $M' : \term_{\lambda_\to}$ with 
         $|M'| = M
         \quad\text{and}\quad
         \Gamma \vdash M' : \sigma$
-      \item If $M \reduce N$ and $M = |M'|$ for some $M' \in \Lambda_{\mathbb{T}}$,
+      \item If $M \reduce N$ and $M = |M'|$ for some $M' : \term_{\lambda_\to}$,
       then there exists $N'$ with $|N'| = N$ and $M' \reduce N'$.
     \end{enumerate}
 \end{proposition}
@@ -371,7 +371,7 @@ Check \emph{bidirectional type inference} for the modern approach.
   
 \end{frame}
 
-\section{Programming in Simply Typed Lambda Calculus}
+\section{Programming in Simply Typed $\lambda$-Calculus}
 
 \begin{frame}[allowframebreaks]{Church encodings of natural numbers}
 The type of natural numbers is of the form
@@ -444,7 +444,7 @@ for each type variable as
 \end{frame}
 
 
-\section{Properties of Simply Typed Lambda Calculus}
+\section{Properties of Simply Typed $\lambda$-Calculus}
 
 
 \begin{frame}[c]{Type safety = Preservation + Progress}
@@ -540,7 +540,7 @@ How to prove it?
 \end{frame}
 
 \begin{frame}{Normal form}
-  The set of normal forms is characterised inductively:
+  The notion of normal form is characterised syntactically:
   \begin{definition}
     Define judgements $\texttt{Neutral}\;M$ and $\texttt{Normal}\;M$ mutually by
     \begin{multicols}{2}
@@ -690,7 +690,7 @@ How to prove it?
 \section{Proof of confluence: Takahashi's approach}
 
 \begin{frame}{Confluence: Parallel reduction}
-  Consider untyped lambda calculus. 
+  Consider untyped $\lambda$-calculus. 
 
   Let $M \parreduce N$ denote the \emph{parallel reduction} defined by
   \begin{multicols}{2}
@@ -726,7 +726,7 @@ How to prove it?
 \begin{frame}{Confluence: Properties of parallel reduction}
   \begin{lemma}
     \begin{enumerate}
-      \item $M \parreduce M$ holds for any $\lambda$-term~$M$, 
+      \item $M \parreduce M$ holds for any term~$M$, 
       \item $M \onereduce N$ implies $M \parreduce N$, and
       \item $M \parreduce N$ implies $M \reduce N$.
     \end{enumerate}
@@ -736,7 +736,7 @@ How to prove it?
       $M \parreduce M'$ and $N \parreduce N'$ imply $M\subst{N}{x} \parreduce
       M'\subst{N'}{x}$. 
   \end{lemma}
-  \begin{proof}
+  \begin{proof}[Proof sketch]
     By induction on the derivation of $M \parreduce M'$.
     
   \end{proof}
@@ -767,7 +767,7 @@ How to prove it?
     \[
       \xymatrix{
         & L \ar@{=>}[rd] \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]_(.8){*}^(.8){\beta} \\
+        M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
             & N
       }
     \]

@@ -6,7 +6,7 @@
 \subtitle{Primitive Recursion, General Recursion, and Polymorphism}
 \begin{document}
 
-{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{image.png}}
 \begin{frame}\maketitle\end{frame}}
 
 %\begin{frame}[fragile]{Polymorphism}
@@ -25,14 +25,14 @@
 %  \end{semiverbatim}
 %\end{frame}
 
-\section{G\"odel's \textbf{T}: Simply typed lambda calculus with naturals}
+\section{G\"odel's \textbf{T}: Simply typed $\lambda$-calculus with naturals}
 \begin{frame}{The limit of $\lambda_\to$}
   Can you write this in $\lambda_\to$ using Church numerals?
   \begin{align*}
     \mathtt{sum}(0)     & = 0 \\
     \mathtt{sum}(1 + n) & = (1 + n) + f(n)
   \end{align*}
-  if not definable in $\lambda_\to$, since fixpoint operator is not allowed any more. 
+  It is not definable in $\lambda_\to$, since fixpoint operator is not allowed any more. 
 
   But, $\mathtt{sum}$ is definable via \emph{primitive recursion}:
   for some $c$ and function $g$
@@ -241,7 +241,7 @@
 \end{frame}
 
 \begin{frame}{Example}
-  An term which never terminates can be defined easily.
+  A term which never terminates can be defined easily.
   \begin{align*}
              & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
     \equiv{} & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
@@ -251,12 +251,10 @@
 \end{frame}
 
 \begin{frame}{Example: Predecessor and negation}
-  \[
-    \pred \defeq \lambda n : \mathbb{N}.\,\ifz(\zero; x.\, x)\;n : \mathbb{N} \to \mathbb{N}
-  \]
-  \[
-    \mathtt{not} \defeq \lambda n : \mathbb{N}.\, \ifz(\suc\;\zero; x.\, \zero) : \mathbb{N} \to \mathbb{N}
-  \]
+  \begin{align*}
+    \pred & \defeq \lambda n : \mathbb{N}.\,\ifz(\zero; x.\, x)\;n & : \mathbb{N} \to \mathbb{N} \\
+               \mathtt{not} & \defeq \lambda n : \mathbb{N}.\, \ifz(\suc\;\zero; x.\, \zero)\; n & : \mathbb{N} \to \mathbb{N}
+  \end{align*}
   \begin{block}{Exercise}
     Evaluate the following terms to their normal forms.
     \begin{enumerate}
@@ -268,7 +266,7 @@
   \end{block}
 \end{frame}
 
-\section{\textbf{F} --- Polymorphic Typed Lambda Calculus}
+\section{\textbf{F} --- Polymorphic Typed $\lambda$-Calculus}
 \begin{frame}{Polymorphic types}
     Given type variables~$\mathbb{V}$, $\tau : \type$ is defined by
     defined by
@@ -614,7 +612,7 @@ Similarly, $\beta$-conversion extends to subterms of a given term, introducing s
 %\end{frame}
 
 \begin{frame}{Self application}
-Self-application is not typable in simply typed lambda calculus. 
+Self-application is not typable in simply typed $\lambda$-calculus. 
   \[
     \lambda (x : t).\, x\; x
   \]
@@ -725,8 +723,7 @@ The type of Church numerals is defined by
        \ifz & \defeq\,?
       \end{align*}
   \end{description}
-However, polymorphic lambda calculus allows us to define
-\emph{iterator} over natural numbers like \texttt{fold} in Haskell.
+System $F$ allows us to define \emph{iterator} like \texttt{fold} in Haskell.
 \begin{align*}
   \mathtt{fold}_{\nat} & : \forall t.\, (t \to t) \to t \to \nat \to t  \\
   \mathtt{fold}_{\nat} & \defeq \Lambda t.\, \lambda (f : t \to t)(e_0 : t)(n : \nat). 
@@ -867,6 +864,7 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   \begin{theorem}[Normalisation properties]
     \textbf{F} enjoys the weak and strong normalisation properties.
   \end{theorem}
+  Proved by Girard's \emph{reducibility candidates}.
 \end{frame}
 
 \begin{frame}{Type erasure}
@@ -891,7 +889,7 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
 \begin{frame}{Undecidability of type inference}
   \begin{theorem}
      It is undecidable whether, given a closed term $M$ of the untyped
-     lambda-calculus, there is a well-typed term $M'$ in System F such that
+     $lambda$-calculus, there is a well-typed term $M'$ in System F such that
      $|M'| = M$.  
   \end{theorem}
 
