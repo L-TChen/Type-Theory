@@ -12,7 +12,7 @@
     \item[Deadline] 17:00, 20 Aug
     \item[Assessment] 
       \begin{description}
-        \item[Assignment] (10\% + 10\% + 10\%)
+        \item[Assignment] (5\% + 10\% + 5\%)
         \item[Exam] (100\%)
       \end{description}
     \item[Email] \texttt{liang.ting.chen.tw(at)gmail(dot)com}
@@ -32,6 +32,7 @@
       \end{description}
   \end{enumerate}
 \end{frame}
+
 %\begin{frame}{Introduction}
 %  $\lambda$-calculus \dots
 %  \begin{enumerate}
@@ -60,7 +61,7 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
   \begin{enumerate}
     \item Variable:
       \begin{prooftree}
-        \AXC{$x \in V$}
+        \AXC{$x$ is in $V$}
         \RightLabel{(var)}
         \UIC{$x : \term_\lambda$}
       \end{prooftree}
@@ -82,6 +83,9 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
       \end{prooftree}
   \end{enumerate}
 \end{definition}
+Note that a \emph{side condition} is written in English instead of a
+judgement. The justification of a side condition remains informal.
+
 \end{frame}
 
 \begin{frame}{Examples and non-examples}
@@ -100,26 +104,6 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
     \item $\lambda x. $
     \item $\lambda.\, x$
     \item $\dots$
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Closed terms}
-  A term $M$ is \alert{closed} if each variable which occurs in $M$ are captured by an abstraction.
-
-  Put differently, $M$ is closed if every variable is in scope.
-
-  Closed terms:
-  \begin{enumerate}
-    \item $\lambda x.\, x$
-    \item $\lambda s.\,(\lambda z.\, (s \;z))$
-    \item $\lambda a.\,(\lambda b.\, (a\;(\lambda c.\, a\; b)))$
-    \item $(\lambda x.\, x)\;(\lambda y.\, y)$
-  \end{enumerate}
-  Open terms:
-  \begin{enumerate}
-    \item $(x\;y)\;z$
-    \item $x\;(y\; z)$
-    \item $\lambda x.\, y$
   \end{enumerate}
 \end{frame}
 
@@ -153,7 +137,7 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
     \item \emph{Object-language} is the object of study. E.g., arithmetic
       expressions and $\lambda$-terms.
   \end{itemize}
-  \emph{Naming} a function is not supported in $\lambda$-calculus, so
+  Naming a function is \emph{not} supported in $\lambda$-calculus, so
   the following
     \[
       \mathtt{id} \defeq \lambda x.\, x
@@ -216,10 +200,10 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
 \end{frame}
 
 \begin{frame}{Evaluation, informally}
-  The \alert{evaluation} of $\lambda$-calculus happens in this form 
+  The \alert{evaluation} of $\lambda$-calculus is of this form 
   \[
-    \underbrace{(\lambda x.\, M)\,N}_{\beta\text{-redex}} \longrightarrow 
-    \underbrace{M\;\subst{N}{x}}_{\text{substitution of $N$ for $x$ in $M$}}
+    \cdots\underbrace{(\lambda x.\, M)\,N}_{\beta\text{-redex}} \cdots \longrightarrow_{\beta 1}
+    \cdots \underbrace{M\;\subst{N}{x}}_{\text{substitution of $N$ for $x$ in $M$}} \cdots
   \]
 
   For example, $(\lambda x.\, x +1)\;3 \to 3 + 1$.
@@ -232,22 +216,6 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Equality, equality, equality!}
-
-  Moreover, we will have different notions of \alert{equality}.
-
-  \begin{itemize}
-    \item $1 + 1 \neq_\alpha 2$
-    \item $1 + 1 \reduce 2$ but $2 \not\reduce 1 + 1$
-    \item $1 + 1 =_\beta 2$
-  \end{itemize}
-  Each of above statements says the following.
-  \begin{itemize}
-    \item $1 + 1$ is a different expression from $2$.
-    \item $1 + 1$ reduces to $2$, but $2$ does not reduce to $1 + 1$.
-    \item $1 + 1$ and $2$ have the same computational meaning.
-  \end{itemize}
-\end{frame}
 
 \begin{frame}{Free and bound variables}
 \begin{definition}
@@ -258,7 +226,6 @@ Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
     \FV(M\;N) & = \FV(M) \cup \FV(N)
   \end{align*}
 \end{definition}
-$\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, z\}$
 \begin{definition}
   \begin{enumerate}
     \item A variable $y$ in $M$ is \alert{free} if $y \in \FV(M)$.
@@ -269,36 +236,46 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
 \end{frame}
 
 \begin{frame}{Exercise: free variables}
+  The set of free variables of a term is calculated by definition readily, e.g., 
+    \begin{align*}
+      \FV(x\;(\lambda y.\, y)\;z) & = \FV(x\;(\lambda y.\, y)) \cup \FV(z) \\ 
+                                  & = \FV(x) \cup (\FV(y) - \{y\}) \cup \{z\} \\
+                                  & = \{x\} \cup (\{y\}-\{y\}) \cup \{z\} \\
+                                  & = \{x, z\}
+    \end{align*}
+
   Calculate the set of free variables of following terms:
   \begin{enumerate}
     \item $x\;(y\; z) $
     \item $\lambda x.\, y$
     \item $\lambda x.\, x$
-    \item $\lambda s\,z.\, (s \;z))$
+    \item $\lambda s\,z.\, s \;z$
     \item $(\lambda x.\, x)\;\lambda y.\, y$
   \end{enumerate}
 \end{frame}
 
 \begin{frame}{Exercise: bound variables}
-  A variable $x$ in a term $M$ is called \emph{bound} if it is not free.
+  A \emph{bound variable} is intuitively a variable introduced by an abstraction.
+  That is, a term like $\lambda x.\, M$ introduces a bound variable $x$ to
+  be used in $M$. 
 
-  Define
-  \begin{itemize}
-    \item $\Var(M)$ the set of variables of a term $M$ by structural recursion on $\Lambda$.
-    \item $\BV(M)$ the set of bound variables.
-  \end{itemize}
+  Define $\BV(M)$ the set of bound variables.
 \end{frame}
 
 \section{Untyped $\lambda$-Calculus: Substitution}
 
 \begin{frame}{Substitution}
    A \alert{substitution} is a process of replacing \emph{free} variables by
-   another terms (on the meta-level). 
+   another terms on the meta-level. Hence, a substitution of $N$ for a free
+   variable $x$ is a function
+   \[
+     {\_}\subst{N}{x}\colon \term \to \term
+   \]
 
-   The name of a variable does not matter but the location does. So, ...
+   The name of a variable does not matter but the location does. So, 
    \begin{enumerate}
      \item bound variables should remain bound after substitution.
-     \item other free variables should remain free after substitution.
+     \item free variables which are not $x$ should remain free after substitution.
    \end{enumerate}
 
    Concretely, we want to avoid ...
@@ -311,7 +288,6 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
 \end{frame}
   
 \begin{frame}{Naive substitution I}
-  \begin{definition}
     For $x \in V$ and $L : \term_\lambda$, the substitution of $L$ for $x$ is
     defined by
     \begin{align*}
@@ -320,14 +296,14 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
       (M\;N)\subst{L}{x}& = M\subst{L}{x} \; N\subst{L}{x} \\
       (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M \subst{L}{x}
     \end{align*}
-  \end{definition}
-    A bound variable may become free. 
+
+    A bound variable may become free after substitution, e.g.,\  
     \[
       (\lambda x.\, x)\subst{y}{x} = \lambda x.\, y
     \]
+    so this is not the one we want.
 \end{frame}
 \begin{frame}{Naive substitution II}
-  \begin{definition}
     For $x \in V$ and $L : \term_\lambda$, the substitution
     of $L$ for $x$ is defined by
     \begin{align*}
@@ -337,94 +313,185 @@ $\FV(x\;y\;z) = \FV(x\;y) \cup \FV(z) = \FV(x) \cup \FV(y) \cup \{z\} = \{x, y, 
       (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M\subst{L}{x} && \text{if $x \neq y$} \\
       (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M && \text{if $x = y$} 
     \end{align*}
-  \end{definition}
-    A variable may be captured by an abstraction. 
+
+    A variable may be captured by an abstraction after substitution, e.g.,
     \[
       (\lambda x. y)\subst{x}{y} = \lambda x.\, x
     \]
+    so again it is not the desired definition.
 \end{frame}
 
 
 \begin{frame}{Capture-avoiding substitution}
-  Capture-avoiding substitution of $L$ for the \alert{free occurrences} of $x$ is a
-  \emph{partial} function $(\cdot)\subst{L}{x}\colon \term_\lambda \to \term_\lambda$ defined by
-  \begin{align*}
-    x\subst{L}{x} & = L \\
-    y\subst{L}{x} & = y && \text{if $x \neq y$} \\
-    (M\, N)\subst{L}{x} & = (M\subst{L}{x}\; N\subst{L}{x}) \\
-    (\lambda x.\, M)\subst{L}{x} & = \lambda x.\, M \\
-    (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M\subst{L}{x}                                 &&\text{if $x \neq y$ and $y \not\in \FV(L)$}
-  \end{align*}
-  \begin{definition}[Freshness]
-    A variable $y$ is \alert{fresh} for $L$ if $y \notin \FV(L)$.  
+  \begin{definition}
+    Capture-avoiding substitution\footnote{Sign, this definition is nevertheless ill-defined.} of $L$ for the \alert{free occurrences} of $x$ is a
+    \emph{partial} function $\_\subst{L}{x}\colon \term_\lambda \to \term_\lambda$ defined by
+    \begin{align*}
+      x\subst{L}{x} & = L \\
+      y\subst{L}{x} & = y && \text{if $x \neq y$} \\
+      (M\, N)\subst{L}{x} & = (M\subst{L}{x}\; N\subst{L}{x}) \\
+      (\lambda x.\, M)\subst{L}{x} & = \lambda x.\, M \\
+      (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M\subst{L}{x}                                 &&\text{if $x \neq y$ and $y \not\in \FV(L)$}
+    \end{align*}
   \end{definition}
+
 \end{frame}
 
 \begin{frame}{Renaming of bound variables}
+\begin{definition}[Freshness]
+  A variable $y$ is \alert{fresh} for $L$ if $y \notin \FV(L)$.  
+\end{definition}
+
 If a variable $y$ is \emph{fresh} for $M$, the bound variable $x$ of~$\lambda
 x.\, M$ can be renamed to~$y$ without changing the meaning. 
   \mode<presentation>{\vfill}
 \begin{definition}[$\alpha$-conversion]
-  $\alpha$-conversion is a relation $\to_\alpha$ defined by
-  \[
-    (\lambda x.\, M) \longrightarrow_\alpha \lambda y.\, M\subst{y}{x}
-    \quad\text{if $y$ is fresh for $M$}.
-  \]
+  \emph{$\alpha$-conversion} is an judgement $M \to_\alpha N$ between terms defined by
+  \begin{prooftree}
+    \AXC{$y$ is fresh for $M$}
+    \UIC{$\lambda x.\, M \longrightarrow_\alpha \lambda y.\, M\subst{y}{x}$}
+  \end{prooftree}
 \end{definition}
 
-Yet, $M\;(\lambda x.\, x) \longrightarrow_\alpha M\;(\lambda y.\, y)$ does not hold.
+Yet, $M\;(\lambda x.\, x) \longrightarrow_\alpha M\;(\lambda y.\, y)$ does
+not follow by definition, so we introduce a new judgement to allow
+$\alpha$-conversion in any subterm of a term.
+
 \end{frame}
 
-\begin{frame}
-  \begin{definition}[$\alpha$-equivalence]
+\begin{frame}{$\alpha$-equivalence}
+  \begin{definition}
   \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$x$ is a variable}
+      \UIC{$x =_\alpha x$}
+    \end{prooftree}
     \begin{prooftree}
       \AXC{$M_1 \mathrel{\to_\alpha} M_2$}
       \UIC{$M_1 \mathrel{=_\alpha} M_2$}
     \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
+%      \UIC{$M_2 \mathrel{=_\alpha} M_1$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
+%      \AXC{$M_2 \mathrel{=_\alpha} M_3$}
+%      \BIC{$M_1 \mathrel{=_\alpha} M_3$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
+%      \UIC{$(M_1\,N) \mathrel{=_\alpha} (M_2\,N)$}
+%    \end{prooftree}
     \begin{prooftree}
       \AXC{$M_1 \mathrel{=_\alpha} M_2$}
-      \UIC{$M_2 \mathrel{=_\alpha} M_1$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
-      \AXC{$M_2 \mathrel{=_\alpha} M_3$}
-      \BIC{$M_1 \mathrel{=_\alpha} M_3$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
-      \UIC{$(M_1\,N) \mathrel{=_\alpha} (M_2\,N)$}
-    \end{prooftree}
-    \begin{prooftree}
-      %\AXC{$M_1 \mathrel{R} M_2$}
       \AXC{$N_1 \mathrel{=_\alpha} N_2$}
-      \UIC{$(M\,N_1) \mathrel{=_\alpha} (M\,N_2)$}
+      \BIC{$M_1\;N_1 \mathrel{=_\alpha} M_2\;N_2$}
     \end{prooftree}
     \begin{prooftree}
       \AXC{$M_1 \mathrel{=_\alpha}M_2$}
-      \UIC{$(\lambda x.\, M_1) \mathrel{=_\alpha}(\lambda x.\, M_2)$}
+      \UIC{$\lambda x.\, M_1 \mathrel{=_\alpha} \lambda x.\, M_2$}
     \end{prooftree}
   \end{multicols}
 \end{definition}
 
-  $(\lambda y.\, y)\;(\lambda x.\, x) =_\alpha (\lambda x.\,x)\;(\lambda y.\,y)$. Why? Apply our rules! 
+$\alpha$-equivalence is an \emph{equivalence}, i.e.
+\begin{description}
+  \item[reflexivity] $M =_\alpha M$ for any term M;
+  \item[symmetry] $N =_\alpha M$ if $M =_\alpha N$;
+  \item[transitivity] $L =_\alpha N$ if $L =_\alpha M$ and $M =_\alpha N$. 
+\end{description}
+All of these can be proved by induction on the derivation of $M =_\alpha M$.
+
 \end{frame}
 
-\begin{frame}
+%\begin{frame}{Proof of reflexivity}
+%      By induction on the formation of $M$.
+%      \begin{enumerate}
+%        \item $M = x$ for some $x \in V$. Then, by definition $x =_\alpha
+%          x$ holds.
+%
+%        \item $M = M_1\;M_2$. Then, by induction hypothesis, we have
+%          derivations $D_1$ and $D_2$ for $M_1 =_\alpha M_1$ and $M_2
+%          =_\alpha M_2$ respectively. Therefore, we have the desired derivation 
+%          \begin{prooftree}
+%            \AXC{$\vdots$}
+%            \RightLabel{$D_1$}
+%            \UIC{$M_1 \mathrel{=_\alpha} M_1$}
+%            \AXC{$\vdots$}
+%            \RightLabel{$D_2$}
+%            \UIC{$M_1 \mathrel{=_\alpha} M_2$}
+%            \BIC{$M_1\;M_2 \mathrel{=_\alpha} M_1\;M_2$}
+%          \end{prooftree}
+%        \item $M = \lambda x.\, M'$. By induction hypothesis, we have a derivation $D$ for $M' =_\alpha M'$. Hence, 
+%          \begin{prooftree}
+%            \AXC{$\vdots$}
+%            \RightLabel{$D$}
+%            \UIC{$M' \mathrel{=_\alpha}M'$}
+%            \UIC{$\lambda x.\, M' \mathrel{=_\alpha}\lambda x.\, M'$}
+%            
+%          \end{prooftree}
+%      \end{enumerate}
+%\end{frame}
 
+%\begin{frame}{Proof of symmetry}
+%  By induction on the derivation $D$ of $M =_\alpha N$. The only interesting
+%  case is that $D$ is derived from an $\alpha$-conversion, i.e.
+%  \[
+%    \lambda x.\, M' \to_\alpha \lambda y.\, M'\subst{y}{x}
+%  \]
+%  and $y$ is fresh for $M'$. We know that $x \not\in \FV(M'\subst{y}{x})$ since 
+%  the substitution $\subst{y}{x}$ replaces\footnote{
+%    We actually need to show that $x \not\in \FV(M[y/x])$ whenever $\FV(M[y/x])$ is defined.}
+%  the free variable $x$ by $y$.  Therefore, we have $\lambda x.\,
+%  M'\subst{y}{x}\subst{x}{y} \equiv \lambda x.\, M'$. It follows that 
+%  \[
+%    \lambda y. M'\subst{y}{x} \to_\alpha \lambda x. M'
+%  \]
+%  Hence, $N =_\alpha M$.
+%\end{frame}
+%
+%\begin{frame}{Proof of transitivity}
+%  By induction on the derivations $D_1$ and $D_2$ of $L =_\alpha M$ and $M =_\alpha N$ respectively. The interesting case is when $D_i$'s are given by $\alpha$-conversion
+%  \[
+%    \lambda x.\,M' \to_\alpha \lambda y.\,M'\subst{y}{x} \to_\alpha \lambda z.\, M'\subst{y}{x}\subst{z}{y}. 
+%  \]
+%  
+%  It follows that 
+%  \[
+%    \lambda x.\,M' \to_\alpha \lambda z.\,M'\subst{z}{x}
+%  \]
+%  where the freshness condition clearly holds (why?)
+%  and also that
+%  \[
+%    M'\subst{y}{x}\subst{z}{y} \equiv M'\subst{z}{x}.
+%  \]
+%  Hence, transitivity holds for this case.
+%\end{frame}
+\begin{frame}
+  \begin{example}
+    \[
+      (\lambda y.\, y)\;(\lambda x.\, x) =_\alpha (\lambda
+    x.\,x)\;(\lambda y.\,y) 
+    \]
+  \end{example}
+
+  Why? We use the fact that $=_\alpha$ is an equivalence!
   \begin{proof}
   \begin{prooftree}
-    \AXC{$\lambda x.\, x \to_\alpha \lambda y.\, x\subst{y}{x}$}
+    \AXC{}
+    \UIC{$\lambda x.\, x \to_\alpha \lambda y.\, x\subst{y}{x}$}
     \UIC{$\lambda x.\, x =_\alpha \lambda y.\, y$}
     \UIC{$(\lambda y.\, y)\; (\lambda x.\, x) =_\alpha (\lambda y.\, y)\; (\lambda y.\, y)$}
-    \AXC{$\lambda y.\, y \to_\alpha \lambda x.\, y\subst{x}{y}$}
+    \AXC{}
+    \UIC{$\lambda y.\, y \to_\alpha \lambda x.\, y\subst{x}{y}$}
     \UIC{$\lambda y.\, y =_\alpha \lambda x.\, x$}
     \UIC{$(\lambda y.\, y)\; (\lambda y.\, y) =_\alpha (\lambda x.\, x)\; (\lambda y.\, y)$}
     \BIC{$(\lambda y.\, y)\; (\lambda x.\, x) =_\alpha (\lambda x.\, x)\; (\lambda y.\, y)$}
   \end{prooftree}
   \end{proof}
-  
 \end{frame}
+
 \begin{frame}{Exercise}
 
 Which of the following pairs are $\alpha$-equivalent? Why?
@@ -434,13 +501,16 @@ Which of the following pairs are $\alpha$-equivalent? Why?
   \item $\lambda x\,y.\, x$ and $\lambda y\,x.\, y$
   \item $\lambda x\,y.\, x$ and $\lambda x\,y.\, y$
 \end{enumerate}
-  
-  $(\lambda y.\,y\;y)\;(\lambda z.\,\lambda x.\, z\;x)$
+
+  \mode<presentation>{\vfill}
 \begin{block}{Convention}
-  Terms are equal up to $\alpha$-equivalence of bound variables.
+  $\alpha$-equivalent terms are identified. 
 \end{block}
 
-Feel free to rename any bound variable whenever convenient.
+In the following development, we do not distinguish $M$ and $N$ if $M
+=_\alpha N$ at all. Feel free to rename any bound variable whenever
+convenient.
+
 \end{frame}
 
 \section{Untyped $\lambda$-Calculus: Dynamics}
@@ -465,33 +535,37 @@ Feel free to rename any bound variable whenever convenient.
 
 \begin{frame}{$\beta$-conversion}
 \begin{definition}[$\beta$-conversion]
-  $\beta$-conversion is defined by
-  \[
-    \underbrace{(\lambda x.\, M)\;N}_{\beta\text{-redex}} \longrightarrow_{\beta} M\subst{N}{x}
-  \]
+  $\beta$-\emph{conversion} is a judgement $M \longrightarrow_\beta N$ defined by
+  \begin{prooftree}
+    \AXC{$M\subst{N}{x}$ is defined}
+    \UIC{$(\lambda x.\, M)\;N \longrightarrow_{\beta} M\subst{N}{x}$}
+  \end{prooftree}
+  for any $x$, $M$ and $N$.
 \end{definition}
-  Good: 
-    \[
-      ((\lambda x.\,\lambda y.\,x)\;M)
-      \longrightarrow_{\beta}
-      (\lambda y.\, x)\subst{M}{x}
-      = \lambda y.\, x\subst{M}{x}
-      = \lambda y.\, M
-    \]
-  Bad: 
-  \[
-    ((\lambda x\, y.\, x)\; M)\;N
-    \longrightarrow_{\beta} \, ?
-  \]
+
+By definition, we can conclude that 
+  \begin{align*}
+    ((\lambda x.\,\lambda y.\,x)\;M)
+    & \longrightarrow_{\beta}
+    (\lambda y.\, x)\subst{M}{x} \\
+    & \equiv \lambda y.\, x\subst{M}{x} \equiv \lambda y.\, M \\
+  \end{align*}
+  but not $((\lambda x\, y.\, x)\; M)\;N \longrightarrow_{\beta} \, (\lambda
+  y.\, M)\;N$,
+  since the above judgement is defined only for $\beta$-redexes.
 \end{frame}
 
-\begin{frame}{Full $\beta$-reduction}
+\begin{frame}{One-step $\beta$-reduction}
+
+One-step $\beta$-reduction extends $\beta$-conversion to any subterm of a
+term.  
+
 \begin{definition}
-  The \alert{full $\beta$-reduction} is defined by
+  The \emph{one-step (full) $\beta$-reduction} is defined inductively by
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$M_1 \longrightarrow_{\beta} M_2$}
-      \UIC{$M_1 \onereduce M_2$}
+      \AXC{$M\subst{N}{x}$ is defined}
+      \UIC{$(\lambda x.\, M)\;N \onereduce M\subst{N}{x}$}
     \end{prooftree}
     \begin{prooftree}
       \AXC{$M_1 \onereduce M_2$}
@@ -507,14 +581,53 @@ Feel free to rename any bound variable whenever convenient.
     \end{prooftree}
   \end{multicols}
 \end{definition}
-  $M \reduce M'$ denotes there are finitely many $M_i$ such that 
-  \[
-    M_0 \onereduce M_1 \onereduce \dots M_i \dots \onereduce M' 
-  \]
-  with $M = M_0$ and $M_n = M'$ (where $n$ can be $0$). 
+    $((\lambda x\, y.\, x)\; M)\;N \onereduce (\lambda y.\, M)\;N \onereduce M\subst{N}{y}$
 \end{frame}
 
-\begin{frame}{$\alpha$-conversion during $\beta$-conversion}
+\begin{frame}{Multi-step full $\beta$-reduction}
+  It is convenient to represents a sequence
+  of $\beta$-reductions
+  \[
+    M \onereduce M_1 \onereduce \dots \onereduce N
+  \]
+  by a single judgement $M \reduce N$. 
+
+  \begin{definition}
+    The \emph{multi-step (full) $\beta$-reduction} is defined inductively by
+    \begin{prooftree}
+      \AXC{$\vphantom{M_1}$}
+      \RightLabel{($0$-step)}
+      \UIC{$M \reduce M$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$L \onereduce M$}
+      \AXC{$M \reduce N$}
+      \RightLabel{($n+1$-step)}
+      \BIC{$L \reduce N$}
+    \end{prooftree}
+    
+  \end{definition}
+\end{frame}
+
+\begin{frame}{$M \reduce N$ is transitive}
+  \begin{lemma}
+    For every derivations of $L \reduce M$ and $M \reduce N$, there
+    is a derivation of $L \reduce N$. 
+  \end{lemma}
+  We often omit the term ``derivation'' and say ``if $L \reduce M$ and $M \reduce N$ then $L \reduce N$'' instead.
+  \begin{proof}
+    By induction on the derivation $d$ of $L \reduce M$. 
+    \begin{enumerate}
+      \item If $d$ is given by (0-step), then $L =_\alpha M$ (by convention).
+      \item If $d$ is given by (n+1-step), i.e.\ there exists $M'$ such that
+        $L \onereduce M'$ and $M' \reduce M$. By induction hypothesis,
+        every derivation $M \reduce N$ gives rise to a derivation of $M' \reduce N$.
+        Hence, by (n+1-step), we have a derivation of $L \reduce N$. 
+    \end{enumerate}
+  \end{proof}
+  
+\end{frame}
+\begin{frame}{$\alpha$-conversion during $\beta$-reduction}
 
   Renaming of bound variables may need to happen during reduction:
   \begin{align*}
@@ -535,9 +648,13 @@ Feel free to rename any bound variable whenever convenient.
 \end{frame}
 
 \begin{frame}{Computational meaning}
+  Two terms $M$ and $N$ may not have the same structure or even not reducible
+  from one to the other, but they may have the same meaning with respect to
+  computation.
+
   \begin{definition}
     $M$ and $N$ have the same \alert{\emph{computational meaning}} if $M =_\beta N$
-    where $=_\beta$ is defined inductively by
+    which is defined inductively by
     \begin{multicols}{2}
       \begin{prooftree}
         \AXC{$M \onereduce N$}
@@ -559,12 +676,15 @@ Feel free to rename any bound variable whenever convenient.
       \end{prooftree}
     \end{multicols}
   \end{definition}
-  \begin{itemize}
-    \item $\bc_2 =_\beta (\lambda x\, y. y)\;\bc_1\;\bc_2$
-    \item $\lambda z.\, (\lambda x\, y. x)\; z =_\beta \lambda z\, y.\, z$
-  \end{itemize}
+  We finally have a notion of equivalence loose enough to express
+  \[
+    \add\;\bc_1\;\bc_1 =_\beta \bc_2 \quad\text{and}\quad \bc_2 =_\beta \add\;\bc_1\;\bc_1
+  \]
 \end{frame}
 
+\begin{frame}{Summary}
+  SUMMARISE HERE ALL THE RELATIONS JUST INTRODUCED.
+\end{frame}
 
 \section{Programming in $\lambda$-Calculus}
 \begin{frame}{Church encoding of boolean values}
@@ -590,7 +710,8 @@ Boolean and conditional can be encoded as combinators.
 \end{frame}
 \begin{frame}[allowframebreaks]{Church Encoding of natural numbers}
 
-  Natural numbers can be encoded as $\lambda$-terms, so can arithmetic operations. 
+  Natural numbers as well as arithmetic operations can be encoded in untyped
+  lambda calculus.
   \begin{description}
     \item[Church numerals] 
       \begin{align*}
@@ -612,10 +733,7 @@ Boolean and conditional can be encoded as combinators.
         n\;f\;(m\;f\;x)  \\ & \mathtt{add}\;\bc_{n}\;\bc_{m}\;
                             && \reduce\; && \bc_{n + m}
       \end{align*}
-  \end{description}
 
-
-  \begin{description}
     \item[Conditional]
       \begin{align*}
         & \mathtt{ifz} && \defeq \; \lambda n\;x\;y.\;n\;(\lambda z.\;y)\;x 
@@ -623,81 +741,96 @@ Boolean and conditional can be encoded as combinators.
         & \mathtt{ifz}\;\bc_0\;M\;N && \reduce \; M \\
         & \mathtt{ifz}\;\bc_{n+1}\;M\;N && \reduce \; N
       \end{align*}
-    \item[Predecessor]
-      \begin{align*}
-        & \mathtt{pred} && \defeq\; && \lambda n.\, \lambda f\,x.\, ? \\
-        & \mathtt{pred}\;\bc_{0}  && \reduce\; && \bc_{0} \\
-        & \mathtt{pred}  \;\bc_{n+1} && \reduce\; && \bc_{n}
-      \end{align*}
   \end{description}
 \end{frame}
 
 \begin{frame}{Exercise}
   \begin{enumerate}
-    \item Define the \emph{flip} operation, i.e.\ a $\lambda$-term~$\mathtt{flip}$
-      such that
-      \[
-        \mathtt{flip}\;M\;N\;P
-        =_\beta M\;P\;N
-      \]
     \item Define Boolean operations $\mathtt{not}$, $\mathtt{and}$, and $\mathtt{or}$.
     \item Evaluate $\mathtt{succ}\;\bc_0$ and $\mathtt{add}\;\bc_{1}\;\bc_{2}$. 
     \item Define the multiplication $\mathtt{mult}$ over Church numerals.
-    \item (Hard) Define $\mathtt{pred}$ so that $\mathtt{pred}\;\bc_0 =_\beta \bc_{0}$ and $\mathtt{pred}\;\bc_{n+1} =_\beta \bc_{n}$.
+    \item Define $\mathtt{pred}$ so that $\mathtt{pred}\;\bc_0 =_\beta
+      \bc_{0}$ and $\mathtt{pred}\;\bc_{n+1} =_\beta \bc_{n}$.
+      \textbf{Hint.} You may need to encode a pair of terms to store the
+      current and the last iteration of the given input. 
+
   \end{enumerate}
 \end{frame}
-\begin{frame}{General Recursion, informally}
+\begin{frame}{General Recursion via self-reference}
 
-  The summation $\sum_{i = 0}^{n} i$ for $n \in \mathbb{N}$ \emph{can be} defined as
+  The summation $\sum_{i = 0}^{n} i$ for $n \in \mathbb{N}$ is usually
+  described by self-reference in mathematics as follows.
 \[
-  \mathtt{sum}(n) =
+  \mathit{sum}(n) =
     \begin{cases} 
      0 & \text{if } n = 0 \\
-     n + \mathtt{sum}(n - 1)  & \text{otherwise}.
+     n + \mathit{sum}(n - 1)  & \text{otherwise}.
     \end{cases}
 \]
-Can we avoid the self-reference? Consider the function
-$G\colon (\mathbb{N} \to \mathbb{N}) \to (\mathbb{N} \to \mathbb{N})$
-defined by
-\begin{equation} \label{eq:summation}
-  (Gf)(n) \defeq
-  \begin{cases}
-     0 & \text{if } n = 0 \\
-     n + f(n - 1)  & \text{otherwise}.
-  \end{cases}
-\end{equation}
-If $G(\mathtt{sum}') =\mathtt{sum}'$, then $\mathtt{sum}' = \mathtt{sum}$. 
+However, this cannot be done in $\lambda$-calculus,
+since a term cannot refer to a name introduced on the meta-level in the
+object language. 
 
+If a recursion is unfolded as many times as it requires to compute, then we have
+
+\[
+  \mathit{sum}(n) =
+    \begin{cases} 
+     0 & \text{if } n = 0 \\
+     1 + \mathit{sum}(0) & n = 1 \\
+     2 + \mathit{sum}(1) & n = 2 \\
+     \cdots \\
+     n + \mathit{sum}(n - 1)  & \text{otherwise}.
+    \end{cases}
+\]
+
+
+%We can avoid self-reference by considering a functional
+%$G\colon (\mathbb{N} \to \mathbb{N}) \to (\mathbb{N} \to \mathbb{N})$
+%defined by
+%\begin{equation} \label{eq:summation}
+%  (G(f))(n) \defeq
+%  \begin{cases}
+%     0 & \text{if } n = 0 \\
+%     n + f(n - 1)  & \text{otherwise}.
+%  \end{cases}
+%\end{equation}
+%Then, we can show that if there exists $s\colon \mathbb{N} \to \mathbb{N}$ such that $G(s) = s$ then $s = \mathit{sum}$ by induction.
 \end{frame}
 
 \begin{frame}{Curry's paradoxical combinator}
-\begin{proposition}
-  Define
+  The \emph{Y combinator} is defined as a term 
   \[
     \mathbf{Y} \defeq \lambda f.\, (\lambda x.\, f\,(x\,x))\,(\lambda
     x.\,f\,(x\,x)).
   \]
-  Then, 
+\begin{proposition}
+  $\mathbf{Y}$ is a fixed-point operator, i.e.\ 
   \begin{align*}
     \mathbf{Y}F
     & \onereduce {\color{red} (\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))} \\
     & \onereduce F\,({\color{red}(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))}) \\
   \end{align*}
-  for every $\lambda$-term~$F$. 
+  for every $\lambda$-term~$F$. In particular, $\mathbf{Y}F =_\beta F(\mathbf{Y}F)$.
 \end{proposition}
+Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration. 
 \end{frame}
 
 
-\begin{frame}{Summation, formally}
-  Using the combinators we have known so far, the equation~\eqref{eq:summation}
-  can be defined as $\lambda$-terms:
-  \begin{align*}
-    G \defeq{} & 
-    \lambda f\,n.\, \mathtt{ifz}\;n\;\bc_0\;
-    (\add\;n\;(f\;(\mathtt{pred}\;n))) \\
-    \mathtt{sum} \defeq{} & \mathbf{Y}G
-  \end{align*}
-  For example
+\begin{frame}{Summation via $\mathtt{Y}$}
+  We encode the following recursion
+  \[
+    \mathit{sum}(n) =
+      \begin{cases} 
+       0 & \text{if } n = 0 \\
+       n + \mathit{sum}(n - 1)  & \text{otherwise}.
+      \end{cases}
+  \]
+  by generalising each iteration $G$ with an additional function $f$
+  \[
+    G \defeq \lambda f\,n.\, \mathtt{ifz}\;n\;\bc_0\; (\add\;n\;(f\;(\mathtt{pred}\;n)))
+  \]
+  so that $\mathtt{sum} \defeq \mathbf{Y}G$. For example, 
   \begin{align*}
     \mathtt{sum}\;\bc_1
       &\equiv  (\mathbf{Y}G)\;\bc_1 \\
@@ -714,7 +847,9 @@ If $G(\mathtt{sum}') =\mathtt{sum}'$, then $\mathtt{sum}' = \mathtt{sum}$.
 \end{frame}
   
 \begin{frame}{Turing's fixed-point combinator}
-Here is a fixed-point operator such that $\Theta F \reduce F(\Theta F)$.
+  Recall that $\mathbf{Y}G =_\beta G(\mathbf{Y}\;G)$ but $\mathbf{Y}G \reduce
+  G(\mathbf{Y}\;G)$ does not hold.  Here is a fixed-point operator such that
+  $\Theta F \reduce F(\Theta F)$.
 \begin{proposition}
   Define 
   \[
@@ -740,7 +875,7 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 \begin{frame}{Exercise}
   \begin{enumerate}
     \item Evaluate $\mathtt{sum}\;\bc_1$ to its normal form in detail.
-    \item Define the factorial $n!$ on Church numerals with Turing's fixed-point combinator.
+    \item Define the factorial $n!$ with Church numerals.
   \end{enumerate}
 \end{frame}
 
@@ -770,45 +905,60 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 \begin{frame}{Confluence}
 \begin{theorem}[Church-Rosser]
   Given $N_1$ and $N_2$ with $M \reduce N_1$ and $M\reduce N_2$, there is $L$
-  such that
+  such that $N_1 \reduce L$ and $N_2 \reduce L$. 
   \[
     \xymatrix{
       & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-      N_1 \ar@{-->}[rd]_{\beta*} & & N_2 \ar@{-->}[ld]^{\beta*} \\
+      N_1 \ar[rd]_{\beta*} & & N_2 \ar[ld]^{\beta*} \\
       & L
     }
   \]
 \end{theorem}
+
+No matter which way we choose we can always find a confluent
+term. 
+
 \end{frame}
 
 \begin{frame}{Normal form}
-  $M$ is in \emph{normal form} if $M \notonereduce$. 
-
+  \begin{definition}
+    $M$ is \emph{in normal form} if 
+    there is no $N$ such that $M \onereduce N$, abbreviated to $M \notonereduce$.
+    
+  \end{definition}
   \begin{lemma}
     Suppose that $M$ is in normal form. Then 
-      $M \reduce N \implies M =_\alpha N$.
+      $M \reduce N$ implies $M =_\alpha N$.
   \label{lem:normal-no-reduction}%
   \end{lemma}
+  \begin{proof}
+    By induction on the derivation $d$ of $M \reduce N$.
+    \begin{enumerate}
+      \item If $d$ is given by (0-step), then
+        $M \reduce N$ where $M =_\alpha N$ by definition.
 
-  \begin{corollary}[Uniqueness of normal forms]
-    Suppose that $N_1$ and $N_2$ are in normal form. Then, 
-    \[
-      \xymatrix{
-        & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-        N_1 \ar@{}[r]|{=_{\alpha}} & N & N_2 \ar@{}[l]|{=_\alpha} \\
-      }
-    \]
-    \label{coro:uniqueness-normal}%
-  \end{corollary}
+      \item If $d$ is given by (n+1-step), then
+        $M \onereduce M'$ and $M' \reduce N$ are derivable for some $M'$. By
+        assumption $M \onereduce N$ is not derivable for any $N$, so by
+        contradiction the statement follows.
+    \end{enumerate}
+  \end{proof}
+
 \end{frame}
 
-\begin{frame}{Computationally equal terms have a confluent term}
+\begin{frame}{Corollaries of confluence}
+  \begin{corollary}[Uniqueness of normal forms]
+    Let $M$ be a term with $M \reduce N_1$ and $M\reduce N_2$ where
+     $N_i$'s are in normal form. Then, $N_1 =_\alpha N_2$.
+    \label{coro:uniqueness-normal}%
+  \end{corollary}
+  
 
-  \begin{corollary}
+  \begin{corollary}[Computationally equal terms have a confluent term]
     If $M =_\beta N$, then there exists $L$ satisfying
   \[
     \xymatrix{
-      M \ar@{-->}[rd]_{\beta*} \ar@{}[rr]|{=_\beta} & & N \ar@{-->}[ld]^{\beta*} \\
+      M \ar[rd]_{\beta*} \ar@{}[rr]|{=_\beta} & & N \ar[ld]^{\beta*} \\
       & L
     }
   \]
@@ -816,8 +966,6 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
   \end{corollary}
   \begin{proof}[Proof sketch]
     By induction on the derivation of $M =_\beta N$. 
-
-    For example, if $M \onereduce N$, then choose $L$ as $N$. 
   \end{proof}
 
 %\begin{corollary}
@@ -837,6 +985,16 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 %\end{block}
 \end{frame}
 
+
+\begin{frame}{Homework}
+  \begin{enumerate}
+    \item (2.5\%) Show Corollary~\ref{coro:uniqueness-normal}
+    \item (2.5\%) Show Corollary~\ref{coro:computational-meanting-confluence}.
+  \end{enumerate}
+\end{frame}
+
+\appendix 
+\section{Appendix: Evaluation strategy}
 \begin{frame}[allowframebreaks]{Evaluation strategies}
 An evaluation strategy is a procedure of selecting $\beta$-redexes
 to reduce. It is a subset $\longrightarrow_{\mathrm{ev}}$ of the full
@@ -931,17 +1089,6 @@ using the call-by-value and the call-by-name strategy respectively.
   normalising term to a normal form.
 \end{theorem}
 
-\end{frame}
-
-\begin{frame}{Homework}
-  \begin{enumerate}
-    \item (25\%) Show that $\reduce$ is transitive, i.e.\
-      $L \reduce N$ whenever $L \reduce M$ and $M \reduce N$. 
-      \textbf{Hint}. By induction on $L \reduce M$.
-    \item (25\%) Show Lemma~\ref{lem:normal-no-reduction}
-    \item (25\%) Show Corollary~\ref{coro:uniqueness-normal}
-    \item (25\%) Show Corollary~\ref{coro:computational-meanting-confluence}.
-  \end{enumerate}
 \end{frame}
 %\begin{frame}{Remark}
 % The definition of capture-avoiding substation is widely adopted, it is still

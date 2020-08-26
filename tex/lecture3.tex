@@ -25,20 +25,21 @@
 %  \end{semiverbatim}
 %\end{frame}
 
-\section{G\"odel's \textbf{T}: Simply typed $\lambda$-calculus with naturals}
-\begin{frame}{The limit of $\lambda_\to$}
+\section{G\"odel's \textbf{T}: Simply typed $\lambda$-calculus with naturals
+and primitive recursion}
+\begin{frame}{The un defineability of $\lambda_\to$}
   Can you write this in $\lambda_\to$ using Church numerals?
   \begin{align*}
-    \mathtt{sum}(0)     & = 0 \\
-    \mathtt{sum}(1 + n) & = (1 + n) + f(n)
+    \mathit{sum}(0)     & = 0 \\
+    \mathit{sum}(1 + n) & = (1 + n) + \mathit{sum}(n)
   \end{align*}
   It is not definable in $\lambda_\to$, since fixpoint operator is not allowed any more. 
 
-  But, $\mathtt{sum}$ is definable via \emph{primitive recursion}:
+  But, this is definable via \emph{primitive recursion}:
   for some $c$ and function $g$
   \begin{align*}
-    \mathtt{rec}(0, c, g(x, y))       &= c \\
-    \mathtt{rec}(1 + n, c, g(x, y))   &= g(n, \mathtt{rec}(n, c, g(x, y)))
+    \mathit{prec}(0, c, g(x, y))       &= c \\
+    \mathit{prec}(1 + n, c, g(x, y))   &= g(n, \mathit{prec}(n, c, g(x, y)))
   \end{align*}
 
   $\lambda_\to$ with primitive recursion is called G\"odel's \textbf{T}.
@@ -153,15 +154,8 @@
   Programming language in reality allows us to do \emph{general recursion}
   including \emph{infinite loops}. 
 
-  \mode<presentation>{\vfill}
-  What to do if we want type and general recursion at the same time?
-  \mode<presentation>{\vfill}
-\end{frame}
+  \textbf{PCF} has the same class of types as \textbf{T}.
 
-\begin{frame}{\textbf{PCF}: Types and terms}
-  \begin{definition}[Types]
-    \textbf{PCF} has the same class of types as \textbf{T}.
-  \end{definition}
   \begin{definition}[Terms]
     Additional term formation rules are added to $\lambda_\to$ as follows.
     \begin{multicols}{2}
@@ -431,9 +425,9 @@
 \end{frame}
 
 \begin{frame}{System F: Typing judgement}
-  A \emph{type context} is a sequence of pairs of type variable and a type
+  A \emph{type context} is a sequence of type variable 
   \[
-    t : \tau
+    t_1, t_2, \dots, t_n
   \]
 
   \textbf{F} has two kinds of typing judgements.
@@ -443,18 +437,17 @@
   \end{itemize}
   For example,
     \[
-      t : \tau_1 \vdash t \to t
+      t \vdash t \to t
     \]
-    is a judgement saying that $t \to $ is a valid type under the type context $(t : \tau_1)$.
+    is a judgement that $t \to $ is a valid type under the type context, $t$.
 
-    Then, we have to \emph{justify} why this judgement holds.
 \end{frame}
 
 \begin{frame}{System F: Type formation}
   The justification of $\Delta \vdash \tau$ is constructed inductively by following rules.
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$t \in \Delta$}
+      \AXC{$t$ occurs in $\Delta$}
       \UIC{$\Delta \vdash t$}
     \end{prooftree}
     \begin{prooftree}
@@ -519,11 +512,11 @@
 The typing judgement ${}\vdash\Lambda t.\, \Lambda u.\, \lambda (x : t)(y : u).\, x : \forall
 t.\;t \to u \to t$ is derivable from the following derivation:
 \begin{prooftree}
-  \AXC{$t \in t , u$}
+  \AXC{}
   \UIC{$t , u \vdash t$}
-  \AXC{$u \in t , u$}
+  \AXC{}
   \UIC{$t , u \vdash u$}
-  \AXC{$x : t \in (x : t, y : u)$}
+  \AXC{}
   \UIC{$t , u ; x : t, y : u \vdash x : t$}
   \BIC{$t , u ; x : t \vdash \lambda (y : u).\; x : u \to t$}
   \BIC{$t , u ; \cdot \vdash \lambda (x : t)(y : u).\; x : t \to u \to t$}
@@ -661,7 +654,7 @@ It has two injection functions: the first injection is defined by
 \begin{block}{Exercise}
   Define 
   \[
-    \mathtt{either} : \forall u.\, (\sigma \to u) \to (\tau \to u) \to (\sigma + \tau \to u) \to u 
+    \mathtt{either} : \forall u.\, (\sigma \to u) \to (\tau \to u) \to \sigma + \tau \to u
   \] 
 \end{block}
 \end{frame}
@@ -851,21 +844,6 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
 %  
 %\end{frame}
 
-\begin{frame}{Type safety and normalisation}
-  \begin{theorem}[Type safety]
-    Suppose $\vdash M : \sigma$. Then, 
-    \begin{enumerate}
-      \item $M \onereduce N$ implies $\vdash N : \sigma$; 
-      \item $M$ is in normal form or there exists $N$ such that $M \onereduce N$
-    \end{enumerate}
-  \end{theorem}
-  Type safety is proved by induction on the derivation of $\vdash M : \sigma$.
-
-  \begin{theorem}[Normalisation properties]
-    \textbf{F} enjoys the weak and strong normalisation properties.
-  \end{theorem}
-  Proved by Girard's \emph{reducibility candidates}.
-\end{frame}
 
 \begin{frame}{Type erasure}
 \begin{definition}
@@ -884,6 +862,22 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   \onereduce N'$, then there exists a well-typed term~$N$ with
   ${}\vdash N : \sigma$ and $|N| = N'$.
 \end{proposition}
+\end{frame}
+
+\begin{frame}{Type safety and normalisation}
+  \begin{theorem}[Type safety]
+    Suppose $\vdash M : \sigma$. Then, 
+    \begin{enumerate}
+      \item $M \onereduce N$ implies $\vdash N : \sigma$; 
+      \item $M$ is in normal form or there exists $N$ such that $M \onereduce N$
+    \end{enumerate}
+  \end{theorem}
+  Type safety is proved by induction on the derivation of $\vdash M : \sigma$.
+
+  \begin{theorem}[Normalisation properties]
+    \textbf{F} enjoys the weak and strong normalisation properties.
+  \end{theorem}
+  Proved by Girard's \emph{reducibility candidates}.
 \end{frame}
 
 \begin{frame}{Undecidability of type inference}

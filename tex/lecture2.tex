@@ -32,20 +32,30 @@
 \begin{frame}{Context}
   
 \begin{definition}
-    A \alert{\emph{typing context}}~$\Gamma$
+    A \emph{typing context}~$\Gamma$
     is a sequence
     \[
-      \Gamma = \{x_1 : \sigma_1, x_2 : \sigma_2, \ldots, x_n : \sigma_n\}
+      \Gamma \equiv x_1 : \sigma_1,\; x_2 : \sigma_2,\; \ldots,\; x_n : \sigma_n
     \]
-    of \emph{distinct variables} $x_i$ of type $\sigma_i$.
+    of \alert{\emph{distinct variables}} $x_i$ of type $\sigma_i$.
 \end{definition}
 
-\begin{block}{Convention}
-    \[
-      \Gamma, x : \sigma\quad\text{stands for}\quad\Gamma\cup \{x : \sigma\}.
-    \]
-\end{block}
-
+\begin{definition}
+  The membership judgement $\Gamma \ni (x : \sigma)$ is defined inductively as follows.
+  
+  \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$\vphantom{\Gamma}$}
+      \RightLabel{(here)}
+      \UIC{$\Gamma, x : \sigma \ni (x : \sigma)$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$\Gamma \ni (x : \sigma)$}
+      \RightLabel{(there)}
+      \UIC{$\Gamma, y : \tau \ni (x : \sigma)$}
+    \end{prooftree}
+  \end{multicols}
+\end{definition}
 \end{frame}
 
 
@@ -53,12 +63,12 @@
 
   
 \begin{definition}
-  Given type variables $B$, define the judgement $\tau : \type$ by
+  Define the judgement $\tau : \type$ by
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$B$}
+      \AXC{$\sigma$ is a type variable}
       \RightLabel{(tvar)}
-      \UIC{$B : \type$}
+      \UIC{$\sigma : \type$}
     \end{prooftree}
     \begin{prooftree}
       \AXC{$\sigma : \type$}
@@ -97,85 +107,82 @@
 \mode<presentation>{\vfill}
 For a term $M$, how to construct a \emph{typing judgement}
 \[
-  \Gamma \vdash M : \sigma \to \tau?
+  \Gamma \vdash M : \sigma \to \tau
 \]
 \end{frame}
 
-\begin{frame}{Hypothetical judgement}
-  A \emph{hypothetical judgement} (or, an inference rule) is of the form
-  \begin{prooftree}
-    \AXC{$J_1$}
-    \AXC{$J_2$}
-    \AXC{$\dots$}
-    \AXC{$J_n$}
-    \RightLabel{(rule)}
-    \QuaternaryInfC{$J$}
-  \end{prooftree}
-  consisting of 
-  \begin{description}
-    \item[hypothesis] a set of judgements $J_i$, for $1 \leq i \leq n$
-    \item[name] the name for the reason why $J_i$'s imply $J$
-    \item[conclusion] a single judgement $J$
-  \end{description}
-  Examples include
-  \begin{enumerate}
-    \item The formation of $\lambda$-terms (var), (app), and (abs).
-    \item The formation of $\alpha$-equivalence $=_\alpha$.
-    \item The formation of simple types $\mathbb{T}$.
-  \end{enumerate}
-\end{frame}
+%\begin{frame}{Hypothetical judgement}
+%  A \emph{hypothetical judgement} (or, an inference rule) is of the form
+%  \begin{prooftree}
+%    \AXC{$J_1$}
+%    \AXC{$J_2$}
+%    \AXC{$\dots$}
+%    \AXC{$J_n$}
+%    \RightLabel{(rule)}
+%    \QuaternaryInfC{$J$}
+%  \end{prooftree}
+%  consisting of 
+%  \begin{description}
+%    \item[hypothesis] a set of judgements $J_i$, for $1 \leq i \leq n$
+%    \item[name] the name for the reason why $J_i$'s imply $J$
+%    \item[conclusion] a single judgement $J$
+%  \end{description}
+%  Examples include
+%  \begin{enumerate}
+%    \item The formation of $\lambda$-terms (var), (app), and (abs).
+%    \item The formation of $\alpha$-equivalence $=_\alpha$.
+%    \item The formation of simple types $\mathbb{T}$.
+%  \end{enumerate}
+%\end{frame}
 
 \begin{frame}{Typing rule -- Curry-style typing system}
-  A \emph{typing rule} is a hypothetical judgement whose conclusion is a \emph{typing judgement}.
+  A \emph{typing rule} is an inference rule with its conclusion a
+  typing judgement.
   
-  \begin{definition}[Implicit typing]
   \begin{prooftree}
-    \AXC{$x : \sigma \in \Gamma$}
+    \AXC{$\Gamma \ni (x : \sigma)$}
     \RightLabel{(var)}
-    \UIC{$\Gamma \vdash x : \sigma$}
+    \UIC{$\Gamma \vdash_i x : \sigma$}
   \end{prooftree}
   \begin{prooftree}
-    \AXC{$\Gamma, x : \sigma \vdash M : \tau$}
+    \AXC{$\Gamma, x : \sigma \vdash_i M : \tau$}
     \RightLabel{(abs)}
-    \UIC{$\Gamma \vdash \lambda x.\; M : \sigma \to \tau$}
+    \UIC{$\Gamma \vdash_i \lambda x.\; M : \sigma \to \tau$}
   \end{prooftree}
   \begin{prooftree}
-    \AXC{$\Gamma \vdash M : \sigma \to \tau$}
-    \AXC{$\Gamma \vdash N : \sigma$}
+    \AXC{$\Gamma \vdash_i M : \sigma \to \tau$}
+    \AXC{$\Gamma \vdash_i N : \sigma$}
     \RightLabel{(app)}
-    \BIC{$\Gamma \vdash M\;N : \tau$}
+    \BIC{$\Gamma \vdash_i M\;N : \tau$}
   \end{prooftree}
-\end{definition}
 
 \mode<presentation>{\vfill}
-It is also known as the \alert{implicit typing} system since the typing information is an add-on to the term.
+It is known as the \alert{implicit typing} system since the typing information is an add-on to the term.
 \end{frame}
 
 
-\begin{frame}{Derivation}
-  Given a set $\mathcal{R}$ of hypothetical judgements, a \emph{derivation} of
-  \begin{prooftree}
-    \AXC{$J_1$}
-    \AXC{$J_2$}
-    \AXC{$\dots$}
-    \AXC{$J_n$}
-    \QuaternaryInfC{$J$}
-  \end{prooftree}
-  is a tree of instances of rules in $\mathcal{R}$ composed with $J_i$'s as the top-level hypothesises.
-
-  A judgement $J$ is \emph{derivable} (with assumptions $J_i$'s) if there is derivation whose root is $J$ (with assumptions $J_i$'s).
-
-  \begin{example}
-    The fact that
-    \[
-      \lambda x\,y.\, y
-    \]
-    is a $\lambda$-term means the judgement $\lambda x\,y.\, y$ is derivable
-    from the formation rules of $\lambda$-terms without any assumption.
-  \end{example}
-      
-  
-\end{frame}
+%\begin{frame}{Derivation}
+%  Given a set $\mathcal{R}$ of hypothetical judgements, a \emph{derivation} of
+%  \begin{prooftree}
+%    \AXC{$J_1$}
+%    \AXC{$J_2$}
+%    \AXC{$\dots$}
+%    \AXC{$J_n$}
+%    \QuaternaryInfC{$J$}
+%  \end{prooftree}
+%  is a tree of instances of rules in $\mathcal{R}$ composed with $J_i$'s as the top-level hypothesises.
+%
+%  A judgement $J$ is \emph{derivable} (with assumptions $J_i$'s) if there is derivation whose root is $J$ (with assumptions $J_i$'s).
+%
+%  \begin{example}
+%    The fact that
+%    \[
+%      \lambda x\,y.\, y
+%    \]
+%    is a $\lambda$-term means the judgement $\lambda x\,y.\, y$ is derivable
+%    from the formation rules of $\lambda$-terms without any assumption.
+%  \end{example}
+%\end{frame}
 
 \begin{frame}{Typing derivation}
   The judgement $\vdash \lambda x.\, x : \sigma \to \sigma$, for all $\sigma
@@ -183,9 +190,9 @@ It is also known as the \alert{implicit typing} system since the typing informat
   \begin{prooftree}
     \AXC{}
     \RightLabel{(var)}
-    \UIC{$x : \sigma \vdash x : \sigma$}
+    \UIC{$x : \sigma \vdash_i x : \sigma$}
     \RightLabel{(abs)}
-    \UIC{$\vdash \lambda x.\; x : (\sigma \to \sigma)$}
+    \UIC{$\vdash_i \lambda x.\; x : (\sigma \to \sigma)$}
   \end{prooftree}
 
   The judgement $ \vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$
@@ -193,11 +200,11 @@ It is also known as the \alert{implicit typing} system since the typing informat
 \begin{prooftree}
   \AXC{}
   \RightLabel{(var)}
-  \UIC{$x : \sigma, y: \tau \vdash x : \sigma$}
+  \UIC{$x : \sigma, y: \tau \vdash_i x : \sigma$}
   \RightLabel{(abs)}
-  \UIC{$x : \sigma \vdash \lambda y.\, x : \tau \to \sigma$}
-  \RightLabel{(app)}
-  \UIC{$\vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$}
+  \UIC{$x : \sigma \vdash_i \lambda y.\, x : \tau \to \sigma$}
+  \RightLabel{(abs)}
+  \UIC{$\vdash_i \lambda x\,y.\, x : \sigma \to \tau \to \sigma$}
 \end{prooftree}
 
   Not every $\lambda$-term has a type: 
@@ -214,14 +221,14 @@ It is also known as the \alert{implicit typing} system since the typing informat
   \begin{lemma}[Typing inversion]
     Suppose 
     \[
-      \Gamma \vdash M : \tau
+      \Gamma \vdash_i M : \tau
     \]
-    is derivable. 
-    \begin{enumerate}
-      \item If $M = \lambda x.\, M'$, then $\tau = \sigma \to \tau'$ for some $\sigma$ and $\Gamma, x:\sigma \vdash M : \tau'$.
-      \item If $M = L\;N$, then there is some $\sigma$ such that $\Gamma \vdash L : \sigma \to \tau$ and $\Gamma \vdash N : \sigma$.
-      
-    \end{enumerate}
+    is derivable. If 
+    \begin{description}
+      \item[$M \equiv x$] then $x : \tau$ occurs in $\Gamma$.
+      \item[$M \equiv \lambda x.\, M'$] then $\tau = \sigma \to \tau'$ for some $\sigma$ and $\Gamma, x:\sigma \vdash_i M' : \tau'$.
+      \item[$M \equiv L\;N$] there is some $\sigma$ such that $\Gamma \vdash_i L : \sigma \to \tau$ and $\Gamma \vdash_i N : \sigma$.
+    \end{description}
   \end{lemma}
 \end{frame}
 
@@ -252,31 +259,31 @@ It is also known as the \alert{implicit typing} system since the typing informat
 \begin{definition}[Typing Rules]
   Typing derivations on \emph{typed terms} are defined by 
   \begin{prooftree}
-    \AXC{$x : \sigma \in \Gamma$}
+    \AXC{$\Gamma \ni (x : \sigma)$}
     \RightLabel{(var)}
-    \UIC{$\Gamma \vdash x : \sigma$}
+    \UIC{$\Gamma \vdash_e x : \sigma$}
   \end{prooftree}
   \begin{prooftree}
-    \AXC{$\Gamma \vdash M : \sigma \to \tau$}
-    \AXC{$\Gamma \vdash N : \sigma$}
+    \AXC{$\Gamma \vdash_e M : \sigma \to \tau$}
+    \AXC{$\Gamma \vdash_e N : \sigma$}
     \RightLabel{(app)}
-    \BIC{$\Gamma \vdash M\;N : \tau$}
+    \BIC{$\Gamma \vdash_e M\;N : \tau$}
   \end{prooftree}
   \begin{prooftree}
-    \AXC{$\Gamma, x : \sigma \vdash M : \tau$}
+    \AXC{$\Gamma, {\color{red}x : \sigma} \vdash_e M : \tau$}
     \RightLabel{(abs)}
-    \UIC{$\Gamma \vdash \lambda x:\sigma.\; M : \sigma \to \tau$}
+    \UIC{$\Gamma \vdash_e \lambda {\color{red}x : \sigma} .\; M : \sigma \to \tau$}
   \end{prooftree}
 \end{definition}
 
 \end{frame}
 \begin{frame}{Explicit typing: Unicity}
 \begin{proposition}
-  For every typed term $M$, context~$\Gamma$, and types $\sigma, \tau$, 
+  For every typed term $M$, context~$\Gamma$, and types $\sigma_i$, 
   \[
-    \Gamma \vdash M : \sigma_1
+    \Gamma \vdash_e M : \sigma_1
     \quad\text{and}\quad
-    \Gamma \vdash M : \sigma_2
+    \Gamma \vdash_e M : \sigma_2
     \implies
     \sigma_1 = \sigma_2
   \]
@@ -284,12 +291,12 @@ It is also known as the \alert{implicit typing} system since the typing informat
 \begin{proof}[Proof sketch]
   Use the inversion lemma and the structural induction on $M$.
 
-  For example, suppose that 
+  E.g., suppose that $M$ is of the form
   \[
-    M \equiv L\;M'
+    L\;M'
   \]
-  By inversion there are $\tau_i$ such that $\Gamma \vdash L: \tau_i \to
-  \sigma_i$ and $\Gamma \vdash M': \tau_i$. By induction hypothesis, $\tau_1 \to
+  By inversion there are $\tau_i$ such that $\Gamma \vdash_e L: \tau_i \to
+  \sigma_i$ and $\Gamma \vdash_e M': \tau_i$. By induction hypothesis, $\tau_1 \to
   \sigma_1 = \tau_2 \to \sigma_2$, so $\sigma_1 = \sigma_2$.
 \end{proof}
 \end{frame}
@@ -318,17 +325,21 @@ It is also known as the \alert{implicit typing} system since the typing informat
     |M\; N| & = |M|\;|N| \\
     |\lambda x:\sigma.\, M| & = \lambda x.\, |M|
   \end{align*}
-  \begin{enumerate}
-    \item $|\lambda (f: \sigma \to \tau)\,(x: \sigma).\, f\;x| = \lambda f\, x.\, f\;x$
-    \item $|(\lambda (x: \sigma)\,(y: \tau). y)\;z| = (\lambda x\,y.\, y)\; z$
-  \end{enumerate}
-  
+  \begin{example}
+    \begin{enumerate}
+      \item $|\lambda (f: \sigma \to \tau)\,(x: \sigma).\, f\;x| = \lambda f\, x.\, f\;x$
+      \item $|(\lambda (x: \sigma)\,(y: \tau). y)\;z| = (\lambda x\,y.\, y)\; z$
+    \end{enumerate}
+  \end{example}
+
+  $|-|$ is an translation from $\term_{\lambda_\to}$ to $\term_{\lambda}$.
+  Does $|-|$ respect the behaviour of $\term_{\lambda_\to}$?
 \end{frame}
 \begin{frame}{From typed terms to untyped and back}
 \begin{proposition}
   Let $M$ and $N$ be typed $\lambda$-terms in~$\term_{\lambda_\to}$. Then, 
   \begin{align*}
-    \Gamma  \vdash M : \sigma & \text{ implies } \Gamma \vdash |M| :
+    \Gamma  \vdash_e M : \sigma & \text{ implies } \Gamma \vdash_i |M| :
     \sigma \\ 
     M \reduce N & \text{ implies } |M| \reduce |N|
   \end{align*}
@@ -337,10 +348,10 @@ It is also known as the \alert{implicit typing} system since the typing informat
 \begin{proposition}
   Let $M$ and $N$ be $\lambda$-terms in~$\term_{\lambda}$. Then, 
   \begin{enumerate}
-  \item If $\Gamma \vdash M : \sigma$, then there is $M' : \term_{\lambda_\to}$ with 
+  \item If $\Gamma \vdash_i M : \sigma$, then there is $M' : \term_{\lambda_\to}$ with 
         $|M'| = M
         \quad\text{and}\quad
-        \Gamma \vdash M' : \sigma$
+        \Gamma \vdash_e M' : \sigma$
       \item If $M \reduce N$ and $M = |M'|$ for some $M' : \term_{\lambda_\to}$,
       then there exists $N'$ with $|N'| = N$ and $M' \reduce N'$.
     \end{enumerate}
@@ -350,7 +361,8 @@ It is also known as the \alert{implicit typing} system since the typing informat
 \begin{frame}{Type inference}
   Can we answer the following questions
   \begin{description}
-    \item[Typability] Given a closed term $M$, is there a type $\sigma$ $\vdash M : \sigma$? 
+    \item[Typability] Given a closed term $M$, is there a type $\sigma$
+      such that $\vdash M : \sigma$? 
     \item[Type checking] Given $\Gamma$ and $\sigma$, is $\Gamma \vdash M : \sigma$ derivable?
   \end{description}
   algorithmically?
@@ -366,7 +378,7 @@ It is also known as the \alert{implicit typing} system since the typing informat
   \end{theorem}
 
 \mode<presentation>{\vfill}
-Check \emph{bidirectional type inference} for the modern approach.
+Check \emph{bidirectional type inference}.
 \subsection*{Exercise}
   
 \end{frame}
@@ -491,28 +503,27 @@ How to prove it?
   $\Omega$ is not typable, so $\mathbf{K}_1\,\mathbf{I}\,\Omega$ is not typable.
 \end{frame}
 
-\begin{frame}{A prelude for proving preservation}
-  Let $\mathrm{dom}(\Gamma)$ denote the set of variables which occur in
-  The following statements are true:
-  $\Gamma$. 
+\begin{frame}{A prelude to the preservation proof}
     \begin{description}
       \item[Weakening] If $\Gamma \vdash M : \tau$ and $x \not\in \Gamma$, then
         $\Gamma, x : \sigma \vdash M : \tau$. 
       \item[Substitution] If $\Gamma, x : \tau \vdash M : \sigma$ and $\Gamma
-        \vdash N : \tau$ then $\Gamma \vdash M\subst{x}{N} : \sigma$.
+        \vdash N : \tau$ then $\Gamma \vdash M\subst{N}{x} : \sigma$.
     \end{description}
 
   \begin{corollary}[Variable renaming]
     If $\Gamma, x : \tau \vdash M :\sigma$ and $y \not\in \mathrm{dom}(\Gamma)$, then $ \Gamma, y : \tau \vdash M\subst{y}{x} :
-    \sigma$. 
+    \sigma$
+    where $\mathrm{dom}(\Gamma)$
+    denotes the set of variables which occur in $\Gamma$.
   \end{corollary}
   \begin{proof}
-    $x'$ is not in $\Gamma$, so 
-      $\Gamma, x' : \tau, x : \tau \vdash M$
-    by weakening and by definition $\Gamma, x' : \tau \vdash x' : \tau$.
+    $y$ is not in $\Gamma$, so 
+      $\Gamma, y : \tau, x : \tau \vdash M$
+    by weakening and by definition $\Gamma, y : \tau \vdash y : \tau$.
     Thus, by substitution, we have
     \[
-      \Gamma, x' : \tau \vdash M\subst{x}{x'} : \sigma
+      \Gamma, y : \tau \vdash M\subst{x}{y} : \sigma
     \]
   \end{proof}
 \end{frame}
@@ -529,18 +540,18 @@ How to prove it?
   \[
     \Gamma \vdash (\lambda  x_1 : \tau .\, M_1)\; N : \sigma%    \quad\text{and}\quad %    (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
   \]
-  with the induction hypothesis applied to
+  with the substitution lemma applied to
   \[
     \Gamma, x_1 : \tau \vdash M_1 : \sigma
     \quad\text{and}\quad
-    \Gamma \vdash N : \tau
+    \Gamma \vdash N : \tau.
   \]
 \end{proof}
   
 \end{frame}
 
 \begin{frame}{Normal form}
-  The notion of normal form is characterised syntactically:
+  The notion of normal form can be characterised syntactically:
   \begin{definition}
     Define judgements $\texttt{Neutral}\;M$ and $\texttt{Normal}\;M$ mutually by
     \begin{multicols}{2}
@@ -564,13 +575,19 @@ How to prove it?
       \end{prooftree}
     \end{multicols}
   \end{definition}
-  \textbf{Idea.} $N$ is in normal form iff $N = \lambda x_1 \cdots x_n .\, x\;N_1 \cdots N_k$
-  where $N_i$'s are in normal form.
+  \textbf{Idea.} $\neutral\;M$ (resp.\, $\normal\;M$) is derivable
+  iff 
+  \[
+    M \equiv x\;N_1 \cdots N_k
+    \quad\text{and}\quad
+    M \equiv \lambda x_1 \cdots x_n .\, x\;N_1 \cdots N_k
+  \]
+  respectively where $N_i$'s are in normal form.
 \end{frame}
 
 \begin{frame}{Soundness and completeness of the inductive characterisation}
   \begin{lemma}
-    Let $M$ be a (typed or untyped) term.
+    Let $M$ be an untyped term.
     \begin{description}
       \item[Soundness] If $\normal\;M$ (resp.\ $\neutral\;M$) is derivable, then $M$ is in normal form.
       \item[Completeness]
@@ -578,10 +595,11 @@ How to prove it?
     \end{description}
   \end{lemma}
   \begin{proof}[Proof sketch.]
-    Prove the soundness by mutual induction on the derivation of
+    \begin{description}
+      \item[Soundness] By mutual induction on the derivation of
     $\normal\;M$ and $\neutral\;M$.
-    
-    Prove the completeness by induction on the formation of $M$.
+      \item[Completeness] By induction on the formation of $M$.
+    \end{description}
   \end{proof}
 
   
@@ -687,113 +705,6 @@ How to prove it?
 \end{theorem}
 \end{frame}
 
-\section{Proof of confluence: Takahashi's approach}
-
-\begin{frame}{Confluence: Parallel reduction}
-  Consider untyped $\lambda$-calculus. 
-
-  Let $M \parreduce N$ denote the \emph{parallel reduction} defined by
-  \begin{multicols}{2}
-    \begin{prooftree}
-      \AXC{}
-      \UIC{$x \parreduce x$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \parreduce N$}
-      \UIC{$\lambda x.\, M \parreduce \lambda x.\, N$}
-    \end{prooftree}
-    \columnbreak
-    \begin{prooftree}
-      \AXC{$M \parreduce M'$}
-      \AXC{$N \parreduce N'$}
-      \BIC{$M\;N \parreduce M'\;N'$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \parreduce M'$}
-      \AXC{$N \parreduce N'$}
-      \BIC{$(\lambda x.\, M)\;N \parreduce M'\subst{N'}{x}$}
-    \end{prooftree}
-  \end{multicols}
-  For example, 
-  \[
-    \underline{(\lambda x.\, (\lambda y.\, y)\;x)}\;\underline{((\lambda x.\, x)\;\false)}
-    \parreduce
-    \false
-  \]
-  because $(\lambda y.\,y)\;x \parreduce x$ and $(\lambda x.\,x)\;\false \parreduce \false$.
-\end{frame}
-
-\begin{frame}{Confluence: Properties of parallel reduction}
-  \begin{lemma}
-    \begin{enumerate}
-      \item $M \parreduce M$ holds for any term~$M$, 
-      \item $M \onereduce N$ implies $M \parreduce N$, and
-      \item $M \parreduce N$ implies $M \reduce N$.
-    \end{enumerate}
-  \end{lemma}
-  Therefore, $M \parreduce^* N$ is equivalent to $M \reduce N$. 
-  \begin{lemma}[Substitution respects parallel reduction]
-      $M \parreduce M'$ and $N \parreduce N'$ imply $M\subst{N}{x} \parreduce
-      M'\subst{N'}{x}$. 
-  \end{lemma}
-  \begin{proof}[Proof sketch]
-    By induction on the derivation of $M \parreduce M'$.
-    
-  \end{proof}
-
-\end{frame}
-
-\begin{frame}{Complete development}
-  The \emph{complete development} $M^*$ of a $\lambda$-term $M$ is defined by
-  \begin{align*}
-    x^*      & = x \\
-    (\lambda x.\, M)^* & = \lambda x.\, M^* \\
-    (\lambda x.\, M)\;N & = M^*\subst{N^*}{x} \\
-    (M\;N)^* & = M^*\;N^* && \text{ if $M \not\equiv \lambda x.\,M'$ } 
-  \end{align*}
-  \begin{theorem}[Triangle property]
-    If $M \parreduce N$, then $N \parreduce M^*$.
-  \end{theorem}
-  \begin{proof}[Proof sketch]
-    By induction on $M \parreduce N$.
-    
-  \end{proof}
-\end{frame}
-
-\begin{frame}{Strip Lemma}
-  \begin{theorem}
-    If $L \parreduce^* M_1$ and $L \parreduce M_2$, then there exists $N$
-    satisfying that $M_1 \parreduce N$ and $M_2 \parreduce^* N$, i.e.\
-    \[
-      \xymatrix{
-        & L \ar@{=>}[rd] \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
-      }
-    \]
-  \end{theorem}
-  \begin{proof}[Proof sketch]
-    By induction on $L \parreduce^* M_1$. 
-  \end{proof}
-\end{frame}
-
-\begin{frame}{Confluence}
-  \begin{theorem}
-    If $L \parreduce^* M_1$ and $L \parreduce^* M_2$, then there exists $N$ such that $M_1 \parreduce^* N$ and $M_2 \parreduce^* N$.
-    \[
-      \xymatrix{
-        & L \ar@{=>}[rd]^(.8){*}_(.8){\beta} \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd]^(.8){*}_(.8){\beta} & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
-      }
-    \]
-  \end{theorem}
-  \begin{corollary}
-    The confluence of $\reduce$ holds. 
-    
-  \end{corollary}
-  
-\end{frame}
 %\subsection{System T}
 %It is also convenient to add some primitive types to our typed lambda calculus (or
 %so-called built-in types in programming languages used in practice) as well as
@@ -878,13 +789,10 @@ How to prove it?
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item (25\%) Show the Preservation Theorem. \\
+    \item (2.5\%) Show the Preservation Theorem. \\
       \textbf{Hint.} Apply the Substitution Lemma if applicable. 
-    \item (25\%) Show the Progress Theorem.
-    \item (25\%) Show that if $\normal\;M$ (resp.\ $\neutral\;M$), then $M$ is in
-      normal form. 
-    \item (25\%) Show that if $M$ is in normal form then $\normal\;M$.
-      \textbf{Hint.} Try to analyse possible cases of the induction hypothesis.
+    \item (2.5\%) Show the Progress Theorem.
+    \item (2.5\%) Show that if $M$ is in normal form then $\normal\;M$ is derivable.
   \end{enumerate}
   
 \end{frame}
@@ -896,4 +804,112 @@ How to prove it?
 %
 %\end{frame}
 
+\appendix
+\section{Appendix Takahashi's Proof of confluence}
+
+\begin{frame}{Confluence: Parallel reduction}
+  Consider untyped $\lambda$-calculus. 
+
+  Let $M \parreduce N$ denote the \emph{parallel reduction} defined by
+  \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$\vphantom{M\reduce M}$}
+      \UIC{$x \parreduce x$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M \parreduce N$}
+      \UIC{$\lambda x.\, M \parreduce \lambda x.\, N$}
+    \end{prooftree}
+    \columnbreak
+    \begin{prooftree}
+      \AXC{$M \parreduce M'$}
+      \AXC{$N \parreduce N'$}
+      \BIC{$M\;N \parreduce M'\;N'$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M \parreduce M'$}
+      \AXC{$N \parreduce N'$}
+      \BIC{$(\lambda x.\, M)\;N \parreduce M'\subst{N'}{x}$}
+    \end{prooftree}
+  \end{multicols}
+  For example, 
+  \[
+    \underline{(\lambda x.\, (\lambda y.\, y)\;x)}\;\underline{((\lambda x.\, x)\;\false)}
+    \parreduce
+    \false
+  \]
+  because $(\lambda y.\,y)\;x \parreduce x$ and $(\lambda x.\,x)\;\false \parreduce \false$.
+\end{frame}
+
+\begin{frame}{Confluence: Properties of parallel reduction}
+  \begin{lemma}
+    \begin{enumerate}
+      \item $M \parreduce M$ holds for any term~$M$, 
+      \item $M \onereduce N$ implies $M \parreduce N$, and
+      \item $M \parreduce N$ implies $M \reduce N$.
+    \end{enumerate}
+  \end{lemma}
+  Therefore, $M \parreduce^* N$ is equivalent to $M \reduce N$. 
+  \begin{lemma}[Substitution respects parallel reduction]
+      $M \parreduce M'$ and $N \parreduce N'$ imply $M\subst{N}{x} \parreduce
+      M'\subst{N'}{x}$. 
+  \end{lemma}
+  \begin{proof}[Proof sketch]
+    By induction on the derivation of $M \parreduce M'$.
+    
+  \end{proof}
+
+\end{frame}
+
+\begin{frame}{Complete development}
+  The \emph{complete development} $M^*$ of a $\lambda$-term $M$ is defined by
+  \begin{align*}
+    x^*      & = x \\
+    (\lambda x.\, M)^* & = \lambda x.\, M^* \\
+    \left((\lambda x.\, M)\;N\right)^* & = M^*\subst{N^*}{x} \\
+    (M\;N)^* & = M^*\;N^* && \text{ if $M \not\equiv \lambda x.\,M'$ } 
+  \end{align*}
+  \begin{theorem}[Triangle property]
+    If $M \parreduce N$, then $N \parreduce M^*$.
+  \end{theorem}
+  \begin{proof}[Proof sketch]
+    By induction on $M \parreduce N$.
+    
+  \end{proof}
+\end{frame}
+
+\begin{frame}{Strip Lemma}
+  \begin{theorem}
+    If $L \parreduce^* M_1$ and $L \parreduce M_2$, then there exists $N$
+    satisfying that $M_1 \parreduce N$ and $M_2 \parreduce^* N$, i.e.\
+    \[
+      \xymatrix{
+        & L \ar@{=>}[rd] \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+        M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+            & N
+      }
+    \]
+  \end{theorem}
+  \begin{proof}[Proof sketch]
+    By induction on $L \parreduce^* M_1$. 
+  \end{proof}
+\end{frame}
+
+\begin{frame}{Confluence}
+  \begin{theorem}
+    If $L \parreduce^* M_1$ and $L \parreduce^* M_2$, then there exists $N$ such that $M_1 \parreduce^* N$ and $M_2 \parreduce^* N$.
+    \[
+      \xymatrix{
+        & L \ar@{=>}[rd]^(.8){*}_(.8){\beta} \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+        M_1 \ar@{=>}[rd]^(.8){*}_(.8){\beta} & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+            & N
+      }
+    \]
+  \end{theorem}
+  \begin{corollary}
+    The confluence of $\reduce$ holds. 
+    
+  \end{corollary}
+  
+\end{frame}
 \end{document}
