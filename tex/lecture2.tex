@@ -47,12 +47,12 @@
     \begin{prooftree}
       \AXC{$\vphantom{\Gamma}$}
       \RightLabel{(here)}
-      \UIC{$\Gamma, x : \sigma \ni (x : \sigma)$}
+      \UIC{$\Gamma, x : \sigma \ni x : \sigma$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$\Gamma \ni (x : \sigma)$}
+      \AXC{$\Gamma \ni x : \sigma$}
       \RightLabel{(there)}
-      \UIC{$\Gamma, y : \tau \ni (x : \sigma)$}
+      \UIC{$\Gamma, y : \tau \ni x : \sigma$}
     \end{prooftree}
   \end{multicols}
 \end{definition}
@@ -157,7 +157,7 @@ For a term $M$, how to construct a \emph{typing judgement}
   \end{prooftree}
 
 \mode<presentation>{\vfill}
-It is known as the \alert{implicit typing} system since the typing information is an add-on to the term.
+It is known as the implicit typing system and typability is a property of a term.
 \end{frame}
 
 
@@ -236,21 +236,21 @@ It is known as the \alert{implicit typing} system since the typing information i
 
 \begin{frame}{Explicit typing: Typed terms}
 \begin{definition}[Typed terms]
-  The formation $M : \term_{\lambda_\to}$ of typed terms is defined by
+  The formation $M \; \term_{V}^{\to}$ of typed terms is defined by
     \begin{prooftree}
       \AXC{$x \in V$}
-      \UIC{$x : \term_{\lambda_\to}$}
+      \UIC{$x \quad \term_{V}^{\to}$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$M : \term_{\lambda_\to}$}
-      \AXC{$N : \term_{\lambda_\to}$}
-      \BIC{$M\, N : \term_{\lambda_\to}$}
+      \AXC{$M \quad \term_{V}^{\to}$}
+      \AXC{$N \quad \term_{V}^{\to}$}
+      \BIC{$M\, N \quad \term_{V}^{\to}$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$M : \term_{\lambda_\to}$}
+      \AXC{$M \quad \term_{V}^{\to}$}
       \AXC{$x \in V$}
-      \AXC{$\tau : \type$}
-      \TIC{$\lambda {\color{red}x:\tau}.\; M : \term_{\lambda_\to}$}
+      \AXC{$\tau \quad \type$}
+      \TIC{$\lambda {\color{red}x : \tau}.\; M \quad \term_{V}^{\to}$}
     \end{prooftree}
 \end{definition}
 \end{frame}
@@ -278,7 +278,8 @@ It is known as the \alert{implicit typing} system since the typing information i
 
 \end{frame}
 \begin{frame}{Explicit typing: Unicity}
-\begin{proposition}
+
+\begin{proposition}\label{prop:unicity}
   For every typed term $M$, context~$\Gamma$, and types $\sigma_i$, 
   \[
     \Gamma \vdash_e M : \sigma_1
@@ -310,7 +311,7 @@ It is known as the \alert{implicit typing} system since the typing information i
       \]
       for every $\sigma, \tau, \rho \in \mathbb{T}$.
 
-    \item Describe all possible types for Church numeral $\bc_{n}$.
+    \item Prove Proposition~\ref{prop:unicity}.
 
     
   \end{enumerate}
@@ -319,7 +320,7 @@ It is known as the \alert{implicit typing} system since the typing information i
 
 
 \begin{frame}{Type erasure}
-  An \emph{erasing map} $|-|\colon \term_{\lambda_\to} \to \term_{\lambda}$ is defined by
+An \emph{erasing map} $|-|\colon \term_{V}^{\to} \to \term_{V}$ is defined by
   \begin{align*}
     |x| & = x \\
     |M\; N| & = |M|\;|N| \\
@@ -332,7 +333,7 @@ It is known as the \alert{implicit typing} system since the typing information i
     \end{enumerate}
   \end{example}
 
-  $|-|$ is an translation from $\term_{\lambda_\to}$ to $\term_{\lambda}$.
+$|-|$ is an translation from $\term_{V}^{\to}$ to $\term_{V}$.
   Does $|-|$ respect the behaviour of $\term_{\lambda_\to}$?
 \end{frame}
 \begin{frame}{From typed terms to untyped and back}
@@ -376,9 +377,6 @@ It is known as the \alert{implicit typing} system since the typing information i
     Type checking is \emph{decidable}
     in simply typed $\lambda$-calculus.
   \end{theorem}
-
-\mode<presentation>{\vfill}
-Check \emph{bidirectional type inference}.
 \subsection*{Exercise}
   
 \end{frame}
@@ -789,8 +787,6 @@ How to prove it?
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item (2.5\%) Show the Preservation Theorem. \\
-      \textbf{Hint.} Apply the Substitution Lemma if applicable. 
     \item (2.5\%) Show the Progress Theorem.
     \item (2.5\%) Show that if $M$ is in normal form then $\normal\;M$ is derivable.
   \end{enumerate}
