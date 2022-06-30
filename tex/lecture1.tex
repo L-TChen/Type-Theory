@@ -33,62 +33,78 @@
   \end{enumerate}
 \end{frame}
 
-%\begin{frame}{Introduction}
-%  $\lambda$-calculus \dots
-%  \begin{enumerate}
-%    \item was developed by Alonzo Church
-%    \item is a model of computation
-%    \item is a backbone of programming languages
-%  \end{enumerate}
-%  \mode<presentation>{\vfill}
-%  As a programming language, it only supports $3$ constructs 
-%  \begin{enumerate}
-%    \item variable
-%    \item function definition
-%    \item function application
-%  \end{enumerate}
-%  \mode<presentation>{\vfill}
-%\end{frame}
-
 \section{Untyped $\lambda$-Calculus: Statics}
 
-\begin{frame}{$\lambda$-calculus: Terms}
 
-Let $V \defeq \{ x, y, z, \ldots \}$ be a countably infinite set of
-\emph{variables}.
-\begin{definition}[Syntax of $\lambda$-calculus]
-  The formation $M : \term_\lambda$ is defined by
-  \begin{enumerate}
-    \item Variable:
-      \begin{prooftree}
-        \AXC{$x$ is in $V$}
-        \RightLabel{(var)}
-        \UIC{$x : \term_\lambda$}
-      \end{prooftree}
+\begin{frame}{$\lambda$-calculus: Term}
 
-    \item Function application of $M$ to the argument $N$:
+\begin{definition}[{Syntax of $\lambda$-calculus}]
+  Given a set $V$ of variables, 
+  the term formation judgement is defined by
+  \begin{description}
+     \item[Variable]
+       \hfill
+       \begin{prooftree}
+         \AXC{$x$ is in $V$}
+         \RightLabel{(var)}
+         \UIC{$x \quad \term_V$}
+       \end{prooftree}
+ 
+    \item[Application]
+      of $M$ to the argument $N$
+      \hfill
       \begin{prooftree}
-        \AXC{$M : \term_\lambda$}
-        \AXC{$N : \term_\lambda$}
+        \AXC{$M \quad \term_V$}
+        \AXC{$N \quad \term_V$}
         \RightLabel{(app)}
-        \BIC{$M \; N : \term_\lambda$}
+        \BIC{$M \; N \quad \term_V$}
       \end{prooftree}
 
-    \item Function abstraction with an argument $x$ and a function body $M$:
+    \item[Abstraction]
+      with an argument $x$ and a function body $M$
+      \hfill
       \begin{prooftree}
-        \AXC{$M : \term_\lambda$}
-        \AXC{$x \in V$}
+        \AXC{$M \quad \term_V$}
+        \AXC{$x$ is in $V$}
         \RightLabel{(abs)}
-        \BIC{$\lambda x.\, M : \term_\lambda$}
+        \BIC{$\lambda \alert{x}.\, M \quad \term_V$}
       \end{prooftree}
-  \end{enumerate}
+  \end{description}
 \end{definition}
+ 
 Note that a \emph{side condition} is written in English instead of a
 judgement. The justification of a side condition remains informal.
-
+ 
 \end{frame}
 
-\begin{frame}{Examples and non-examples}
+
+\begin{frame}{An Example}
+  The judgement
+\[
+  \fbox{$\lambda p.\, \lambda a.\, \lambda b.\, (p\;a)\; b \quad \term_V$}
+\]
+is justified by the following derivation
+  \begin{prooftree}
+    \footnotesize
+    \AXC{$p$ is in $V$}
+    \UIC{$p \quad \term_V$}
+    \AXC{$a$ is in $V$}
+    \UIC{$a \quad \term_V$}
+    \BIC{$p\;a \quad \term_V$}
+    \AXC{$b$ is in $V$}
+    \UIC{$b \quad \term_V$}
+    \BIC{$(p\;a)\;b \quad \term_V$}
+    \AXC{$b$ is in $V$}
+    \BIC{$\lambda b.\, (p\;a)\;b \quad \term_V$}
+    \AXC{$a$ is in $V$}
+    \BIC{$\lambda a.\, \lambda b.\, (p\;a)\; b \quad \term_V$}
+    \AXC{$p$ is in $V$}
+    \BIC{$\lambda p.\, \lambda a.\, \lambda b.\, (p\;a)\; b \quad \term_V$}
+  \end{prooftree}
+  N.B.\ brackets `(' and `)' are not parts of terms and they are used only to group a term.
+\end{frame}
+
+\begin{frame}{More Example and non-examples}
   \begin{enumerate}
     \item $(x\;y)\;z$
     \item $x\;(y\; z)$
@@ -111,11 +127,11 @@ judgement. The justification of a side condition remains informal.
   \begin{description}
     \item[Consecutive abstractions]
       \[
-        \lambda x_1\,x_2\,\ldots x_n.\, M \defeq \lambda x_1.\,(\lambda x_2.\,(\ldots (\lambda x_n.\, M)\ldots))
+        \lambda x_1\,x_2\,\ldots x_n.\, M \equiv \lambda x_1.\,(\lambda x_2.\,(\ldots (\lambda x_n.\, M)\ldots))
       \]
     \item[Consecutive applications]
       \[
-        M_1\;M_2\; M_3\; \dots\;M_n \defeq (\dots((M_1\;M_2)\;M_3) \dots )\; M_n
+        M_1\;M_2\; M_3\; \dots\;M_n \equiv (\dots((M_1\;M_2)\;M_3) \dots )\; M_n
       \]
     \item[Function body extends as far right as possible]
       \[
@@ -127,7 +143,16 @@ judgement. The justification of a side condition remains informal.
       $\lambda x_1.\,(\lambda x_2.\, x_1) \equiv \lambda x_1\,x_2.\,x_1$
       and
       $\alert{x\;y\;z}$ means $\alert{(x\; y)\;z}$. 
-  \alert{Warning}. We apply these rules in our \emph{meta}-language.
+
+\end{frame}
+
+\begin{frame}{Examples}
+  \begin{enumerate}
+    \item $(x\;y)\;z \equiv x\;y\;z$
+    \item $\lambda s.\,(\lambda z.\, (s \;z)) \equiv \lambda s\,z.\, s\;z$
+    \item $\lambda a.\,(\lambda b.\, (a\;(\lambda c.\, a\; b))) \equiv \lambda a\,b.\, a\;(\lambda c.\, a\;b)$
+    \item $(\lambda x.\, x)\;(\lambda y.\, y) \equiv (\lambda x.\, x)\;\lambda y.\, y$
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}{Meta-language and object-language}
@@ -149,7 +174,6 @@ judgement. The justification of a side condition remains informal.
       \[
         \mathtt{id} \equiv \lambda x.\, x
       \]
-      in the object language.
   \end{enumerate}
 \end{frame}
 
@@ -166,15 +190,17 @@ judgement. The justification of a side condition remains informal.
       \quad\text{and}\quad \mathtt{snd} \defeq \lambda x.\, \lambda y.\, y
     \]
   \end{example}
-  \begin{example}[Church encoding of Natural numbers]
-    \begin{align*}
-      &\bc_{0}   &&\defeq \;&& \lambda f\,x.\, x \\
-      &\bc_{1} &&\defeq \;&& \lambda f\,x.\, f\,x \\
-      &\bc_{2} &&\defeq \;&& \lambda f\,x.\, f\,(f\,x) \\
-      &\bc_{3} &&\defeq \;&& \lambda f\,x.\, f\,(f\,(f(\,x))) \\
-      && \vdots 
-    \end{align*}
-  \end{example}
+  Remember that there are only three constructs in $\lambda$-calculus.
+  For convenience, we normally use a surface language to generate terms in the object-language.
+%  \begin{example}[Church encoding of Natural numbers]
+%    \begin{align*}
+%      &\bc_{0}   &&\defeq \;&& \lambda f\,x.\, x \\
+%      &\bc_{1} &&\defeq \;&& \lambda f\,x.\, f\,x \\
+%      &\bc_{2} &&\defeq \;&& \lambda f\,x.\, f\,(f\,x) \\
+%      &\bc_{3} &&\defeq \;&& \lambda f\,x.\, f\,(f\,(f(\,x))) \\
+%      && \vdots 
+%    \end{align*}
+%  \end{example}
 \end{frame}
 
 \begin{frame}{$\alpha$-equivalence, informally}
@@ -195,15 +221,15 @@ judgement. The justification of a side condition remains informal.
         \lambda x.\, \lambda y.\, y$. 
     \end{enumerate}
   \end{example}
-  $\alpha$-equivalent terms are \emph{programs of the same structure}.
   
+  $\alpha$-equivalent terms are \emph{programs of the same structure modulo the name of bound variables}.
 \end{frame}
 
 \begin{frame}{Evaluation, informally}
   The \alert{evaluation} of $\lambda$-calculus is of this form 
   \[
-    \cdots\underbrace{(\lambda x.\, M)\,N}_{\beta\text{-redex}} \cdots \longrightarrow_{\beta 1}
-    \cdots \underbrace{M\;\subst{N}{x}}_{\text{substitution of $N$ for $x$ in $M$}} \cdots
+    \fbox{$\cdots\underbrace{(\lambda x.\, M)\,N}_{\beta\text{-redex}} \cdots$} \longrightarrow_{\beta 1}
+    \fbox{$\cdots \underbrace{M\;\subst{N}{x}}_{\text{substitution of $N$ for $x$ in $M$}} \cdots$}
   \]
 
   For example, $(\lambda x.\, x +1)\;3 \to 3 + 1$.
@@ -217,10 +243,11 @@ judgement. The justification of a side condition remains informal.
 \end{frame}
 
 
-\begin{frame}{Free and bound variables}
+\begin{frame}{Structural recursion: Free variables}
 \begin{definition}
-  The set $\FV$ of free variables of a term $M$ is defined by
+  The set $\FV$ of free variables of a term $M$ is inductively defined by
   \begin{align*}
+    \FV \colon  \Lambda_V & \to \mathcal{P}(V) \\
     \FV(x) & = \{x\} \\
     \FV(\lambda x.\, M) & = \FV(M) - \{x\} \\
     \FV(M\;N) & = \FV(M) \cup \FV(N)
@@ -235,7 +262,7 @@ judgement. The justification of a side condition remains informal.
 
 \end{frame}
 
-\begin{frame}{Exercise: free variables}
+\begin{frame}{Exercise}
   The set of free variables of a term is calculated by definition readily, e.g., 
     \begin{align*}
       \FV(x\;(\lambda y.\, y)\;z) & = \FV(x\;(\lambda y.\, y)) \cup \FV(z) \\ 
@@ -254,12 +281,15 @@ judgement. The justification of a side condition remains informal.
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Exercise: bound variables}
-  A \emph{bound variable} is intuitively a variable introduced by an abstraction.
-  That is, a term like $\lambda x.\, M$ introduces a bound variable $x$ to
-  be used in $M$. 
-
-  Define $\BV(M)$ the set of bound variables.
+\begin{frame}{Exercise: Height}
+  The height of a term is given informally as follows:
+  \begin{enumerate}
+    \item the height of a variable is zero;
+    \item the height of an application is the maximum of the heights of its subterms plus 1;
+    \item the height of an abstraction is the height of its body plus 1.
+  \end{enumerate}
+  
+  Define the height function $h\colon \term_V \to \mathbb{N}$ inductively.
 \end{frame}
 
 \section{Untyped $\lambda$-Calculus: Substitution}
@@ -269,10 +299,10 @@ judgement. The justification of a side condition remains informal.
    another terms on the meta-level. Hence, a substitution of $N$ for a free
    variable $x$ is a function
    \[
-     {\_}\subst{N}{x}\colon \term \to \term
+     {\_}\subst{N}{x}\colon \term_V \to \term_V
    \]
 
-   The name of a variable does not matter but the location does. So, 
+   The name of a variable does not matter but its location does.
    \begin{enumerate}
      \item bound variables should remain bound after substitution.
      \item free variables which are not $x$ should remain free after substitution.
@@ -288,7 +318,7 @@ judgement. The justification of a side condition remains informal.
 \end{frame}
   
 \begin{frame}{Naive substitution I}
-    For $x \in V$ and $L : \term_\lambda$, the substitution of $L$ for $x$ is
+    For $x \in V$ and $L : \term_V$, the substitution of $L$ for $x$ is
     defined by
     \begin{align*}
       x\subst{L}{x} & = L \\
@@ -304,7 +334,7 @@ judgement. The justification of a side condition remains informal.
     so this is not the one we want.
 \end{frame}
 \begin{frame}{Naive substitution II}
-    For $x \in V$ and $L : \term_\lambda$, the substitution
+    For $x \in V$ and $L : \term_V$, the substitution
     of $L$ for $x$ is defined by
     \begin{align*}
       x\subst{L}{x} & = L \\
@@ -324,12 +354,12 @@ judgement. The justification of a side condition remains informal.
 
 \begin{frame}{Capture-avoiding substitution}
   \begin{definition}
-    Capture-avoiding substitution\footnote{Sign, this definition is nevertheless ill-defined.} of $L$ for the \alert{free occurrences} of $x$ is a
-    \emph{partial} function $\_\subst{L}{x}\colon \term_\lambda \to \term_\lambda$ defined by
+    Capture-avoiding substitution\footnote{Sign, this definition is still not rigorous.} of $L$ for the \alert{free occurrences} of $x$ is a
+    \emph{partial} function $\_\subst{L}{x}\colon \term_V \to \term_V$ defined by
     \begin{align*}
       x\subst{L}{x} & = L \\
       y\subst{L}{x} & = y && \text{if $x \neq y$} \\
-      (M\, N)\subst{L}{x} & = (M\subst{L}{x}\; N\subst{L}{x}) \\
+      (M\, N)\subst{L}{x} & = M\subst{L}{x}\; N\subst{L}{x} \\
       (\lambda x.\, M)\subst{L}{x} & = \lambda x.\, M \\
       (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M\subst{L}{x}                                 &&\text{if $x \neq y$ and $y \not\in \FV(L)$}
     \end{align*}
@@ -504,7 +534,7 @@ Which of the following pairs are $\alpha$-equivalent? Why?
 
   \mode<presentation>{\vfill}
 \begin{block}{Convention}
-  $\alpha$-equivalent terms are identified. 
+  $\alpha$-equivalent terms are \alert{identified}. 
 \end{block}
 
 In the following development, we do not distinguish $M$ and $N$ if $M
@@ -545,14 +575,14 @@ convenient.
 
 By definition, we can conclude that 
   \begin{align*}
-    ((\lambda x.\,\lambda y.\,x)\;M)
+    (\lambda x.\,\lambda y.\,x)\;M
     & \longrightarrow_{\beta}
     (\lambda y.\, x)\subst{M}{x} \\
     & \equiv \lambda y.\, x\subst{M}{x} \equiv \lambda y.\, M \\
   \end{align*}
   but not $((\lambda x\, y.\, x)\; M)\;N \longrightarrow_{\beta} \, (\lambda
   y.\, M)\;N$,
-  since the above judgement is defined only for $\beta$-redexes.
+  since the above judgement is defined only for \alert{$\beta$-redexes}.
 \end{frame}
 
 \begin{frame}{One-step $\beta$-reduction}
@@ -676,10 +706,6 @@ term.
       \end{prooftree}
     \end{multicols}
   \end{definition}
-  We finally have a notion of equivalence loose enough to express
-  \[
-    \add\;\bc_1\;\bc_1 =_\beta \bc_2 \quad\text{and}\quad \bc_2 =_\beta \add\;\bc_1\;\bc_1
-  \]
 \end{frame}
 
 \begin{frame}{Summary}
@@ -749,10 +775,6 @@ Boolean and conditional can be encoded as combinators.
     \item Define Boolean operations $\mathtt{not}$, $\mathtt{and}$, and $\mathtt{or}$.
     \item Evaluate $\mathtt{succ}\;\bc_0$ and $\mathtt{add}\;\bc_{1}\;\bc_{2}$. 
     \item Define the multiplication $\mathtt{mult}$ over Church numerals.
-    \item Define $\mathtt{pred}$ so that $\mathtt{pred}\;\bc_0 =_\beta
-      \bc_{0}$ and $\mathtt{pred}\;\bc_{n+1} =_\beta \bc_{n}$.
-      \textbf{Hint.} You may need to encode a pair of terms to store the
-      current and the last iteration of the given input. 
 
   \end{enumerate}
 \end{frame}
@@ -767,11 +789,10 @@ Boolean and conditional can be encoded as combinators.
      n + \mathit{sum}(n - 1)  & \text{otherwise}.
     \end{cases}
 \]
-However, this cannot be done in $\lambda$-calculus,
-since a term cannot refer to a name introduced on the meta-level in the
-object language. 
+This \alert{cannot} be done in $\lambda$-calculus directly. (Why?)
 
-If a recursion is unfolded as many times as it requires to compute, then we have
+\begin{block}{Observation}
+  If $\mathit{sum}$ is unfolded as many times as it requires, then
 
 \[
   \mathit{sum}(n) =
@@ -783,6 +804,9 @@ If a recursion is unfolded as many times as it requires to compute, then we have
      n + \mathit{sum}(n - 1)  & \text{otherwise}.
     \end{cases}
 \]
+  
+\end{block}
+
 
 
 %We can avoid self-reference by considering a functional
@@ -884,7 +908,7 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
 
 \begin{frame}
   \begin{example}
-    Suppose $M : \term_\lambda$ and $y \not\in \FV(M)$. 
+    Suppose $M \; \term_\lambda$ and $y \not\in \FV(M)$. 
     Then, consider 
     \[
       (\lambda y.\, M)\, ((\lambda x.\, x\,x)(\lambda x.\, x\, x))
@@ -915,7 +939,7 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
   \]
 \end{theorem}
 
-No matter which way we choose we can always find a confluent
+No matter which way we choose we can always find a \alert{confluent}
 term. 
 
 \end{frame}
