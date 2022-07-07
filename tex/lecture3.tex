@@ -3,7 +3,7 @@
 
 \usepackage{listings}
 \title{Programming Language Theory}
-\subtitle{Primitive Recursion, General Recursion, and Polymorphism}
+\subtitle{General Recursion, and Polymorphism}
 \begin{document}
 
 {\usebackgroundtemplate{\includegraphics[width=\paperwidth]{image.png}}
@@ -25,136 +25,137 @@
 %  \end{semiverbatim}
 %\end{frame}
 
-\section{G\"odel's \textbf{T}: Simply typed $\lambda$-calculus with naturals
-and primitive recursion}
-\begin{frame}{The un defineability of $\lambda_\to$}
-  Can you write this in $\lambda_\to$ using Church numerals?
-  \begin{align*}
-    \mathit{sum}(0)     & = 0 \\
-    \mathit{sum}(1 + n) & = (1 + n) + \mathit{sum}(n)
-  \end{align*}
-  It is not definable in $\lambda_\to$, since fixpoint operator is not allowed any more. 
-
-  But, this is definable via \emph{primitive recursion}:
-  for some $c$ and function $g$
-  \begin{align*}
-    \mathit{prec}(0, c, g(x, y))       &= c \\
-    \mathit{prec}(1 + n, c, g(x, y))   &= g(n, \mathit{prec}(n, c, g(x, y)))
-  \end{align*}
-
-  $\lambda_\to$ with primitive recursion is called G\"odel's \textbf{T}.
-\end{frame}
-
-\begin{frame}{\textbf{T}: Types and terms}
-  \begin{definition}[Types]
-    \begin{multicols}{2}
-      \begin{prooftree}
-        \AXC{$B \in \mathbb{V}$}
-        \RightLabel{(tvar)}
-        \UIC{$B : \type$}
-      \end{prooftree}
-      \begin{prooftree}
-        \AXC{$\vphantom{B}$}
-        \RightLabel{(nat)}
-        \UIC{$\mathbb{N} : \type$}
-      \end{prooftree}
-      \begin{prooftree}
-        \AXC{$\sigma : \type$}
-        \AXC{$\tau   : \type$}
-        \RightLabel{(fun)}
-        \BIC{$\sigma \to \tau : \type$}
-      \end{prooftree}
-    \end{multicols}
-  \end{definition}
-  \begin{definition}[Terms]
-    Additional term formation rules are added to $\lambda_\to$ as follows.
-    \begin{multicols}{2}
-      \begin{prooftree}
-        \AXC{$\vphantom{M}$}
-        \UIC{$\zero : \term_{\textbf{T}}$}
-      \end{prooftree}
-      \begin{prooftree}
-        \AXC{$M$}
-        \UIC{$\suc\;M : \term_{\textbf{T}}$}
-      \end{prooftree}
-    \end{multicols}
-      \begin{prooftree}
-        \AXC{$L : \term_{\textbf{T}}$}
-        \AXC{$M : \term_{\textbf{T}}$}
-        \AXC{$N : \term_{\textbf{T}}$}
-        \AXC{$x \in V$}
-        \AXC{$y \in V$}
-        \QuinaryInfC{$\mathtt{rec}(M; x.\,y.\,N)\; L : \term_{\textbf{T}}$}
-      \end{prooftree}
-  \end{definition}
-\end{frame}
-
-\begin{frame}{\textbf{T}: Typing rules}
-  \begin{definition}
-    Additional term typing rules are added to $\lambda_\to$ as follows.
-    \begin{multicols}{2}
-      \begin{prooftree}
-        \AXC{$\vphantom{\Gamma}$}
-        \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
-      \end{prooftree}
-      \begin{prooftree}
-        \AXC{$\Gamma \vdash M : \mathbb{N}$}
-        \UIC{$\Gamma \vdash \suc\;M : \mathbb{N}$}
-      \end{prooftree}
-    \end{multicols}
-    \begin{prooftree}
-      \AXC{$\Gamma \vdash L : \mathbb{N}$}
-      \AXC{$\Gamma \vdash M : \tau$}
-      \AXC{$\Gamma, x : \mathbb{N}, y : \tau \vdash N : \tau$}
-      \TrinaryInfC{$\Gamma \vdash \mathtt{rec}(M; x.\,y.\,N)\;L : \tau$}
-    \end{prooftree}
-  \end{definition}
-  \begin{itemize}
-    \item Substitution for \textbf{T} is defined similarly.
-    \item Substitution respects typing judgements, i.e.\ 
-      $\Gamma \vdash N : \tau$ and $\Gamma, x : \tau \vdash M : \sigma$, then 
-      $\Gamma \vdash M\subst{N}{x} : \sigma$.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{\textbf{T}: Dynamics}
-  $\beta$-conversion for \textbf{T} is extended with two rules
-  \begin{align*}
-    \mathtt{rec}(M, x.\,y.\, N)\;\zero & \longrightarrow_\beta M \\
-    \mathtt{rec}(M, x.\,y.\, N)\;\suc\;L & \longrightarrow_\beta N\subst{L , \mathtt{rec}(M; x.\,y.\,N)\;L}{x, y}
-  \end{align*}
-  Similarly, a $\beta$-reduction $\onereduce$ extends $\longrightarrow_\beta$ to all parts of a term and $\reduce$ indicates finitely many $\beta$-reductions.
-  
-  \mode<presentation>{\vfill}
-  \begin{theorem}
-    \textbf{T} enjoys the strong and weak normalisation properties as well as type safety.
-  \end{theorem}
-\end{frame}
-
-\begin{frame}{Example: Addition and summation}
-  $\mathtt{add} : \mathbb{N} \to \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
-  \[
-    \lambda n.\,\lambda m.\,\mathtt{rec}\;(m; x.\,y.\, \suc\;y)\;n\;m
-  \]
-
-  $\mathtt{sum} : \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
-  \[
-    \lambda n.\, \mathtt{rec}\;(\zero; x.\,y.\, \add\;(\suc\;x)\;y)\;n
-  \]
-\mode<presentation>{\vfill}
-  \begin{block}{Exercise}
-    Evaluate $\mathtt{sum}\;(\suc\;\zero)$.
-  \end{block}
-\end{frame}
+%\section{G\"odel's \textbf{T}: Simply typed $\lambda$-calculus with naturals
+%and primitive recursion}
+%\begin{frame}{The un defineability of $\lambda_\to$}
+%  Can you write this in $\lambda_\to$ using Church numerals?
+%  \begin{align*}
+%    \mathit{sum}(0)     & = 0 \\
+%    \mathit{sum}(1 + n) & = (1 + n) + \mathit{sum}(n)
+%  \end{align*}
+%  It is not definable in $\lambda_\to$, since fixpoint operator is not allowed any more. 
+%
+%  But, this is definable via \emph{primitive recursion}:
+%  for some $c$ and function $g$
+%  \begin{align*}
+%    \mathit{prec}(0, c, g(x, y))       &= c \\
+%    \mathit{prec}(1 + n, c, g(x, y))   &= g(n, \mathit{prec}(n, c, g(x, y)))
+%  \end{align*}
+%
+%  $\lambda_\to$ with primitive recursion is called G\"odel's \textbf{T}.
+%\end{frame}
+%
+%\begin{frame}{\textbf{T}: Types and terms}
+%  \begin{definition}[Types]
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$B \in \mathbb{V}$}
+%        \RightLabel{(tvar)}
+%        \UIC{$B : \type$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{B}$}
+%        \RightLabel{(nat)}
+%        \UIC{$\mathbb{N} : \type$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$\sigma : \type$}
+%        \AXC{$\tau   : \type$}
+%        \RightLabel{(fun)}
+%        \BIC{$\sigma \to \tau : \type$}
+%      \end{prooftree}
+%    \end{multicols}
+%  \end{definition}
+%  \begin{definition}[Terms]
+%    Additional term formation rules are added to $\lambda_\to$ as follows.
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{M}$}
+%        \UIC{$\zero : \term_{\textbf{T}}$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$M$}
+%        \UIC{$\suc\;M : \term_{\textbf{T}}$}
+%      \end{prooftree}
+%    \end{multicols}
+%      \begin{prooftree}
+%        \AXC{$L : \term_{\textbf{T}}$}
+%        \AXC{$M : \term_{\textbf{T}}$}
+%        \AXC{$N : \term_{\textbf{T}}$}
+%        \AXC{$x \in V$}
+%        \AXC{$y \in V$}
+%        \QuinaryInfC{$\mathtt{rec}(M; x.\,y.\,N)\; L : \term_{\textbf{T}}$}
+%      \end{prooftree}
+%  \end{definition}
+%\end{frame}
+%
+%\begin{frame}{\textbf{T}: Typing rules}
+%  \begin{definition}
+%    Additional term typing rules are added to $\lambda_\to$ as follows.
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{\Gamma}$}
+%        \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$\Gamma \vdash M : \mathbb{N}$}
+%        \UIC{$\Gamma \vdash \suc\;M : \mathbb{N}$}
+%      \end{prooftree}
+%    \end{multicols}
+%    \begin{prooftree}
+%      \AXC{$\Gamma \vdash L : \mathbb{N}$}
+%      \AXC{$\Gamma \vdash M : \tau$}
+%      \AXC{$\Gamma, x : \mathbb{N}, y : \tau \vdash N : \tau$}
+%      \TrinaryInfC{$\Gamma \vdash \mathtt{rec}(M; x.\,y.\,N)\;L : \tau$}
+%    \end{prooftree}
+%  \end{definition}
+%  \begin{itemize}
+%    \item Substitution for \textbf{T} is defined similarly.
+%    \item Substitution respects typing judgements, i.e.\ 
+%      $\Gamma \vdash N : \tau$ and $\Gamma, x : \tau \vdash M : \sigma$, then 
+%      $\Gamma \vdash M\subst{N}{x} : \sigma$.
+%  \end{itemize}
+%\end{frame}
+%
+%\begin{frame}{\textbf{T}: Dynamics}
+%  $\beta$-conversion for \textbf{T} is extended with two rules
+%  \begin{align*}
+%    \mathtt{rec}(M, x.\,y.\, N)\;\zero & \longrightarrow_\beta M \\
+%    \mathtt{rec}(M, x.\,y.\, N)\;\suc\;L & \longrightarrow_\beta N\subst{L , \mathtt{rec}(M; x.\,y.\,N)\;L}{x, y}
+%  \end{align*}
+%  Similarly, a $\beta$-reduction $\onereduce$ extends $\longrightarrow_\beta$ to all parts of a term and $\reduce$ indicates finitely many $\beta$-reductions.
+%  
+%  \mode<presentation>{\vfill}
+%  \begin{theorem}
+%    \textbf{T} enjoys the strong and weak normalisation properties as well as type safety.
+%  \end{theorem}
+%\end{frame}
+%
+%\begin{frame}{Example: Addition and summation}
+%  $\mathtt{add} : \mathbb{N} \to \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
+%  \[
+%    \lambda n.\,\lambda m.\,\mathtt{rec}\;(m; x.\,y.\, \suc\;y)\;n\;m
+%  \]
+%
+%  $\mathtt{sum} : \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
+%  \[
+%    \lambda n.\, \mathtt{rec}\;(\zero; x.\,y.\, \add\;(\suc\;x)\;y)\;n
+%  \]
+%\mode<presentation>{\vfill}
+%  \begin{block}{Exercise}
+%    Evaluate $\mathtt{sum}\;(\suc\;\zero)$.
+%  \end{block}
+%\end{frame}
+%
 
 \section{\PCF --- System of Recursive Functions}
 
 \begin{frame}{\textbf{PCF}: $\lambda_\to$ with naturals and general recursion}
-  \textbf{T} does not include all computable functions, since all terms terminate eventually. 
-  Programming language in reality allows us to do \emph{general recursion}
-  including \emph{infinite loops}. 
+%  \textbf{T} does not include all computable functions, since all terms terminate eventually. 
+%  Programming language in reality allows us to do \emph{general recursion}
+%  including \emph{infinite loops}. 
 
-  \textbf{PCF} has the same class of types as \textbf{T}.
+%  \textbf{PCF} has the same class of types as \textbf{T}.
 
   \begin{definition}[Terms]
     Additional term formation rules are added to $\lambda_\to$ as follows.
@@ -680,7 +681,7 @@ Define projections
 \]
 \end{block}
 \end{frame}
-\begin{frame}[allowframebreaks]{Natural Numbers}
+\begin{frame}[allowframebreaks]{Natural numbers}
 The type of Church numerals is defined by 
 \[
   \nat \defeq \forall t.\, (t\to t)\to t\to t
@@ -880,22 +881,6 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   Proved by Girard's \emph{reducibility candidates}.
 \end{frame}
 
-\begin{frame}{Undecidability of type inference}
-  \begin{theorem}
-     It is undecidable whether, given a closed term $M$ of the untyped
-     $lambda$-calculus, there is a well-typed term $M'$ in System F such that
-     $|M'| = M$.  
-  \end{theorem}
-
-  \begin{description}
-    \item[Arbitrary Rank Polymorphism] $\forall$ can appear
-      anywhere {\small (GHC with \texttt{-XRankNType})}. 
-    \item[Rank-1 Polymorphism]
-      $\forall$ only appear in the outermost position.
-  \end{description}
-  \emph{Hindley-Milner type system} adapted by Haskell 98, Standard ML, etc.
-  supports only rank-1 polymorphism, so type inference is still decidable.
-\end{frame}
 
 \begin{frame}{Parametricity}
   What functions can you write for the following type?
@@ -924,6 +909,186 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
       M \sim M : \mathcal{R}_{\sigma, \sigma}
     \]
   \end{theorem}
+\end{frame}
+
+
+\begin{frame}{Undecidability of type inference}
+  \begin{theorem}[Wells, 1999]
+     It is undecidable whether, given a closed term $M$ of the untyped
+     $lambda$-calculus, there is a well-typed term $M'$ in System F such that
+     $|M'| = M$.  
+  \end{theorem}
+
+  Two ways to retain decidable type inference:
+  \begin{enumerate}
+    \item Limit the expressiveness so that type inference remains decidable.
+      For example, \emph{Hindley-Milner type system} adapted by Haskell 98, Standard ML, etc.\ supports only a limited form of polymorphism but type inference is decidable.
+    \item Adopt \emph{partial} type inference so that type annotations are needed for, e.g. top-level definitions and 
+      local definitions. 
+  \end{enumerate}
+
+  Check out \emph{bidirectional type inference}.
+%  \begin{description}
+%    \item[Arbitrary Rank Polymorphism] $\forall$ can appear
+%      anywhere {\small (GHC with \texttt{-XRankNType})}. 
+%    \item[Rank-1 Polymorphism]
+%      $\forall$ only appear in the outermost position.
+%  \end{description}
+\end{frame}
+
+\section{Nameless Representation}
+
+\begin{frame}{Capture-avoiding but ill-defined substitution}
+  The definition of capture-avoiding substitution is not well-defined.
+  Recall that
+    \begin{align*}
+      x\subst{L}{x} & = L \\
+      y\subst{L}{x} & = y && \text{if $x \neq y$} \\
+      (M\, N)\subst{L}{x} & = M\subst{L}{x}\; N\subst{L}{x} \\
+      (\lambda x.\, M)\subst{L}{x} & = \lambda x.\, M \\
+      (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M\subst{L}{x}                                 &&\text{if $x \neq y$ and $y \not\in \FV(L)$}
+    \end{align*}
+    The function $\_\subst{L}{x}\colon \term_V \to \term_V$ is not total, so it is \alert{not} an instance of \emph{structural recursion} (i.e.\ $\texttt{fold}$).
+    In what sense, is the above well-defined? 
+    
+  \begin{enumerate}
+    \item Use \emph{nominal technique} and the notion of $\alpha$-structure recursion/induction.
+      It requires some elements of group theory.
+    \item Use \emph{nameless} representation.
+  \end{enumerate}
+  
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Well-Scoped de Bruijn index representation}
+  An index $i$ starting from $0$ is used as a variable to represent the $i$-th enclosing $\lambda$ (binder) `from the inside out'.
+  For example, a term with named variables
+  \[
+    \lambda a.\,\lambda b.\, (\lambda c.\, c) \;(\lambda c.\, a\;b)
+  \]
+  becomes
+  \[
+  {\color{blue}\lambda}\, {\color{red}\lambda}\, (\lambda\,0) \;(\lambda\,{\color{blue} 2}\;{\color{red}1})
+  \]
+  Hint.\ It may be easier to think of a term in its tree representation.
+  \begin{definition}[de Bruijn representation with a local scope]
+    The term formation \fbox{$t\quad \term_n$} is defined inductively for $n \in \mathbb{N}$ by
+    \begin{minipage}{.45\textwidth}
+      \begin{prooftree}
+        \AXC{$0 \leq i < n$}
+        \UIC{$i \quad \term_{n}$}
+      \end{prooftree}
+    \end{minipage}
+    \begin{minipage}{.45\textwidth}
+      \begin{prooftree}
+        \AXC{$t \quad \term_{n + 1}$}
+        \UIC{$\lambda\, t \quad \term_n$}
+      \end{prooftree}
+    \end{minipage}
+      \begin{prooftree}
+        \AXC{$t \quad \term_{n}$}
+        \AXC{$u \quad \term_{n}$}
+        \BIC{$t\;u \quad \term_{n}$}
+      \end{prooftree}
+    \fbox{$t\quad \term_n$} means $t$ has at most $n$ many free variables.
+  \end{definition}
+  
+\end{frame}
+
+\begin{frame}{Exercise}
+  Translate the following terms to its de Bruijn index representation. 
+  \begin{enumerate}
+    \item $\lambda x.\, x$
+    \item $\lambda s.\,\lambda z.\, s \;z$
+    \item $\lambda a.\,\lambda b.\, a\;(\lambda c.\, a\; b)$
+    \item $(\lambda x.\, x)\;(\lambda y.\, y)$
+    \item $\lambda x.\, y$
+    \item $x\;y\;z$
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Substitution, revisited}
+  How to reformulate $\beta$-reduction for terms in de Bruijn representation? 
+  Consider
+  \[
+    \left({\color{blue}\lambda}\, {\color{red}\lambda}\,(\lambda\,0) \;(\lambda\,{\color{blue} 2}\;{\color{red}1})\right)\;t
+  \longrightarrow_{\beta}
+  \left({\color{red}\lambda}\, \;(\lambda\,0) \;(\lambda\,{\color{blue} 2}\;{\color{red}1})\right)\subst{t}{\color{blue}0}
+  \]
+
+  The de Bruijn index increments under a binder so $\subst{t}{i}$ should be $\subst{t'}{i+1}$ where $t'$ is the result of incrementing every index in $t$, e.g., 
+  \begin{align*}
+      \left({\color{red}\lambda}\, (\lambda\,0) \;(\lambda\,{\color{blue} 2}\;{\color{red}1})\right)\subst{t}{\color{blue}0}
+      & = 
+      {\color{red}\lambda}\, (\lambda\,0)\subst{t'}{\color{blue}1} \quad(\lambda\,{\color{blue} 2}\;{\color{red}1})\subst{t'}{1} \\
+      & =
+      {\color{red}\lambda}\, (\lambda\,0\subst{t''}{\color{blue}2}) \quad(\lambda\,\left({\color{blue} 2}\;{\color{red}1}\right)\subst{t''}{2}) \\
+      & =
+      {\color{red}\lambda}\, (\lambda\,0) \quad(\lambda\, {\color{blue} 2}\subst{t''}{2}\;{\color{red}1}\subst{t''}{2}) \\
+      & = 
+      {\color{red}\lambda}\, (\lambda\,0) \quad(\lambda\, t''\;{\color{red}1})
+  \end{align*}
+  
+\end{frame}
+
+
+\begin{frame}{Simultaneous variable renaming}
+  \begin{definition}
+    A \emph{(variable) renaming} is a function $\rho$ between $\mathbb{Z}_n$ and $\mathbb{Z}_m$. 
+  \end{definition}
+  Every renaming $\rho\colon \mathbb{Z}_n \to \mathbb{Z}_m$ extends to an action on terms:
+  \begin{align*}
+    \left< \rho \right> i                 & = \rho(i)                                  \\
+    \left< \rho \right> \left(t\;u\right) & = \left<\rho\right>t \; \left<\rho\right>u \\
+    \left< \rho \right> \lambda\,t        & = \lambda\left< \rho' \right> t
+  \end{align*}
+  where $\rho' \colon \mathbb{Z}_{n+1} \to \mathbb{Z}_{m+1}$ is defined as 
+  \begin{align*}
+    \rho'(0) & = 0 \\
+    \rho'(i) & = 1 + \rho(i) & \text{if $i \neq 0$}
+  \end{align*}
+  to avoid changing bound variables. 
+  
+  In particular, $\mathit{wk}\colon \term_{n} \to \term_{n+1}$ derived by $i \mapsto i+1 \in \mathbb{Z}_{n+1}$ increments every index of a free variable by $1$.
+\end{frame}
+
+\begin{frame}{Simultaneous substitution}
+  \begin{definition}
+    A \emph{(simultaneous) substitution} is a function $\sigma$ from $\mathbb{Z}_n$ to $\term_m$.
+  \end{definition}
+  Every substitution extends to an action terms: 
+  \begin{align*}
+    \left< \sigma \right> i                 & = \sigma(i)                                \\
+    \left< \sigma \right> \left(t\;u\right) & = \left<\sigma\right>t \; \left<\sigma\right>u \\
+    \left< \sigma \right> \lambda\,t        & = \lambda\left< \sigma' \right> t
+  \end{align*}
+  where $\sigma' \colon \mathbb{Z}_{n+1} \to \term_{m+1}$ is defined as
+  \begin{align*}
+    \sigma'(0) & = 0 \\
+    \sigma'(i) & = \mathit{wk}\left(\sigma(i)\right) & \text{if $i \neq 0$}
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Single substitution}
+  \begin{definition}
+    A \emph{single substitution} for $t$ is a simultaneous substitution given by
+    \[
+      \sigma(i) =
+      \begin{cases}
+        t & \text{$i = 0$} \\
+        i & \text{otherwise.}
+      \end{cases}
+    \]
+  \end{definition}
+\end{frame}
+
+\begin{frame}{Exercise}
+  \begin{enumerate}
+    \item Adopt $\alpha$-equivalence to the de Bruijn representation.
+    \item Adopt $\beta$-equivalence to the de Bruijn representation.
+    \item Apply the new definition of substitution to compute $\mathtt{not}\;\mathtt{True}$.
+    \item Adopt the definitions of renaming and substitution to the de Bruijn level representation.
+  N.B.\ we may also count the $i$-th enclosing binder `from the outside in' using the same definition, called \emph{the de Bruijn level}.
+  \end{enumerate}
 \end{frame}
 
 %\begin{frame}
@@ -1051,20 +1216,20 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item (25\%) Extend {\PCF} with the type $\mathbb{B}$ of boolean values with
+    \item (2.5\%) Extend {\PCF} with the type $\mathbb{B}$ of boolean values with
       $\mathtt{ifz}(M; N)\;\true =_\beta M$ and $\mathtt{ifz}(M; N)\;\false
       =_\beta N$ including term formation rules, typing rules, and dynamics for
       $\mathbb{B}$.
 
-    \item (25\%) Define \textbf{pred} in {\textbf{T}} such that $\pred\;\zero =\zero$
+%    \item (25\%) Define \textbf{pred} in {\textbf{T}} such that $\pred\;\zero =\zero$
       and $\pred\;(\suc\;n) = n$.
 
-    \item (25\%) Define \textbf{even} in {\PCF} such that $\mathbf{even}\;n =
-      \suc\;\zero$ if $n$ is an even number; $\mathbf{even}\;n = \zero$
-      otherwise. 
+%    \item (25\%) Define \textbf{even} in {\PCF} such that $\mathbf{even}\;n =
+%      \suc\;\zero$ if $n$ is an even number; $\mathbf{even}\;n = \zero$
+%      otherwise. 
 
-    \item (25\%) Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list.
-    \item (0\%) Read the paper by Wadler (1989).
+    \item (2.5\%) Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list in System F.
+%    \item (0\%) Read the paper by Wadler (1989).
     
   \end{enumerate}
   

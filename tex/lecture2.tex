@@ -526,24 +526,35 @@ How to prove it?
   \end{proof}
 \end{frame}
 
-\begin{frame}{Preservation Theorem}
+\begin{frame}[allowframebreaks] {Preservation Theorem}
   \begin{theorem}
-    If $\Gamma \vdash M : \sigma$ is derivable and $M \onereduce N$, then $\Gamma \vdash N : \sigma$. 
+    For any $M$ and $N$ if $\Gamma \vdash M : \sigma$ is derivable and $M \onereduce N$, then $\Gamma \vdash N : \sigma$. 
   \end{theorem}
   \begin{proof}[Proof sketch]
-  By induction on both the derivation of $\Gamma \vdash M :
-  \sigma$ and $M \onereduce N$.
-
-  The only non-trivial case is
+    By induction on both the derivation of $\Gamma \vdash M :
+    \sigma$ and $M \onereduce N$.
+  \end{proof}
+  N.B. The only non-trivial case is
   \[
     \Gamma \vdash (\lambda  x_1 : \tau .\, M_1)\; N : \sigma%    \quad\text{and}\quad %    (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
   \]
-  with the substitution lemma applied to
-  \[
-    \Gamma, x_1 : \tau \vdash M_1 : \sigma
-    \quad\text{and}\quad
-    \Gamma \vdash N : \tau.
-  \]
+  which needs the substitution lemma.
+  
+  \begin{proof}
+  By induction on both the derivation of $\Gamma \vdash M :
+  \sigma$ and $M \onereduce N$.
+
+  \begin{enumerate}
+    \item Suppose $\Gamma \vdash x : \sigma$.
+      However, $x \not\onereduce N$ for any $N$.
+      Therefore, it is vacuously true that $\Gamma \vdash N : \sigma$.
+    \item Suppose $\Gamma \vdash \lambda x.\, M : \sigma \to \tau$ and $\lambda x.\, M \onereduce N$.
+      Then, $N$ must be $\lambda x.\, N'$ for some $N'$; $\Gamma, x : \sigma \vdash M \colon \tau$ and $M \onereduce N'$ must be derivable.
+      By induction hypothesis, $\Gamma, x : \sigma \vdash N'$ is derivable, so is $\Gamma \vdash \lambda x.\, N'\colon \sigma \to \tau$.
+    \item Suppose $\Gamma \vdash M\; N$.
+      Then ...
+    \item ...
+  \end{enumerate}
 \end{proof}
   
 \end{frame}
@@ -592,7 +603,7 @@ How to prove it?
         If $M$ is in normal form, then $\normal\;M$ is derivable.
     \end{description}
   \end{lemma}
-  \begin{proof}[Proof sketch.]
+  \begin{proof}[Proof sketch]
     \begin{description}
       \item[Soundness] By mutual induction on the derivation of
     $\normal\;M$ and $\neutral\;M$.
