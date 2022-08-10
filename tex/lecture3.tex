@@ -1072,12 +1072,11 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
 \begin{frame}{Single substitution}
   \begin{definition}
     A \emph{single substitution} for $t$ is a simultaneous substitution given by
-    \[
-      \begin{cases}
-        \sigma(0) & = 0  \\
-        \sigma(1+i) & = i
-      \end{cases}
-    \]
+    \begin{align*}
+      \sigma      \colon  \mathbb{Z}_{1+n} & \to \mathbb{Z}_{n} \\
+      \sigma(0)   & = t  \\
+      \sigma(1+i) & = i
+    \end{align*}
   \end{definition}
 \end{frame}
 
