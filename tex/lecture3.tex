@@ -225,7 +225,7 @@
   \begin{align*}
     \fix\,x.\,M & \longrightarrow_\beta M\subst{\fix\,x.\,M}{x} \\
     \ifz(M; x.\, N)\;\zero & \longrightarrow_\beta M \\
-    \ifz(M; x.\, N)\;(\suc M) & \longrightarrow_\beta N\subst{M}{x}
+    \ifz(M; x.\, N)\;(\suc\;L) & \longrightarrow_\beta N\subst{L}{x}
   \end{align*}
   Similarly, a $\beta$-reduction $\onereduce$ extends $\longrightarrow_\beta$ to all parts of a term and $\reduce$ indicates finitely many $\beta$-reductions.
   
@@ -254,8 +254,8 @@
     Evaluate the following terms to their normal forms.
     \begin{enumerate}
       \item $\pred\;\zero$
-      \item $\pred\;(\suc\;\suc\;\suc\;\zero)$
-      \item $\mathtt{not}\;(\suc\;\suc\;\zero)$
+      \item $\pred\;(\suc\;(\suc\;(\suc\;\zero)))$
+      \item $\mathtt{not}\;(\suc\;(\suc\;\zero))$
     \end{enumerate}
     
   \end{block}
@@ -337,7 +337,7 @@
 \end{frame}
 \begin{frame}{Capture-avoiding substitution for type}
   \begin{definition}
-  The \emph{(capture-avoidance) substitution} of a type $\rho$ for the free
+  The \emph{(capture-avoiding) substitution} of a type $\rho$ for the free
   occurrence of a type variable~$t$ is defined by 
   \begin{align*}
     t\subst{\rho}{t} & = \rho \\
@@ -466,7 +466,7 @@
   \begin{block}{Exercise}
     Derive the judgement 
     \[
-        t : \tau \vdash t \to t
+        t \vdash t \to t
     \]
   \end{block}
 \end{frame}
@@ -511,7 +511,7 @@
 \begin{frame}{Typing derivation}
 
 The typing judgement ${}\vdash\Lambda t.\, \Lambda u.\, \lambda (x : t)(y : u).\, x : \forall
-t.\;t \to u \to t$ is derivable from the following derivation:
+t.\;\forall u. \;t \to u \to t$ is derivable from the following derivation:
 \begin{prooftree}
   \AXC{}
   \UIC{$t , u \vdash t$}
@@ -527,6 +527,21 @@ t.\;t \to u \to t$ is derivable from the following derivation:
   t \to u \to t$}
 \end{prooftree}
   
+\end{frame}
+
+\begin{frame}{Self application}
+Self-application is not typable in simply typed $\lambda$-calculus. 
+  \[
+    \lambda (x : t).\, x\; x
+  \]
+  However, self-application is possible in System F. 
+  \[
+    \lambda (x : \forall t. t\to t).\, x\;(\forall t. t\to t)\;x
+  \]
+\mode<presentation>{\vfill}
+  \begin{block}{Exercise}
+    Instantiate the first $t$ with the type $\forall t.\, t \to t$.  
+  \end{block}
 \end{frame}
 
 \begin{frame}{Exercise}
@@ -605,20 +620,6 @@ Similarly, $\beta$-conversion extends to subterms of a given term, introducing s
 %$\longrightarrow_\beta$.
 %\end{frame}
 
-\begin{frame}{Self application}
-Self-application is not typable in simply typed $\lambda$-calculus. 
-  \[
-    \lambda (x : t).\, x\; x
-  \]
-  However, self-application is possible in System F. 
-  \[
-    \lambda (x : \forall t. t\to t).\, x\;(\forall t. t\to t)\;x
-  \]
-\mode<presentation>{\vfill}
-  \begin{block}{Exercise}
-    Instantiate the first $t$ with the type $\forall t.\, t \to t$.  
-  \end{block}
-\end{frame}
 
 \begin{frame}{Sum type}
 
@@ -1044,7 +1045,7 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   where $\rho' \colon \mathbb{Z}_{n+1} \to \mathbb{Z}_{m+1}$ is defined as 
   \begin{align*}
     \rho'(0) & = 0 \\
-    \rho'(i) & = 1 + \rho(i) & \text{if $i \neq 0$}
+    \rho'(1 + i) & = 1 + \rho(i)
   \end{align*}
   to avoid changing bound variables. 
   
@@ -1064,7 +1065,7 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   where $\sigma' \colon \mathbb{Z}_{n+1} \to \term_{m+1}$ is defined as
   \begin{align*}
     \sigma'(0) & = 0 \\
-    \sigma'(i) & = \mathit{wk}\left(\sigma(i)\right) & \text{if $i \neq 0$}
+    \sigma'(1 + i) & = \mathit{wk}\left(\sigma(i)\right)
   \end{align*}
 \end{frame}
 
@@ -1072,10 +1073,9 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
   \begin{definition}
     A \emph{single substitution} for $t$ is a simultaneous substitution given by
     \[
-      \sigma(i) =
       \begin{cases}
-        t & \text{$i = 0$} \\
-        i & \text{otherwise.}
+        \sigma(0) & = 0  \\
+        \sigma(1+i) & = i
       \end{cases}
     \]
   \end{definition}
@@ -1222,8 +1222,8 @@ of type $\sigma \to \List\;\sigma \to \List\;\sigma$.
       $\mathbb{B}$.
 
 %    \item (25\%) Define \textbf{pred} in {\textbf{T}} such that $\pred\;\zero =\zero$
-      and $\pred\;(\suc\;n) = n$.
-
+%      and $\pred\;(\suc\;n) = n$.
+%
 %    \item (25\%) Define \textbf{even} in {\PCF} such that $\mathbf{even}\;n =
 %      \suc\;\zero$ if $n$ is an even number; $\mathbf{even}\;n = \zero$
 %      otherwise. 

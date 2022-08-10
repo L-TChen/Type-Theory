@@ -160,7 +160,6 @@ For a term $M$, how to construct a \emph{typing judgement}
 It is known as the implicit typing system and typability is a property of a term.
 \end{frame}
 
-
 %\begin{frame}{Derivation}
 %  Given a set $\mathcal{R}$ of hypothetical judgements, a \emph{derivation} of
 %  \begin{prooftree}
@@ -232,7 +231,14 @@ It is known as the implicit typing system and typability is a property of a term
   \end{lemma}
 \end{frame}
 
-
+\begin{frame}{Exercise}
+  Derive the judgement
+    \[
+      \vdash \lambda f\,g\,x.\, f\,x\, (g\,x) : (\sigma \to \tau \to \rho) \to
+      (\sigma\to\tau) \to \sigma\to\rho 
+    \]
+    for every $\sigma, \tau, \rho \in \mathbb{T}$.
+\end{frame}
 
 \begin{frame}{Explicit typing: Typed terms}
 \begin{definition}[Typed terms]
@@ -302,21 +308,6 @@ It is known as the implicit typing system and typability is a property of a term
 \end{proof}
 \end{frame}
 
-\begin{frame}{Exercise}
-  \begin{enumerate}
-    \item Derive the judgement
-      \[
-        \vdash \lambda f\,g\,x.\, f\,x\, (g\,x) : (\sigma \to \tau \to \rho) \to
-        (\sigma\to\tau) \to \sigma\to\rho 
-      \]
-      for every $\sigma, \tau, \rho \in \mathbb{T}$.
-
-    \item Prove Proposition~\ref{prop:unicity}.
-
-    
-  \end{enumerate}
-
-\end{frame}
 
 
 \begin{frame}{Type erasure}
@@ -334,11 +325,11 @@ An \emph{erasing map} $|-|\colon \term_{V}^{\to} \to \term_{V}$ is defined by
   \end{example}
 
 $|-|$ is an translation from $\term_{V}^{\to}$ to $\term_{V}$.
-  Does $|-|$ respect the behaviour of $\term_{\lambda_\to}$?
+Does $|-|$ respect the behaviour of $\term_{\term_V^{\to}}$?
 \end{frame}
 \begin{frame}{From typed terms to untyped and back}
 \begin{proposition}
-  Let $M$ and $N$ be typed $\lambda$-terms in~$\term_{\lambda_\to}$. Then, 
+  Let $M$ and $N$ be typed $\lambda$-terms in~$\term_{\lambda_V^{\to}}$. Then, 
   \begin{align*}
     \Gamma  \vdash_e M : \sigma & \text{ implies } \Gamma \vdash_i |M| :
     \sigma \\ 
@@ -347,13 +338,13 @@ $|-|$ is an translation from $\term_{V}^{\to}$ to $\term_{V}$.
 \end{proposition}
 
 \begin{proposition}
-  Let $M$ and $N$ be $\lambda$-terms in~$\term_{\lambda}$. Then, 
+  Let $M$ and $N$ be $\lambda$-terms in~$\term_V$. Then, 
   \begin{enumerate}
-  \item If $\Gamma \vdash_i M : \sigma$, then there is $M' : \term_{\lambda_\to}$ with 
+  \item If $\Gamma \vdash_i M : \sigma$, then there is $M' : \term_V^{\to}$ with 
         $|M'| = M
         \quad\text{and}\quad
         \Gamma \vdash_e M' : \sigma$
-      \item If $M \reduce N$ and $M = |M'|$ for some $M' : \term_{\lambda_\to}$,
+      \item If $M \reduce N$ and $M = |M'|$ for some $M' : \term_V^{\to}$,
       then there exists $N'$ with $|N'| = N$ and $M' \reduce N'$.
     \end{enumerate}
 \end{proposition}
@@ -370,7 +361,7 @@ $|-|$ is an translation from $\term_{V}^{\to}$ to $\term_{V}$.
   
   Typability is reducible to type checking problem of
   \[
-    x_0: \tau \vdash \textbf{K}_1\;x_0\;M : \tau
+    x_0: \tau \vdash \mathtt{fst} \;x_0\;M : \tau
   \]
 
   \begin{theorem}
@@ -812,7 +803,7 @@ How to prove it?
 %\end{frame}
 
 \appendix
-\section{Appendix Takahashi's Proof of confluence}
+\section{Appendix: Takahashi's Proof of confluence}
 
 \begin{frame}{Confluence: Parallel reduction}
   Consider untyped $\lambda$-calculus. 
@@ -919,4 +910,5 @@ How to prove it?
   \end{corollary}
   
 \end{frame}
+z
 \end{document}

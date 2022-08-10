@@ -244,7 +244,7 @@ is justified by the following derivation
 \begin{definition}
   The set $\FV$ of free variables of a term $M$ is inductively defined by
   \begin{align*}
-    \FV \colon  \Lambda_V & \to \mathcal{P}(V) \\
+    \FV \colon  \term_V & \to \mathcal{P}(V) \\
     \FV(x) & = \{x\} \\
     \FV(\lambda x.\, M) & = \FV(M) - \{x\} \\
     \FV(M\;N) & = \FV(M) \cup \FV(N)
@@ -351,7 +351,7 @@ is justified by the following derivation
 
 \begin{frame}{Capture-avoiding substitution}
   \begin{definition}
-    Capture-avoiding substitution\footnote{Sign, this definition is still not rigorous.} of $L$ for the \alert{free occurrences} of $x$ is a
+    Capture-avoiding substitution\footnote{Sigh, this definition is still not rigorous.} of $L$ for the \alert{free occurrences} of $x$ is a
     \emph{partial} function $\_\subst{L}{x}\colon \term_V \to \term_V$ defined by
     \begin{align*}
       x\subst{L}{x} & = L \\
