@@ -1,93 +1,180 @@
 %! TEX program = xelatex
 %! TEX root = lecture2_slide.tex
 
-\title{$\lambda$-Calculus}
-\subtitle{Higher-Order Functions}
+\title{\texorpdfstring{$\lambda$}{λ}-Calculus}
+\subtitle{Simple Types and their Extensions}
 \begin{document}
 
-{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
-\begin{frame}\maketitle\end{frame}}
+\bgroup
+  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+  \begin{frame}[plain,noframenumbering]
+    \maketitle
+  \end{frame}
+\egroup
 
-\section{Simply Typed $\lambda$-Calculus: Statics}
+%\section{Properties of \texorpdfstring{$\lambda$}{λ}-Calculus}
+%
+%\begin{frame}
+%  \begin{example}
+%    Suppose $t$ is a term and $y \not\in \FV(t)$. 
+%    Then, consider 
+%    \[
+%      (\lambda y.\, t)\, ((\lambda x.\, x\,x)(\lambda x.\, x\, x))
+%    \]
+%  \end{example}
+%  \mode<presentation>{\vfill}
+%  Observations:
+%  \begin{itemize}
+%    \item Some evaluation may diverge while some may converge.
+%    \item Full $\beta$-reduction lacks for determinacy. 
+%  \end{itemize}
+%  Question:
+%  \begin{itemize}
+%    \item Does every path give the same evaluation?
+%  \end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Confluence}
+%\begin{theorem}[Church-Rosser]
+%  Given $u_1$ and $u_2$ with $t \reduce u_1$ and $t\reduce u_2$, there is $v$
+%  such that $u_1 \reduce v$ and $u_2 \reduce v$, pictorially,
+%  \[
+%    \xymatrix{
+%      & t \ar@{->>}[rd]^{\beta} \ar@{->>}[ld]_{\beta} \\
+%      u_1 \ar@{->>}[rd]_{\beta} & & u_2 \ar@{->>}[ld]^{\beta} \\
+%      & v
+%    }
+%  \]
+%\end{theorem}
+%
+%No matter which way we choose we can always find a \alert{confluent}
+%term. 
+%
+%\end{frame}
+%
+%\begin{frame}{Normal form}
+%  \begin{definition}
+%    $M$ is \emph{in normal form} if 
+%    there is no $N$ such that $M \onereduce N$, abbreviated to $M \notonereduce$.
+%    
+%  \end{definition}
+%  \begin{lemma}
+%    Suppose that $M$ is in normal form. Then 
+%      $M \reduce N$ implies $M =_\alpha N$.
+%  \label{lem:normal-no-reduction}%
+%  \end{lemma}
+%  \begin{proof}
+%    By induction on the derivation $d$ of $M \reduce N$.
+%    \begin{enumerate}
+%      \item If $d$ is given by (0-step), then
+%        $M \reduce N$ where $M =_\alpha N$ by definition.
+%
+%      \item If $d$ is given by (n+1-step), then
+%        $M \onereduce M'$ and $M' \reduce N$ are derivable for some $M'$. By
+%        assumption $M \onereduce N$ is not derivable for any $N$, so by
+%        contradiction the statement follows.
+%    \end{enumerate}
+%  \end{proof}
+%
+%\end{frame}
+%
+%\begin{frame}{Corollaries of confluence}
+%  \begin{corollary}[Uniqueness of normal forms]
+%    Let $M$ be a term with $M \reduce N_1$ and $M\reduce N_2$ where
+%     $N_i$'s are in normal form. Then, $N_1 =_\alpha N_2$.
+%    \label{coro:uniqueness-normal}%
+%  \end{corollary}
+%  
+%
+%  \begin{corollary}[Computationally equal terms have a confluent term]
+%    If $M =_\beta N$, then there exists $L$ satisfying
+%  \[
+%    \xymatrix{
+%      M \ar@{->>}[rd]_{\beta} \ar@{}[rr]|{=_\beta} & & N \ar@{->>}[ld]^{\beta} \\
+%      & L
+%    }
+%  \]
+%  \label{coro:computational-meanting-confluence}
+%  \end{corollary}
+%  \begin{proof}[Proof sketch]
+%    By induction on the derivation of $M =_\beta N$. 
+%  \end{proof}
+%
+%%\begin{corollary}
+%%  Let $=_\beta$ denote the congruence closure of $\onereduce$. 
+%%  \begin{enumerate}
+%%    \item If $M =_\beta N$, then there exists $L$ such that 
+%%      \[
+%%        M \reduce L
+%%        \; _{\beta*}\longleftarrow N
+%%      \]
+%%    \item If in addition $N$ is in normal form, then 
+%%      $M \reduce N$. 
+%%  \end{enumerate}
+%%\end{corollary}
+%%\begin{block}{Homework}
+%%  Show this corollary.
+%%\end{block}
+%\end{frame}
 
-\begin{frame}{Typing judgement}
-  A \alert{typing judgement} is of the form
+
+\section{Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus: Introduction}
+
+\begin{frame}{Adding types to a language}
+  While $\lambda$-calculus is expressive and computationally powerful, it is rather painful to write programs inside $\lambda$-calculus.
+
+  Function can be applied to an arbitrary term which can represent a Boolean value, a number, or even a function, so as a programming language it is not easy to see the \alert{intention} of a program.
+
+  Therefore, we will consider a formal definition of a \alert{typing judgement}
   \[
-    \Gamma \vdash M : \sigma
+    \Gamma \vdash t : A
   \]
-  saying the \emph{term $M$ is of type $\sigma$ under the context $\Gamma$}
-  where 
-  \begin{description}
-    \item[context $\Gamma$] free variables $x : \tau$ available in $M$
-    \item[term $M$] possibly with free variables in $\Gamma$,
-    \item[type $\sigma$] for $M$
-  \end{description}
-
-  \[
-    x_1:\tau_1, x_2: \tau_2 \vdash x_1 : \tau_1
-  \]
-  `\emph{Under the context consisting of variables $x_1:\tau_1, x_2:\tau_2$, the term $x_1$ is of type $\tau_1$.}'
+  which specifies the type $A$ of a term $t$ under a list of free (typed) variables, allowing us to \emph{restrict the formation} of a valid term by typing.
 \end{frame}
 
-\begin{frame}{Context}
-  
-\begin{definition}
-    A \emph{typing context}~$\Gamma$
-    is a sequence
-    \[
-      \Gamma \equiv x_1 : \sigma_1,\; x_2 : \sigma_2,\; \ldots,\; x_n : \sigma_n
-    \]
-    of \alert{\emph{distinct variables}} $x_i$ of type $\sigma_i$.
-\end{definition}
+\section{Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus: Statics}
 
-\begin{definition}
-  The membership judgement $\Gamma \ni (x : \sigma)$ is defined inductively as follows.
-  
-  \begin{multicols}{2}
-    \begin{prooftree}
-      \AXC{$\vphantom{\Gamma}$}
-      \RightLabel{(here)}
-      \UIC{$\Gamma, x : \sigma \ni x : \sigma$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$\Gamma \ni x : \sigma$}
-      \RightLabel{(there)}
-      \UIC{$\Gamma, y : \tau \ni x : \sigma$}
-    \end{prooftree}
-  \end{multicols}
-\end{definition}
-\end{frame}
+%\begin{frame}{Typing judgement}
+%  A \alert{typing judgement} is of the form
+%  \[
+%    \Gamma \vdash t : A
+%  \]
+%  saying the \emph{term $t$ is of type $\sigma$ under the context $\Gamma$}
+%  where 
+%  \begin{description}
+%    \item[$\Gamma$] is a list of variables $x_i : A_i$ available in $t$
+%    \item[$A$] is the type of $t$.
+%  \end{description}
+%
+%  For example, the typing judgement
+%  \[
+%    x_1:A_1, x_2: A_2 \vdash x_1 : A_1
+%  \]
+%  means `the term $x_1$ is of type $A_1$ under the context $x_1:A_1, x_2:A_2$'.
+%\end{frame}
+
 
 
 \begin{frame}{Higher-order function type}
+Assume $\mathbb{V}$ is a set of type variables different from variables in untyped $\lambda$-terms. 
+(And suppress its existence from now on.)
 
-  
 \begin{definition}
-  Define the judgement $\tau : \type$ by
+  The judgement $A : \type$ is defined inductively as follows.
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$\sigma$ is a type variable}
-      \RightLabel{(tvar)}
-      \UIC{$\sigma : \type$}
+      \AXC{$X$ is a type variable}
+      \UIC{$X : \type$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$\sigma : \type$}
-      \AXC{$\tau   : \type$}
-      \RightLabel{(fun)}
-      \BIC{$\sigma \to \tau : \type$}
+      \AXC{$A : \type$}
+      \AXC{$B : \type$}
+      \BIC{$A \to B : \type$}
     \end{prooftree}
   \end{multicols}
-  where $\sigma\to\tau$ represents a function type from $\sigma$ to $\tau$.
-
-  Also $\sigma_1 \to \tau_1 = \sigma_2 \to \tau_2$ if and only if $\sigma_1 = \sigma_2 \text{ and } \tau_1 = \tau_2$.
+  where $A \to B$ represents a function type from $A$ to $B$.
 \end{definition}
-\mode<presentation>{\vfill}
-\begin{block}{Convention}
-\[
-  \sigma_1 \to \sigma_2 \to \dots \sigma_n \quad  \defeq\quad \sigma_1 \to
-  (\sigma_2 \to ( \dots \to (\sigma_{n-1} \to \sigma_n)\dots))
-\]
-\end{block}
+We say that $A$ is a type if $A : \type$ is derivable.
 
 \end{frame}
 
@@ -97,18 +184,47 @@
     \item functions can be arguments of another function;
     \item functions can be the result of a computation.
   \end{enumerate}
-  \begin{example}
-    \begin{description}
-      \item[$\;(\sigma_1 \to \sigma_2) \to \tau$] a function type whose argument is of type $\sigma_1 \to \sigma_2$; 
-      \item[$\;\sigma_1 \to (\sigma_2 \to \tau)$] a function whose return type is $\sigma_2 \to \tau$. 
-    \end{description}
-  \end{example}
-    
-\mode<presentation>{\vfill}
-For a term $M$, how to construct a \emph{typing judgement}
-\[
-  \Gamma \vdash M : \sigma \to \tau
-\]
+  For example, 
+  \begin{description}
+    \item[$\;(A_1 \to A_2) \to B$] a function type whose argument is of type $A_1 \to A_2$; 
+    \item[$\;A_1 \to (A_2 \to B)$] a function whose return type is $A_2 \to B$. 
+  \end{description}
+  \vfill
+  Following the convention of function application, we introduce the convention for the function type:
+  \begin{block}{Convention}
+  \[
+    A_1 \to A_2 \to \dots A_n \quad  \defeq\quad A_1 \to
+    (A_2 \to ( \dots \to (A_{n-1} \to A_n)\dots))
+  \]
+  \end{block}
+\end{frame}
+
+\begin{frame}{Context}
+  
+\begin{definition}
+    A \emph{typing context}~$\Gamma$
+    is a sequence
+    \[
+      \Gamma \equiv x_1 : A_1,\; x_2 : A_2,\; \ldots,\; x_n : A_n
+    \]
+    of \alert{\emph{distinct variables}} $x_i$ of type $A_i$.
+\end{definition}
+
+\begin{definition}
+  The membership judgement $\Gamma \ni (x : A)$ is defined inductively:
+  
+  \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$\vphantom{\Gamma}$}
+      \UIC{$\Gamma, x : A \ni x : A$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$\Gamma \ni x : A$}
+      \UIC{$\Gamma, y : B \ni x : A$}
+    \end{prooftree}
+  \end{multicols}
+  We say that $x$ of type $A$ occurs in $\Gamma$ if $\Gamma \ni (x : A)$ if derivable.
+\end{definition}
 \end{frame}
 
 %\begin{frame}{Hypothetical judgement}
@@ -136,28 +252,28 @@ For a term $M$, how to construct a \emph{typing judgement}
 %\end{frame}
 
 \begin{frame}{Typing rule -- Curry-style typing system}
-  A \emph{typing rule} is an inference rule with its conclusion a
-  typing judgement.
+  The implicit typing system for simply typed $\lambda$-calculus is defined by the following typing rules, i.e.\ 
+  inference rules with its conclusion a typing judgement:
   
   \begin{prooftree}
-    \AXC{$\Gamma \ni (x : \sigma)$}
+    \AXC{$\Gamma \ni (x : A)$}
     \RightLabel{(var)}
-    \UIC{$\Gamma \vdash_i x : \sigma$}
+    \UIC{$\Gamma \vdash_i x : A$}
   \end{prooftree}
   \begin{prooftree}
-    \AXC{$\Gamma, x : \sigma \vdash_i M : \tau$}
+    \AXC{$\Gamma, x : A \vdash_i t : B$}
     \RightLabel{(abs)}
-    \UIC{$\Gamma \vdash_i \lambda x.\; M : \sigma \to \tau$}
+    \UIC{$\Gamma \vdash_i \lambda x.\; t : A \to B$}
   \end{prooftree}
   \begin{prooftree}
-    \AXC{$\Gamma \vdash_i M : \sigma \to \tau$}
-    \AXC{$\Gamma \vdash_i N : \sigma$}
+    \AXC{$\Gamma \vdash_i t : A \to B$}
+    \AXC{$\Gamma \vdash_i u : A$}
     \RightLabel{(app)}
-    \BIC{$\Gamma \vdash_i M\;N : \tau$}
+    \BIC{$\Gamma \vdash_i t\;u : B$}
   \end{prooftree}
+  We say that $t$ is a \alert{closed term} or a \alert{program} of type $A$ if $\vdash t : A$ is derivable. 
 
-\mode<presentation>{\vfill}
-It is known as the implicit typing system and typability is a property of a term.
+  N.B.\ Whether a term $t$ has a typing derivation is a \emph{property} of $t$.
 \end{frame}
 
 %\begin{frame}{Derivation}
@@ -183,225 +299,219 @@ It is known as the implicit typing system and typability is a property of a term
 %  \end{example}
 %\end{frame}
 
-\begin{frame}{Typing derivation}
-  The judgement $\vdash \lambda x.\, x : \sigma \to \sigma$, for all $\sigma
-  \in \mathbb{T}$ has a derivation
-  \begin{prooftree}
-    \AXC{}
-    \RightLabel{(var)}
-    \UIC{$x : \sigma \vdash_i x : \sigma$}
-    \RightLabel{(abs)}
-    \UIC{$\vdash_i \lambda x.\; x : (\sigma \to \sigma)$}
-  \end{prooftree}
+\begin{frame}{Syntax-directedness}
+  A typing system is \emph{syntax-directed} if it has \emph{exactly} one typing rule
+  for each term construct.
+  \vfill
+  By being syntax-directed, every typing derivation can be inverted:
+  \begin{lemma}[Typing inversion]
+    Suppose 
+    \[
+      \Gamma \vdash_i t : A
+    \]
+    is derivable. If 
+    \begin{description}
+      \item[$t \equiv x$] then $x : A$ occurs in $\Gamma$.
+      \item[$t \equiv \lambda x.\, t'$] then $A = B \to C$ and $\Gamma, x: B \vdash_i u' : C$.
+      \item[$t \equiv u\;v$] there is some $A$ such that $\Gamma \vdash_i u : A \to B$ and $\Gamma \vdash_i v : B$.
+    \end{description}
+  \end{lemma}
+  This lemma is particularly useful when constructing a typing derivation by hand.
+\end{frame}
 
-  The judgement $ \vdash \lambda x\,y.\, x : \sigma \to \tau \to \sigma$
+\begin{frame}{Typing derivation}
+%  The judgement $\vdash_i \lam{x}x : A \to A$, for any type $A$, has a derivation
+%  \begin{prooftree}
+%    \AXC{}
+%    \RightLabel{(var)}
+%    \UIC{$x : A \vdash_i x : A$}
+%    \RightLabel{(abs)}
+%    \UIC{$\vdash_i \lambda x.\; x : (A \to A)$}
+%  \end{prooftree}
+
+  For any types $A$ and $B$, the judgement $ \vdash_i \lambda x\,y.\, x : A \to B \to A$
   has a derivation
 \begin{prooftree}
   \AXC{}
   \RightLabel{(var)}
-  \UIC{$x : \sigma, y: \tau \vdash_i x : \sigma$}
+  \UIC{$x : A, y: B \vdash_i x : A$}
   \RightLabel{(abs)}
-  \UIC{$x : \sigma \vdash_i \lambda y.\, x : \tau \to \sigma$}
+  \UIC{$x : A \vdash_i \lambda y.\, x : B \to A$}
   \RightLabel{(abs)}
-  \UIC{$\vdash_i \lambda x\,y.\, x : \sigma \to \tau \to \sigma$}
+  \UIC{$\vdash_i \lambda x\,y.\, x : A \to B \to A$}
 \end{prooftree}
+Therefore, $\lam{x\,y}x$ is a program of type $A \to B \to A$.
 
-  Not every $\lambda$-term has a type: 
-  \[
-    \lambda x.\, x\,x
-  \]
-  there is no $\tau$ satisfying $\vdash \lambda x.\, x\;x : \tau$.
-\end{frame}
-
-\begin{frame}{Syntax-directedness}
-  A typing system is \emph{syntax-directed} if it has \emph{exactly} one typing rule
-  for each term construct. Therefore, 
-  
-  \begin{lemma}[Typing inversion]
-    Suppose 
-    \[
-      \Gamma \vdash_i M : \tau
-    \]
-    is derivable. If 
-    \begin{description}
-      \item[$M \equiv x$] then $x : \tau$ occurs in $\Gamma$.
-      \item[$M \equiv \lambda x.\, M'$] then $\tau = \sigma \to \tau'$ for some $\sigma$ and $\Gamma, x:\sigma \vdash_i M' : \tau'$.
-      \item[$M \equiv L\;N$] there is some $\sigma$ such that $\Gamma \vdash_i L : \sigma \to \tau$ and $\Gamma \vdash_i N : \sigma$.
-    \end{description}
-  \end{lemma}
 \end{frame}
 
 \begin{frame}{Exercise}
-  Derive the judgement
+  Derive the typing judgement
     \[
-      \vdash \lambda f\,g\,x.\, f\,x\, (g\,x) : (\sigma \to \tau \to \rho) \to
-      (\sigma\to\tau) \to \sigma\to\rho 
+      \vdash_i \lambda f\,g\,x.\, f\,x\, (g\,x) : (A \to B \to C) \to
+      (A\to B) \to A \to C
     \]
-    for every $\sigma, \tau, \rho \in \mathbb{T}$.
+    for every types $A, B$ and $C$.
 \end{frame}
 
-\begin{frame}{Explicit typing: Typed terms}
-\begin{definition}[Typed terms]
-  The formation $M \; \term_{V}^{\to}$ of typed terms is defined by
-    \begin{prooftree}
-      \AXC{$x \in V$}
-      \UIC{$x \quad \term_{V}^{\to}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \quad \term_{V}^{\to}$}
-      \AXC{$N \quad \term_{V}^{\to}$}
-      \BIC{$M\, N \quad \term_{V}^{\to}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \quad \term_{V}^{\to}$}
-      \AXC{$x \in V$}
-      \AXC{$\tau \quad \type$}
-      \TIC{$\lambda {\color{red}x : \tau}.\; M \quad \term_{V}^{\to}$}
-    \end{prooftree}
-\end{definition}
-\end{frame}
+%\begin{frame}{Explicit typing: Typed terms}
+%\begin{definition}[Typed terms]
+%  The formation $M \; \term_{V}^{\to}$ of typed terms is defined by
+%    \begin{prooftree}
+%      \AXC{$x \in V$}
+%      \UIC{$x \quad \term_{V}^{\to}$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M \quad \term_{V}^{\to}$}
+%      \AXC{$N \quad \term_{V}^{\to}$}
+%      \BIC{$M\, N \quad \term_{V}^{\to}$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$M \quad \term_{V}^{\to}$}
+%      \AXC{$x \in V$}
+%      \AXC{$\tau \quad \type$}
+%      \TIC{$\lambda {\color{red}x : \tau}.\; M \quad \term_{V}^{\to}$}
+%    \end{prooftree}
+%\end{definition}
+%\end{frame}
+%
+%\begin{frame}{Explicit typing: Typing rules}
+%\begin{definition}[Typing Rules]
+%  Typing derivations on \emph{typed terms} are defined by 
+%  \begin{prooftree}
+%    \AXC{$\Gamma \ni (x : \sigma)$}
+%    \RightLabel{(var)}
+%    \UIC{$\Gamma \vdash_e x : \sigma$}
+%  \end{prooftree}
+%  \begin{prooftree}
+%    \AXC{$\Gamma \vdash_e M : \sigma \to \tau$}
+%    \AXC{$\Gamma \vdash_e N : \sigma$}
+%    \RightLabel{(app)}
+%    \BIC{$\Gamma \vdash_e M\;N : \tau$}
+%  \end{prooftree}
+%  \begin{prooftree}
+%    \AXC{$\Gamma, {\color{red}x : \sigma} \vdash_e M : \tau$}
+%    \RightLabel{(abs)}
+%    \UIC{$\Gamma \vdash_e \lambda {\color{red}x : \sigma} .\; M : \sigma \to \tau$}
+%  \end{prooftree}
+%\end{definition}
+%
+%\end{frame}
+%\begin{frame}{Explicit typing: Unicity}
+%
+%\begin{proposition}\label{prop:unicity}
+%  For every typed term $M$, context~$\Gamma$, and types $\sigma_i$, 
+%  \[
+%    \Gamma \vdash_e M : \sigma_1
+%    \quad\text{and}\quad
+%    \Gamma \vdash_e M : \sigma_2
+%    \implies
+%    \sigma_1 = \sigma_2
+%  \]
+%\end{proposition}
+%\begin{proof}[Proof sketch]
+%  Use the inversion lemma and the structural induction on $M$.
+%
+%  E.g., suppose that $M$ is of the form
+%  \[
+%    L\;M'
+%  \]
+%  By inversion there are $\tau_i$ such that $\Gamma \vdash_e L: \tau_i \to
+%  \sigma_i$ and $\Gamma \vdash_e M': \tau_i$. By induction hypothesis, $\tau_1 \to
+%  \sigma_1 = \tau_2 \to \sigma_2$, so $\sigma_1 = \sigma_2$.
+%\end{proof}
+%\end{frame}
+%
+%
+%
+%\begin{frame}{Type erasure}
+%An \emph{erasing map} $|-|\colon \term_{V}^{\to} \to \term_{V}$ is defined by
+%  \begin{align*}
+%    |x| & = x \\
+%    |M\; N| & = |M|\;|N| \\
+%    |\lambda x:\sigma.\, M| & = \lambda x.\, |M|
+%  \end{align*}
+%  \begin{example}
+%    \begin{enumerate}
+%      \item $|\lambda (f: \sigma \to \tau)\,(x: \sigma).\, f\;x| = \lambda f\, x.\, f\;x$
+%      \item $|(\lambda (x: \sigma)\,(y: \tau). y)\;z| = (\lambda x\,y.\, y)\; z$
+%    \end{enumerate}
+%  \end{example}
+%
+%$|-|$ is an translation from $\term_{V}^{\to}$ to $\term_{V}$.
+%Does $|-|$ respect the behaviour of $\term_{\term_V^{\to}}$?
+%\end{frame}
+%\begin{frame}{From typed terms to untyped and back}
+%\begin{proposition}
+%  Let $M$ and $N$ be typed $\lambda$-terms in~$\term_{\lambda_V^{\to}}$. Then, 
+%  \begin{align*}
+%    \Gamma  \vdash_e M : \sigma & \text{ implies } \Gamma \vdash_i |M| :
+%    \sigma \\ 
+%    M \reduce N & \text{ implies } |M| \reduce |N|
+%  \end{align*}
+%\end{proposition}
+%
+%\begin{proposition}
+%  Let $M$ and $N$ be $\lambda$-terms in~$\term_V$. Then, 
+%  \begin{enumerate}
+%  \item If $\Gamma \vdash_i M : \sigma$, then there is $M' : \term_V^{\to}$ with 
+%        $|M'| = M
+%        \quad\text{and}\quad
+%        \Gamma \vdash_e M' : \sigma$
+%      \item If $M \reduce N$ and $M = |M'|$ for some $M' : \term_V^{\to}$,
+%      then there exists $N'$ with $|N'| = N$ and $M' \reduce N'$.
+%    \end{enumerate}
+%\end{proposition}
+%\end{frame}
 
-\begin{frame}{Explicit typing: Typing rules}
-\begin{definition}[Typing Rules]
-  Typing derivations on \emph{typed terms} are defined by 
-  \begin{prooftree}
-    \AXC{$\Gamma \ni (x : \sigma)$}
-    \RightLabel{(var)}
-    \UIC{$\Gamma \vdash_e x : \sigma$}
-  \end{prooftree}
-  \begin{prooftree}
-    \AXC{$\Gamma \vdash_e M : \sigma \to \tau$}
-    \AXC{$\Gamma \vdash_e N : \sigma$}
-    \RightLabel{(app)}
-    \BIC{$\Gamma \vdash_e M\;N : \tau$}
-  \end{prooftree}
-  \begin{prooftree}
-    \AXC{$\Gamma, {\color{red}x : \sigma} \vdash_e M : \tau$}
-    \RightLabel{(abs)}
-    \UIC{$\Gamma \vdash_e \lambda {\color{red}x : \sigma} .\; M : \sigma \to \tau$}
-  \end{prooftree}
-\end{definition}
-
-\end{frame}
-\begin{frame}{Explicit typing: Unicity}
-
-\begin{proposition}\label{prop:unicity}
-  For every typed term $M$, context~$\Gamma$, and types $\sigma_i$, 
-  \[
-    \Gamma \vdash_e M : \sigma_1
-    \quad\text{and}\quad
-    \Gamma \vdash_e M : \sigma_2
-    \implies
-    \sigma_1 = \sigma_2
-  \]
-\end{proposition}
-\begin{proof}[Proof sketch]
-  Use the inversion lemma and the structural induction on $M$.
-
-  E.g., suppose that $M$ is of the form
-  \[
-    L\;M'
-  \]
-  By inversion there are $\tau_i$ such that $\Gamma \vdash_e L: \tau_i \to
-  \sigma_i$ and $\Gamma \vdash_e M': \tau_i$. By induction hypothesis, $\tau_1 \to
-  \sigma_1 = \tau_2 \to \sigma_2$, so $\sigma_1 = \sigma_2$.
-\end{proof}
-\end{frame}
-
-
-
-\begin{frame}{Type erasure}
-An \emph{erasing map} $|-|\colon \term_{V}^{\to} \to \term_{V}$ is defined by
-  \begin{align*}
-    |x| & = x \\
-    |M\; N| & = |M|\;|N| \\
-    |\lambda x:\sigma.\, M| & = \lambda x.\, |M|
-  \end{align*}
-  \begin{example}
-    \begin{enumerate}
-      \item $|\lambda (f: \sigma \to \tau)\,(x: \sigma).\, f\;x| = \lambda f\, x.\, f\;x$
-      \item $|(\lambda (x: \sigma)\,(y: \tau). y)\;z| = (\lambda x\,y.\, y)\; z$
-    \end{enumerate}
-  \end{example}
-
-$|-|$ is an translation from $\term_{V}^{\to}$ to $\term_{V}$.
-Does $|-|$ respect the behaviour of $\term_{\term_V^{\to}}$?
-\end{frame}
-\begin{frame}{From typed terms to untyped and back}
-\begin{proposition}
-  Let $M$ and $N$ be typed $\lambda$-terms in~$\term_{\lambda_V^{\to}}$. Then, 
-  \begin{align*}
-    \Gamma  \vdash_e M : \sigma & \text{ implies } \Gamma \vdash_i |M| :
-    \sigma \\ 
-    M \reduce N & \text{ implies } |M| \reduce |N|
-  \end{align*}
-\end{proposition}
-
-\begin{proposition}
-  Let $M$ and $N$ be $\lambda$-terms in~$\term_V$. Then, 
-  \begin{enumerate}
-  \item If $\Gamma \vdash_i M : \sigma$, then there is $M' : \term_V^{\to}$ with 
-        $|M'| = M
-        \quad\text{and}\quad
-        \Gamma \vdash_e M' : \sigma$
-      \item If $M \reduce N$ and $M = |M'|$ for some $M' : \term_V^{\to}$,
-      then there exists $N'$ with $|N'| = N$ and $M' \reduce N'$.
-    \end{enumerate}
-\end{proposition}
-\end{frame}
-
-\begin{frame}{Type inference}
-  Can we answer the following questions
+\begin{frame}{Type inference and checking}
+  Can we answer the following questions algorithmically?
   \begin{description}
-    \item[Typability] Given a closed term $M$, is there a type $\sigma$
-      such that $\vdash M : \sigma$? 
-    \item[Type checking] Given $\Gamma$ and $\sigma$, is $\Gamma \vdash M : \sigma$ derivable?
+    \item[Type inference] Given a context $\Gamma$ and a term $t$, is there a type $?$
+      such that the typing judgement $\Gamma \vdash t : ?$ is derivable? 
+    \item[Type checking] Given a context $\Gamma$, a type $A$, and a term $t$, is the typing judgement $\Gamma \vdash t : A$ derivable?
   \end{description}
-  algorithmically?
   
   Typability is reducible to type checking problem of
   \[
-    x_0: \tau \vdash \mathtt{fst} \;x_0\;M : \tau
+    x_0: A \vdash \mathtt{fst} \;x_0\;t : A
   \]
 
   \begin{theorem}
-    Type checking is \emph{decidable}
-    in simply typed $\lambda$-calculus.
+    Type checking is \emph{decidable} in simply typed $\lambda$-calculus.
   \end{theorem}
-\subsection*{Exercise}
   
 \end{frame}
 
-\section{Programming in Simply Typed $\lambda$-Calculus}
+\section{Programming in Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus}
 
 \begin{frame}[allowframebreaks]{Church encodings of natural numbers}
 The type of natural numbers is of the form
 \[
-  \nat_\tau \defeq (\tau \to \tau) \to \tau \to \tau
+  \nat_A \defeq (A \to A) \to A \to A
 \]
-for every type $\tau \in \T$.
+for every type $A$.
   
   \begin{description}
     \item[Church numerals]
       \begin{align*}
         & \bc_n \defeq \lambda f\,x.\,
         f^n x \\
-        \vdash{} & \bc_n : \nat_\tau
+        \vdash{} & \bc_n : \nat_A
       \end{align*}
     \item[Successor]
       \begin{align*}
         & \suc \defeq \lambda n \,f\,x\,.\;f\;(n\;f\;x) \\
-        \vdash{} & \suc : \nat_\tau \to \nat_\tau
+        \vdash{} & \suc : \nat_A \to \nat_A
       \end{align*}
     \item[Addition]
       \begin{align*}
         & \add \defeq \lambda n\,m\,f\,x.\; (m\;f)\;(n\;f\;x) \\
-        \vdash{} & \add : \nat_\tau \to \nat_\tau \to \nat_\tau
+        \vdash{} & \add : \nat_A \to \nat_A \to \nat_A
       \end{align*}
     \item[Muliplication] 
       \begin{align*}
         & \mul \defeq \lambda n\,m\,f\,x.\, (m\;(n\;f))\;x\\
-      \vdash{} & \mul : \nat_\tau \to \nat_\tau \to \nat_\tau
+      \vdash{} & \mul : \nat_A \to \nat_A \to \nat_A
       \end{align*}
     \item[Conditional]
       \begin{align*}
@@ -410,14 +520,14 @@ for every type $\tau \in \T$.
       \end{align*}
   \end{description}
 The type of~$\ifz$ may not be as obvious as you may expect.
-Try to find one as general as possible and justify your guess.
+Try to find one and justify your guess.
 
 \end{frame}
 \begin{frame}{Church encodings of boolean values}
 We can also define the type of Boolean values 
 for each type variable as
 \[
-  \bool_\tau \defeq \tau \to \tau \to \tau
+  \bool_A \defeq A \to A \to A
 \]
 \begin{description}
   \item[Boolean values]
@@ -429,7 +539,7 @@ for each type variable as
   \item[Conditional]
     \begin{align*}
       & \cond \defeq \lambda b\,x\,y.\, b\,x\,y\\
-      \vdash {} & \cond : \bool_{\tau} \to \tau \to \tau \to \tau
+      \vdash {} & \cond : \bool_{A} \to A \to A \to A
     \end{align*}
 \end{description}
 \end{frame}
@@ -445,7 +555,7 @@ for each type variable as
 \end{frame}
 
 
-\section{Properties of Simply Typed $\lambda$-Calculus}
+\section{Properties of Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus}
 
 
 \begin{frame}[c]{Type safety = Preservation + Progress}
@@ -456,259 +566,360 @@ for each type variable as
 \end{quote}
 
 \begin{description}
-  \item[Preservation] If $\Gamma \vdash M : \sigma$ is derivable and $M \onereduce N$, then $\Gamma \vdash N : \sigma$.
-  \item[Progress] If $\Gamma \vdash M : \sigma$ is derivable, then either $M$ is in \emph{normal form} or there is $N$ with $M \onereduce N$.
+  \item[Preservation] If $\Gamma \vdash t : A$ is derivable and $t \onereduce u$, then $\Gamma \vdash u : A$.
+  \item[Progress] If $\Gamma \vdash t : A$ is derivable, then either $t$ is in \emph{normal form} or there is $u$ with $t \onereduce u$.
 \end{description}
-
+\vfill
+By combing the above two properties, we can extend the progress theorem to $\reduce$: if $\Gamma \vdash t : A$ then $t \reduce u$ for some $\Gamma \vdash u : A$ which is either reducible or in normal form.
 \end{frame}
 
-\begin{frame}[allowframebreaks]{Converse of Preservation}
-\begin{example}
+\begin{frame}{Converse of Preservation}
+  The converse of preservation might not hold.
+
+\begin{lemma}[Typability of subterms]
+  Let $t$ be a term with $\Gamma \vdash t : A$ derivable. Then, for every
+  subterm $t'$ of~$t$ there exists $\Gamma'$ such that
+  \[
+    \Gamma' \vdash t' : A'.
+  \]
+\end{lemma}
+%\begin{proof}
+%  By induction on $\Gamma \vdash t : A$.
+%\end{proof}
   Recall that 
   \begin{enumerate}
-    \item $\mathbf{I} = \lambda x.\, x$
     \item $\mathbf{K}_1 = \lambda x\,y.\, x$
     \item $\Omega = (\lambda x.\, x\,x)\,(\lambda x.\, x\,x)$
   \end{enumerate}
-  and $\mathbf{K}_1\,\mathbf{I}\,\Omega \reduce \mathbf{I}$. However, 
-  \[
-    \vdash \mathbf{I} : \sigma \to \sigma
-    \notimplies
-    \vdash \mathbf{K}_1\;\mathbf{I}\;\Omega : \sigma \to \sigma.
-  \]
-\end{example}
-How to prove it?
-\framebreak
-\begin{lemma}[Typability of subterms]
-  Let $M$ be a term with $\Gamma \vdash M : \tau$ derivable. Then, for every
-  subterm $M'$ of~$M$ there exists $\Gamma'$ such that
-  \[
-    \Gamma' \vdash M' : \sigma'.
-  \]
-\end{lemma}
-\begin{proof}
-  By induction on $\Gamma \vdash M : \sigma$.
-\end{proof}
+  and $\mathbf{K}_1\;(\lam{x}x)\;\Omega \reduce \mathbf{I}$.
+
   $\Omega$ is not typable, so $\mathbf{K}_1\,\mathbf{I}\,\Omega$ is not typable.
 \end{frame}
 
-\begin{frame}{A prelude to the preservation proof}
+\begin{frame}{Preservation Theorem}
     \begin{description}
-      \item[Weakening] If $\Gamma \vdash M : \tau$ and $x \not\in \Gamma$, then
-        $\Gamma, x : \sigma \vdash M : \tau$. 
-      \item[Substitution] If $\Gamma, x : \tau \vdash M : \sigma$ and $\Gamma
-        \vdash N : \tau$ then $\Gamma \vdash M\subst{N}{x} : \sigma$.
+      \item[Weakening] If $\Gamma \vdash t : A$ and $x \not\in \Gamma$, then
+        $\Gamma, x : B \vdash t : A$. 
+      \item[Substitution] If $\Gamma, x : A \vdash t : B$ and $\Gamma \vdash u : A$ then $\Gamma \vdash t\subst{u}{x} : B$.
     \end{description}
 
   \begin{corollary}[Variable renaming]
-    If $\Gamma, x : \tau \vdash M :\sigma$ and $y \not\in \mathrm{dom}(\Gamma)$, then $ \Gamma, y : \tau \vdash M\subst{y}{x} :
-    \sigma$
+    If $\Gamma, x : A \vdash t : B$ and $y \not\in \mathrm{dom}(\Gamma)$, then $ \Gamma, y : A \vdash t\subst{y}{x} : B$
     where $\mathrm{dom}(\Gamma)$
     denotes the set of variables which occur in $\Gamma$.
   \end{corollary}
-  \begin{proof}
-    $y$ is not in $\Gamma$, so 
-      $\Gamma, y : \tau, x : \tau \vdash M$
-    by weakening and by definition $\Gamma, y : \tau \vdash y : \tau$.
-    Thus, by substitution, we have
-    \[
-      \Gamma, y : \tau \vdash M\subst{x}{y} : \sigma
-    \]
-  \end{proof}
-\end{frame}
 
-\begin{frame}[allowframebreaks] {Preservation Theorem}
   \begin{theorem}
-    For any $M$ and $N$ if $\Gamma \vdash M : \sigma$ is derivable and $M \onereduce N$, then $\Gamma \vdash N : \sigma$. 
+    For any $t$ and $u$ if $\Gamma \vdash t : A$ is derivable and $t \onereduce u$, then $\Gamma \vdash u : A$. 
   \end{theorem}
   \begin{proof}[Proof sketch]
-    By induction on both the derivation of $\Gamma \vdash M :
-    \sigma$ and $M \onereduce N$.
+    By induction on both the derivation of $\Gamma \vdash t : A$ and $t \onereduce u$.
   \end{proof}
-  N.B. The only non-trivial case is
-  \[
-    \Gamma \vdash (\lambda  x_1 : \tau .\, M_1)\; N : \sigma%    \quad\text{and}\quad %    (\lambda (x_1 : \tau).\, M_1)\;N \onereduce M_2\subst{x_2}{N}
-  \]
-  which needs the substitution lemma.
-  
+  N.B. The only non-trivial case is $\Gamma \vdash (\lam{x}t)\; u : B$ which needs the above results.
+%  \begin{proof}
+%    $y$ is not in $\Gamma$, so 
+%      $\Gamma, y : A, x : A \vdash M$
+%    by weakening and by definition $\Gamma, y : A \vdash y : A$.
+%    Thus, by substitution, we have
+%    \[
+%      \Gamma, y : A \vdash M\subst{x}{y} : \sigma
+%    \]
+%  \end{proof}
+\end{frame}
+
+
+\begin{frame}{Proof of Preservation Theorem}
   \begin{proof}
-  By induction on both the derivation of $\Gamma \vdash M :
-  \sigma$ and $M \onereduce N$.
+  By induction on both the derivation of $\Gamma \vdash t : A$ and $t \onereduce u$.
 
   \begin{enumerate}
-    \item Suppose $\Gamma \vdash x : \sigma$.
-      However, $x \not\onereduce N$ for any $N$.
-      Therefore, it is vacuously true that $\Gamma \vdash N : \sigma$.
-    \item Suppose $\Gamma \vdash \lambda x.\, M : \sigma \to \tau$ and $\lambda x.\, M \onereduce N$.
-      Then, $N$ must be $\lambda x.\, N'$ for some $N'$; $\Gamma, x : \sigma \vdash M \colon \tau$ and $M \onereduce N'$ must be derivable.
-      By induction hypothesis, $\Gamma, x : \sigma \vdash N'$ is derivable, so is $\Gamma \vdash \lambda x.\, N'\colon \sigma \to \tau$.
-    \item Suppose $\Gamma \vdash M\; N$.
+    \item Suppose $\Gamma \vdash x : A$.
+      However, $x \not\onereduce u$ for any $u$.
+      Therefore, it is vacuously true that $\Gamma \vdash u : A$.
+    \item Suppose $\Gamma \vdash \lambda x.\, t : A \to B$ and $\lambda x.\, t \onereduce u$.
+      Then, $u$ must be $\lambda x.\, u'$ for some $u'$; $\Gamma, x : A \vdash t \colon B$ and $t \onereduce u'$ must be derivable.
+      By induction hypothesis, $\Gamma, x : A \vdash u'$ is derivable, so is $\Gamma \vdash \lambda x.\, u'\colon A \to B$.
+    \item Suppose $\Gamma \vdash t\; u$.
       Then ...
     \item ...
   \end{enumerate}
 \end{proof}
-  
+\end{frame}
+
+\begin{frame}{Progress: First attempt}
+  \begin{theorem}
+    If $\Gamma \vdash t : A$ is derivable, then $t$ is in normal form or there is $u$ with $t \onereduce u$.
+  \end{theorem}
+  To prove the theorem, we would like to use induction on $\Gamma \vdash t : A$ again.
+
+  However, the fact that $t$ is in normal form does not tell us much what $t$ is.
+  Can we characterise $t$ syntactically?
 \end{frame}
 
 \begin{frame}{Normal form}
   The notion of normal form can be characterised syntactically:
   \begin{definition}
-    Define judgements $\texttt{Neutral}\;M$ and $\texttt{Normal}\;M$ mutually by
+    Define judgements $\texttt{Neutral}\;t$ and $\texttt{Normal}\;u$ mutually by
     \begin{multicols}{2}
       \begin{prooftree}
         \AXC{$\vphantom{\Gamma}$}
         \UIC{$\texttt{Neutral}\;x$}
       \end{prooftree}
       \begin{prooftree}
-        \AXC{$\neutral\;M$}
-        \AXC{$\normal\;N$}
-        \BIC{$\neutral\;M\;N$}
+        \AXC{$\neutral\;t$}
+        \AXC{$\normal\;u$}
+        \BIC{$\neutral\;t\;u$}
       \end{prooftree}
       \columnbreak
       \begin{prooftree}
-        \AXC{$\neutral\;M$}
-        \UIC{$\normal\;M$}
+        \AXC{$\neutral\;t$}
+        \UIC{$\normal\;t$}
       \end{prooftree}
       \begin{prooftree}
-        \AXC{$\normal\;M$}
-        \UIC{$\normal\;\lambda x.\,M$}
+        \AXC{$\normal\;t$}
+        \UIC{$\normal\;\lambda x.\,t$}
       \end{prooftree}
     \end{multicols}
   \end{definition}
-  \textbf{Idea.} $\neutral\;N$ (resp.\, $\normal\;M$) is derivable
+  \textbf{Idea.} $\neutral\;u$ (resp.\, $\normal\;t$) is derivable
   iff 
   \[
-    N \equiv x\;N_1 \cdots N_k
+    u \equiv x\;u_1 \cdots u_k
     \quad\text{(resp.\ }\quad
-    M \equiv \lambda x_1 \cdots x_n .\, x\;N_1 \cdots N_k)
+    t \equiv \lam{x_1 \cdots x_n}x\;u_1 \cdots u_k).
   \]
-  respectively where $N_i$'s are in normal form.
+  That is, $\beta$-redex cannot exist in $t$ if $t$ is normal.
 \end{frame}
 
 \begin{frame}{Soundness and completeness of the inductive characterisation}
+  A term $t$ has no $\beta$-reduction if and only if $t$ is normal:
   \begin{lemma}
-    Let $M$ be an untyped term.
     \begin{description}
-      \item[Soundness] If $\normal\;M$ (resp.\ $\neutral\;M$) is derivable, then $M$ is in normal form.
+      \item[Soundness] If $\normal\;t$ (resp.\ $\neutral\;t$) is derivable, then $t$ is in normal form.
       \item[Completeness]
-        If $M$ is in normal form, then $\normal\;M$ is derivable.
+        If $t$ is in normal form, then $\normal\;t$ is derivable.
     \end{description}
   \end{lemma}
   \begin{proof}[Proof sketch]
     \begin{description}
       \item[Soundness] By mutual induction on the derivation of
-    $\normal\;M$ and $\neutral\;M$.
-      \item[Completeness] By induction on the formation of $M$.
+    $\normal\;t$ and $\neutral\;t$.
+      \item[Completeness] By induction on the formation of $t$.
     \end{description}
   \end{proof}
 
   
 \end{frame}
+
 \begin{frame}{Progress}
   \begin{theorem}
-    If $\Gamma \vdash M : \sigma$ is derivable, then $\normal\;M$ or there is $N$ with $M \onereduce N$.
+    If $\Gamma \vdash t : A$ is derivable, then $\normal\;t$ or there is $u$ with $t \onereduce u$.
   \end{theorem}
   \begin{proof}[Proof sketch]
-    By induction on the derivation of $\Gamma \vdash M : \sigma$. 
+    By induction on the derivation of $\Gamma \vdash t : A$. 
   \end{proof}
 \end{frame}
 
 
 \begin{frame}{Weak normalisation}
   \begin{definition}
-    $M$ is \emph{weakly normalising} denoted by $M\downarrow$ if 
+    $t$ is \emph{weakly normalising} denoted by $t\downarrow$ if 
     \begin{multicols}{2}
       \begin{prooftree}
-        \AXC{$\normal\; M$}
-        \UIC{$M \downarrow$}
+        \AXC{$\normal\; t$}
+        \UIC{$t \downarrow$}
       \end{prooftree}
       \columnbreak
       \begin{prooftree}
-        \AXC{$M \onereduce N$}
-        \AXC{$N \downarrow$}
-        \BIC{$M \downarrow$}
+        \AXC{$t \onereduce u$}
+        \AXC{$u \downarrow$}
+        \BIC{$t \downarrow$}
       \end{prooftree}
     \end{multicols}
   \end{definition}
-  That is, $M$ is weakly normalising if there is a sequence
+  That is, $t$ is weakly normalising if there is a sequence
   \[
-    M \onereduce M_1 \onereduce M_2 \onereduce \dots N \notonereduce 
+    t \onereduce t_1 \onereduce t_2 \onereduce \dots u \notonereduce 
   \]
   \begin{theorem}[Weak normalisation]
-    Every term $M$ with $\Gamma \vdash M : \tau$ is weakly normalising.
+    Every term $t$ with $\Gamma \vdash t : A$ is weakly normalising.
   \end{theorem}
-
 \end{frame}
 
 \begin{frame}{Strong normalisation}
   \begin{definition}
-    $M$ is \emph{strongly normalising} denoted by $M \Downarrow$ if 
+    $t$ is \emph{strongly normalising} denoted by $t \Downarrow$ if 
     \begin{prooftree}
-      \AXC{$\forall N.\, (M \onereduce N \implies N \Downarrow)$}
-      \UIC{$M \Downarrow$}
+      \AXC{$\forall u.\, (t \onereduce u \implies u \Downarrow)$}
+      \UIC{$u \Downarrow$}
     \end{prooftree}
     
   \end{definition}
   Intuitively, \emph{strong normalisation} says every sequence
     \[
-      M \onereduce M_1 \onereduce M_2 \cdots
+      t \onereduce t_1 \onereduce t_2 \cdots
     \]
-  terminates.
+  terminates, but the definition builds the sequence backwards. 
+
   \begin{theorem}
-    Every term $M$ with $\Gamma \vdash M : \tau$ is strongly normalising.
+    Every term $t$ with $\Gamma \vdash t : A$ is strongly normalising.
   \end{theorem}
-  
 \end{frame}
 
-\begin{frame}{Definability}
-%Within simply typed lambda calculus, we wonder how many computable functions can
-%be defined, as it excludes non-terminating $\lambda$-terms. 
-  A function $f\colon \mathbb{N}^k \to \mathbb{N}$ is called
-  \alert{\emph{$\lambda_\to$-definable}} if there is a $\lambda$-term $F$ of
-  type $\nat \to \nat \to \dots \nat \to \nat$ such that
-  \[
-    F\,\bc_{n_1}\ldots\bc_{n_k} \reduce \bc_{f(n_1, \dots, n_k)}
-  \]
-  for every sequence $(n_1, n_2, \ldots, n_k) \in \mathbb{N}^k$.
-  Diagrammatically, 
+%\begin{frame}{Typed Conversion}
+%
+%
+%\end{frame}
 
-\[
-  \xymatrix{
-    (n_1, n_2, \ldots, n_k) \ar@{|->}[rr] \ar@{|->}[d]_{(\bc_{-})^k} & & f(n_1,
-    n_2, \ldots, n_k) \ar@{|->}[d]^{\bc_{-}}\\
-    (\bc_{n_1}, \bc_{n_2}, \ldots, \bc_{n_k}) \ar@{|->}[rr] & & 
-    F\;\bc_{n_1}\; \bc_{n_2}\; \ldots\;\bc_{n_k}
-    = \bc_{f(n_1, n_2, \ldots, n_k)}
-  }
-\]
-\end{frame}
-\begin{frame}{The limit of $\lambda_\to$}
-\begin{theorem}
-  The $\lambda_\to$-definable functions are the class of functions
-  of the form $f\colon \mathbb{N}^k \to \mathbb{N}$ closed under 
-  compositions
-  which contains
-  \begin{itemize}
-    \item the constant functions,
-    \item projections,
-    \item additions,
-    \item multiplications,
-    \item and the conditional 
+%\begin{frame}{Definability}
+%%Within simply typed lambda calculus, we wonder how many computable functions can
+%%be defined, as it excludes non-terminating $\lambda$-terms. 
+%  A function $f\colon \mathbb{N}^k \to \mathbb{N}$ is called
+%  \alert{\emph{$\lambda_\to$-definable}} if there is a $\lambda$-term $F$ of
+%  type $\nat \to \nat \to \dots \nat \to \nat$ such that
+%  \[
+%    F\,\bc_{n_1}\ldots\bc_{n_k} \reduce \bc_{f(n_1, \dots, n_k)}
+%  \]
+%  for every sequence $(n_1, n_2, \ldots, n_k) \in \mathbb{N}^k$.
+%  Diagrammatically, 
+%
+%\[
+%  \xymatrix{
+%    (n_1, n_2, \ldots, n_k) \ar@{|->}[rr] \ar@{|->}[d]_{(\bc_{-})^k} & & f(n_1,
+%    n_2, \ldots, n_k) \ar@{|->}[d]^{\bc_{-}}\\
+%    (\bc_{n_1}, \bc_{n_2}, \ldots, \bc_{n_k}) \ar@{|->}[rr] & & 
+%    F\;\bc_{n_1}\; \bc_{n_2}\; \ldots\;\bc_{n_k}
+%    = \bc_{f(n_1, n_2, \ldots, n_k)}
+%  }
+%\]
+%\end{frame}
+%\begin{frame}{The limit of $\lambda_\to$}
+%\begin{theorem}
+%  The $\lambda_\to$-definable functions are the class of functions
+%  of the form $f\colon \mathbb{N}^k \to \mathbb{N}$ closed under 
+%  compositions
+%  which contains
+%  \begin{itemize}
+%    \item the constant functions,
+%    \item projections,
+%    \item additions,
+%    \item multiplications,
+%    \item and the conditional 
+%  \[
+%    \mathrm{ifz}(n_0, n_1, n_2) = 
+%    \begin{cases}
+%      n_1 & \text{if } n_0 = 0\\
+%      n_2 & \text{otherwise.}
+%    \end{cases}
+%  \]
+%  \end{itemize}
+%\end{theorem}
+%\end{frame}
+\section{Extensions to Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus}
+
+
+\begin{frame}{General Recursion: Static}
+  Self-applicative term cannot be typed in simply typed $\lambda$-calculus.
+  For example, 
   \[
-    \mathrm{ifz}(n_0, n_1, n_2) = 
-    \begin{cases}
-      n_1 & \text{if } n_0 = 0\\
-      n_2 & \text{otherwise.}
-    \end{cases}
+    \lambda x.\, x\,x
   \]
-  \end{itemize}
-\end{theorem}
+  cannot be typed, since $A \to A$ is not equal to $A$.
+  Hence, the $Y$-combinator in untyped $\lambda$-calculus cannot be typed.
+
+  We introduce a new construct explicitly for general recursion:
+
+  Let $\Lambda_{\fix}(V)$ be the set of terms defined inductively with a construct additional to $\Lambda(V)$:
+  \begin{description}
+    \item[fixpoint] $\fix\,f.\, t$ is a term in $\Lambda_{\fix}(V)$, if $t$ is a term in $\Lambda_{\fix}(V)$ and $f$ is a variable in $V$
+  \end{description}
+
+  An additional typing rule is added to simply typed $\lambda$-calculus:
+  \begin{prooftree}
+    \AXC{$\Gamma, f : A \vdash_{i} t : A$}
+    \UIC{$\Gamma \vdash_{i} \fix\,f.\,t : A$}
+  \end{prooftree}
+\end{frame}
+
+\begin{frame}{General Recursion: Dynamic}
+  $\beta$-reduction for the general recursion $\fix$ is extended with the relation
+  \begin{align*}
+    \fix\,x.\,t & \onereduce t\subst{\fix\,x.\,t}{x}
+  \end{align*}
+  \vfill
+  A term which never terminates can be defined easily.
+  \begin{align*}
+             & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
+    \equiv{} & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
+    \equiv{} & \fix\,x.\,x & \onereduce x\subst{\fix\,x.\,x}{x} \\
+    \equiv{} & \dots
+  \end{align*}
+  \vfill
+  Other notions such as $=_\alpha, \reduce$, and $\FV$ are extended similarly.
 \end{frame}
 
 %\subsection{System T}
-%It is also convenient to add some primitive types to our typed lambda calculus (or
-%so-called built-in types in programming languages used in practice) as well as
-%\emph{primitive terms}. For example, for a system with natural numbers, we
+\begin{frame}{Natural numbers: Static}
+  While Church numerals can have multiple types $\nat_A$, for any $A$, we extend the calculus with a single type of natural numbers instead.
+
+  Let $\Lambda_{\fix, \N}(V)$ be the set of terms defined inductively with constructs additional to $\Lambda_{\fix}(V)$:
+  \begin{itemize}
+    \item $\zero$ is a term in $\Lambda_{\fix, \N}(V)$
+    \item $\suc(t)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t$ is
+    \item $\ifz(t; x.\,u)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t$ and $u$ are terms and $x$ is a variable.
+  \end{itemize}
+  with additional typing rules
+  \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$\vphantom{\Gamma}$}
+      \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$\Gamma \vdash t : \mathbb{N}$}
+      \UIC{$\Gamma \vdash \suc(t) : \mathbb{N}$}
+    \end{prooftree}
+  \end{multicols}
+
+  \begin{prooftree}
+    \AXC{$\Gamma \vdash v : \mathbb{N}$}
+    \AXC{$\Gamma \vdash t : A$}
+    \AXC{$\Gamma, x : \mathbb{N} \vdash u : A$}
+    \TrinaryInfC{$\Gamma \vdash \ifz(t; x.\,u)\;v : A$}
+  \end{prooftree}
+  The third rule is akin to pattern matching on natural numbers.
+\end{frame}
+
+\begin{frame}{Natural numbers: Dynamic}
+  $\beta$-reduction for natural numbers is extended with two rules:
+  \begin{align*}
+    \ifz(t; x.\, u)\;\zero   & \onereduce t \\
+    \ifz(t; x.\, u)\;\suc(n) & \onereduce u\subst{n}{x}
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Natural numbers: Exercise}
+  Define the predecessor of natural numbers as a program
+  \[
+    \pred : \mathbb{N} \to \mathbb{N}.
+  \]
+
+  Evaluate the following terms to their normal forms.
+  \begin{enumerate}
+    \item $\pred\;\zero$
+    \item $\pred\;(\suc\;(\suc\;(\suc\;\zero)))$
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Boolean values: Exercise}
+  Extend simply typed $\lambda$-calculus $\Lambda_{\fix, \N}(V)$ further with a type of Boolean values. 
+  \begin{enumerate}
+    \item What term constructs are needed?
+    \item What typing rules should be added?
+    \item How $\beta$-reduction should be updated?
+    \item Define Boolean operations, i.e. conjunction, disjunction, and negation, in this extension.
+  \end{enumerate}
+
+\end{frame}
 %include numerals in the generation of syntax:
 %  \begin{multicols}{2}
 %    \begin{prooftree}
@@ -789,8 +1000,11 @@ How to prove it?
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item (2.5\%) Show the Progress Theorem.
-    \item (2.5\%) Show that if $M$ is in normal form then $\normal\;M$ is derivable.
+    \item (2.5\%) Complete the proof of the Preservation Theorem.
+    \item (5\%) Show the Progress Theorem.
+    \item (2.5\%) Show that if $t$ is in normal form then $\normal\;t$ is derivable.
+    \item (5\%) Extend $\Lambda_{\fix, \N}(V)$ further with product types $A \times B$, for any $A$ and $B$ where additional constructs should include pairs $(t, u)$ and a construct to pattern match on a pair.
+
   \end{enumerate}
   
 \end{frame}
@@ -803,112 +1017,5 @@ How to prove it?
 %\end{frame}
 
 \appendix
-\section{Appendix: Takahashi's Proof of confluence}
 
-\begin{frame}{Confluence: Parallel reduction}
-  Consider untyped $\lambda$-calculus. 
-
-  Let $M \parreduce N$ denote the \emph{parallel reduction} defined by
-  \begin{multicols}{2}
-    \begin{prooftree}
-      \AXC{$\vphantom{M\reduce M}$}
-      \UIC{$x \parreduce x$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \parreduce N$}
-      \UIC{$\lambda x.\, M \parreduce \lambda x.\, N$}
-    \end{prooftree}
-    \columnbreak
-    \begin{prooftree}
-      \AXC{$M \parreduce M'$}
-      \AXC{$N \parreduce N'$}
-      \BIC{$M\;N \parreduce M'\;N'$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \parreduce M'$}
-      \AXC{$N \parreduce N'$}
-      \BIC{$(\lambda x.\, M)\;N \parreduce M'\subst{N'}{x}$}
-    \end{prooftree}
-  \end{multicols}
-  For example, 
-  \[
-    \underline{(\lambda x.\, (\lambda y.\, y)\;x)}\;\underline{((\lambda x.\, x)\;\false)}
-    \parreduce
-    \false
-  \]
-  because $(\lambda y.\,y)\;x \parreduce x$ and $(\lambda x.\,x)\;\false \parreduce \false$.
-\end{frame}
-
-\begin{frame}{Confluence: Properties of parallel reduction}
-  \begin{lemma}
-    \begin{enumerate}
-      \item $M \parreduce M$ holds for any term~$M$, 
-      \item $M \onereduce N$ implies $M \parreduce N$, and
-      \item $M \parreduce N$ implies $M \reduce N$.
-    \end{enumerate}
-  \end{lemma}
-  Therefore, $M \parreduce^* N$ is equivalent to $M \reduce N$. 
-  \begin{lemma}[Substitution respects parallel reduction]
-      $M \parreduce M'$ and $N \parreduce N'$ imply $M\subst{N}{x} \parreduce
-      M'\subst{N'}{x}$. 
-  \end{lemma}
-  \begin{proof}[Proof sketch]
-    By induction on the derivation of $M \parreduce M'$.
-    
-  \end{proof}
-
-\end{frame}
-
-\begin{frame}{Complete development}
-  The \emph{complete development} $M^*$ of a $\lambda$-term $M$ is defined by
-  \begin{align*}
-    x^*      & = x \\
-    (\lambda x.\, M)^* & = \lambda x.\, M^* \\
-    \left((\lambda x.\, M)\;N\right)^* & = M^*\subst{N^*}{x} \\
-    (M\;N)^* & = M^*\;N^* && \text{ if $M \not\equiv \lambda x.\,M'$ } 
-  \end{align*}
-  \begin{theorem}[Triangle property]
-    If $M \parreduce N$, then $N \parreduce M^*$.
-  \end{theorem}
-  \begin{proof}[Proof sketch]
-    By induction on $M \parreduce N$.
-    
-  \end{proof}
-\end{frame}
-
-\begin{frame}{Strip Lemma}
-  \begin{theorem}
-    If $L \parreduce^* M_1$ and $L \parreduce M_2$, then there exists $N$
-    satisfying that $M_1 \parreduce N$ and $M_2 \parreduce^* N$, i.e.\
-    \[
-      \xymatrix{
-        & L \ar@{=>}[rd] \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
-      }
-    \]
-  \end{theorem}
-  \begin{proof}[Proof sketch]
-    By induction on $L \parreduce^* M_1$. 
-  \end{proof}
-\end{frame}
-
-\begin{frame}{Confluence}
-  \begin{theorem}
-    If $L \parreduce^* M_1$ and $L \parreduce^* M_2$, then there exists $N$ such that $M_1 \parreduce^* N$ and $M_2 \parreduce^* N$.
-    \[
-      \xymatrix{
-        & L \ar@{=>}[rd]^(.8){*}_(.8){\beta} \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd]^(.8){*}_(.8){\beta} & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
-      }
-    \]
-  \end{theorem}
-  \begin{corollary}
-    The confluence of $\reduce$ holds. 
-    
-  \end{corollary}
-  
-\end{frame}
-z
 \end{document}

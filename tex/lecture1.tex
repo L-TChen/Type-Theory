@@ -1,125 +1,256 @@
-%! TEX program = xelatex
+%! TeX program = xelatex
 %! TEX root = lecture1_slide.tex
-\title{$\lambda$-Calculus}
-\subtitle{Untyped $\lambda$-Calculus}
+
+\title{\texorpdfstring{$\lambda$}{λ}-Calculus}
+\subtitle{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus}
 \begin{document}
 
-{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
-\begin{frame}\maketitle\end{frame}}
+\bgroup
+  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+  \begin{frame}[plain,noframenumbering]
+    \maketitle
+  \end{frame}
+\egroup
 
-\begin{frame}[fragile]{Assessment guidelines}
-  \begin{description}
-    \item[Deadline] 17:00, 10 Aug
-    \item[Assessment] 
-      \begin{description}
-        \item[Assignment] (15\%)
-        \item[Exam] (100\%)
-      \end{description}
-    \item[Email] \texttt{liang.ting.chen.tw(at)gmail(dot)com}
-  \end{description}
+%\begin{frame}[fragile]{Assessment guidelines}
+%  \begin{description}
+%    \item[Deadline] 17:00, 10 Aug
+%    \item[Assessment] 
+%      \begin{description}
+%        \item[Assignment] (15\%)
+%        \item[Exam] (100\%)
+%      \end{description}
+%    \item[Email] \texttt{liang.ting.chen.tw(at)gmail(dot)com}
+%  \end{description}
+%
+%  \textbf{Please follow the instructions below.}
+%
+%  \begin{enumerate}
+%    \item Use A4 paper.
+%    \item Write down your name and student id. 
+%    \item Be clear and brief.
+%    \item Submit assignments in person or by email as \alert{PDF} with 
+%      \begin{description}
+%        \item[subject] \texttt{[FLOLAC] PL HW\%x\%}
+%        \item[attachment] \texttt{PL-HW\%x\% - \%STDNO\% - \%NAME\%.pdf}
+%        \item[body] (optional)
+%      \end{description}
+%  \end{enumerate}
+%\end{frame}
 
-  \textbf{Please follow the instructions below.}
+\section{Untyped $\lambda$-Calculus: Introduction}
+\begin{frame}[fragile]{The idea of anonymous functions}
+Anonymous functions can be defined in many languages, e.g.,
+\begin{description}
+  \item[\Hask]
+    \verb|\x f -> f x|
+  \item[\OCaml]
+    \verb|fun x f -> f x|
+\end{description}
 
-  \begin{enumerate}
-    \item Use A4 paper.
-    \item Write down your name and student id. 
-    \item Be clear and brief.
-    \item Submit assignments in person or by email as \alert{PDF} with 
-      \begin{description}
-        \item[subject] \texttt{[FLOLAC] PL HW\%x\%}
-        \item[attachment] \texttt{PL-HW\%x\% - \%STDNO\% - \%NAME\%.pdf}
-        \item[body] (optional)
-      \end{description}
-  \end{enumerate}
-\end{frame}
+This type of expression is inspired by the \alert{$\lambda$-notation} introduced by Alan Turing's supervisor, Alonzo Church, who was seeking a foundational framework for mathematics.
 
-\section{Untyped $\lambda$-Calculus: Statics}
+\vfill
 
-
-\begin{frame}{$\lambda$-calculus: Term}
-
-\begin{definition}[{Syntax of $\lambda$-calculus}]
-  Given a set $V$ of variables, 
-  the term formation judgement is defined by
-  \begin{description}
-     \item[Variable]
-       \hfill
-       \begin{prooftree}
-         \AXC{$x$ is in $V$}
-         \RightLabel{(var)}
-         \UIC{$x \quad \term_V$}
-       \end{prooftree}
- 
-    \item[Application]
-      of $M$ to the argument $N$
-      \hfill
-      \begin{prooftree}
-        \AXC{$M \quad \term_V$}
-        \AXC{$N \quad \term_V$}
-        \RightLabel{(app)}
-        \BIC{$M \; N \quad \term_V$}
-      \end{prooftree}
-
-    \item[Abstraction]
-      with an argument $x$ and a function body $M$
-      \hfill
-      \begin{prooftree}
-        \AXC{$M \quad \term_V$}
-        \AXC{$x$ is in $V$}
-        \RightLabel{(abs)}
-        \BIC{$\lambda \alert{x}.\, M \quad \term_V$}
-      \end{prooftree}
-  \end{description}
-\end{definition}
- 
-\end{frame}
-
-
-\begin{frame}{An Example}
-  The judgement
+In $\lambda$-notation
 \[
-  \fbox{$\lambda p.\, \lambda a.\, \lambda b.\, (p\;a)\; b \quad \term_V$}
+  \lam{x}e
 \]
-is justified by the following derivation
-  \begin{prooftree}
-    \footnotesize
-    \AXC{$p$ is in $V$}
-    \UIC{$p \quad \term_V$}
-    \AXC{$a$ is in $V$}
-    \UIC{$a \quad \term_V$}
-    \BIC{$p\;a \quad \term_V$}
-    \AXC{$b$ is in $V$}
-    \UIC{$b \quad \term_V$}
-    \BIC{$(p\;a)\;b \quad \term_V$}
-    \AXC{$b$ is in $V$}
-    \BIC{$\lambda b.\, (p\;a)\;b \quad \term_V$}
-    \AXC{$a$ is in $V$}
-    \BIC{$\lambda a.\, \lambda b.\, (p\;a)\; b \quad \term_V$}
-    \AXC{$p$ is in $V$}
-    \BIC{$\lambda p.\, \lambda a.\, \lambda b.\, (p\;a)\; b \quad \term_V$}
-  \end{prooftree}
-  N.B.\ brackets `(' and `)' are not parts of terms and they are used only to group a term.
+means `a function that maps the argument $x$ to expression $e$' where $x$ may appear in $e$.
+E.g., the above examples can be expressed as
+\[
+  \lam{x\,f}f\;x
+\]
 \end{frame}
 
-\begin{frame}{More Example and non-examples}
+\begin{frame}{An example of $\lambda$-notation}
+  The idea of function application in $\lambda$-notation is straightforward.
+
+  For example, in high school we may say a function $f(x) \defeq x^2$ with the variable $x$ and write
+  \[
+    f(3) = 3^2 = 9
+  \]
+
+  In $\lambda$-notation, we write
+  \[
+    (\lambda x.\, x^2)\;3 = x^2 \subst{3}{x} = 3^2 = 9
+  \]
+  where $x^2\subst{3}{x}$ means `the \alert{substitution} of $3$ for $x$ in the expression $x^2$'. 
+\end{frame}
+
+\begin{frame}{What is $\lambda$-calculus}
+  $\lambda$-calculus is a \emph{language of functions in $\lambda$-notation} consisting of three constructs:
+\begin{description}
+  \item[abstraction]
+    functions can be introduced $\lam{x} t$
+
+  \item[application]
+    functions can be applied to an argument $t\;u$
+
+  \item[variable]
+    variables are terms
+\end{description}
+where a \emph{term} means a minimal unit of expression.
+
+That is, every term in $\lambda$-calculus is in one and only one of the above forms.
+
+$\lambda$-calculus can be understood as a programming language \emph{without} any built-in data types and suffices to define every computable function.
+\end{frame}
+
+\begin{frame}{Why should we study $\lambda$-calculus?}
+  $\lambda$-calculus itself is a fruitful subject but it is also useful: 
+  \begin{itemize}
+    \item it serves as a prototype of programming languages which can be reasoned about \alert{mathematically} and \alert{rigorously};
+    \item the methodology we develop to understand $\lambda$-calculus can be used to study and design other programming languages.
+  \end{itemize}
+  \vfill
+  The common practice in PL research is to start with a variant of typed $\lambda$-calculus and a \emph{language feature} in question and investigate properties of this prototype language.
+
+  \vfill 
+  Moreover, $\lambda$-calculus has a strong connection with \emph{logic} and \emph{mathematics} which is a topic for another day.
+\end{frame}
+
+\begin{frame}{What to expect next?}
+  For $\lambda$-calculus, we will consider following topics in programming language in a style of mathematical formalism.
   \begin{enumerate}
-    \item $(x\;y)\;z$
-    \item $x\;(y\; z)$
-    \item $\lambda x.\, y$
-    \item $\lambda x.\, x$
-    \item $\lambda s.\,(\lambda z.\, (s \;z))$
-    \item $\lambda a.\,(\lambda b.\, (a\;(\lambda c.\, a\; b)))$
-    \item $(\lambda x.\, x)\;(\lambda y.\, y)$
-  \end{enumerate}
-  The following are NOT examples
-  \begin{enumerate}
-    \item $\lambda (\lambda x.\, x).\, y$
-    \item $\lambda x. $
-    \item $\lambda.\, x$
-    \item $\dots$
+    \item How programs can be identified \emph{up to variable renaming}?
+      E.g., $\lambda x.\, x$ should be `equal' to $\lambda y.\, y$.
+    \item How do programs \emph{compute}?
+      E.g., the application $(\lambda x.\, x)\;3$ of the identity to $3$ should compute to $3$.
+    \item How programs can be identified \emph{computationally}?
+      E.g.,
+      \[
+        (\lambda x.\, x) \quad\text{and}\quad (\lambda y.\, 3)\;10
+      \]
+      should be `computationally equal' as they should compute to the same term (but not each other).
+    \item How to write programs in $\lambda$-calculus?
   \end{enumerate}
 \end{frame}
 
+\section{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus: Statics}
+
+\begin{frame}{Syntax of $\lambda$-calculus}
+  To define the language of $\lambda$-calculus, we need a primitive notion of \emph{variables} first.
+  Let us fix a \emph{countably infinite} set $V$ for variables.
+
+  The set $\Lambda(V)$ of $\lambda$-terms over $V$ is defined \emph{inductively} as
+  \begin{description}
+    \item[variable] $x \in \Lambda(V)$ if $x$ is in $V$
+    \item[application] $t@u \in \Lambda(V)$ if $t, u \in \Lambda(V)$
+    \item[abstraction] $\lam{x}t$ if $x \in V$ and $t \in \Lambda(V)$
+  \end{description}
+
+  \vfill
+  Each construct can be represented as a node in a tree where variables are leafs, e.g.,
+  \begin{center}
+    \begin{minipage}[t]{.32\textwidth}
+      \centering
+      \begin{tikzpicture}[
+            level distance=0.75cm,
+          level 1/.style={sibling distance=1cm},
+        ]
+
+        \node {$x$};
+      \end{tikzpicture}
+    \end{minipage}
+    \begin{minipage}[t]{.32\textwidth}
+      \centering
+      \begin{tikzpicture}[
+            level distance=0.75cm,
+          level 1/.style={sibling distance=1cm},
+        ]
+
+        \node {$@$}
+          child { node {$t$} }
+          child { node {$u$} };
+      \end{tikzpicture}
+    \end{minipage}
+    \begin{minipage}[t]{.32\textwidth}
+      \centering
+      \begin{tikzpicture}[
+            level distance=0.75cm,
+          level 1/.style={sibling distance=2cm},
+        ]
+
+        \node {$\lambda x$}
+          child { node {$t$} };
+      \end{tikzpicture}
+    \end{minipage}
+  \end{center}
+  for a variable $x$, an application $t@u$, and an abstraction $\lam{x}t$.
+\end{frame}
+
+
+\begin{frame}{Representing a term as an abstract syntax tree}
+  The expression $\lam{x}(\lam{y}((x@y)@z))$ can be represented as
+  \begin{center}
+    \begin{tikzpicture}[
+          level distance=1cm,
+        level 1/.style={sibling distance=8cm},
+        level 2/.style={sibling distance=5cm},
+        level 3/.style={sibling distance=4cm}
+      ]
+
+      \node {$\lambda x$}
+        child {node {$\lambda y$}
+          child {node {$@$}
+            child {node {$@$}
+              child {node {$x$}}
+              child {node {$y$}}
+            }
+            child {node {$z$}}
+          }
+        };
+    \end{tikzpicture}
+  \end{center}
+  \begin{alertblock}{Important}
+    Brackets `(' and `)' are not part of a term but are used for grouping a subterm.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Formal justification}
+  The validity of the same expression 
+  \[
+    \lam{x}(\lam{y}((x@y)@z))
+  \]
+  can be justified by its very definition:
+  \begin{enumerate}
+    \item $x$, $y$, and $z$ are in $V$, so $x$, $y$, $z$ are terms;
+    \item $x@y$ is a term since $x$ and $y$ are terms;
+    \item $(x@y)@z$ is a term since $x@y$ is a term and $z$ is a term;
+    \item $\lam{y}((x@y)@z)$ is a term since $(x@y)@z$ is a term and $y$ is a variable;
+    \item $\lam{x}(\lam{y}((x@y)@z))$ is a term since $\lam{y}((x@y)@z)$ is a term and $x$ is a variable.
+  \end{enumerate}
+
+  \begin{convention*}
+    $@$ is omitted when a term is written as a sequence of symbols, so we write
+    \[
+      t\;u
+      \qquad\text{instead of}\qquad
+      t@u
+    \]
+  \end{convention*}
+\end{frame}
+
+\begin{frame}{The need for some conventions}
+  For arithmetic expressions, we typically write
+  \[
+    3 * 4 + 7 *2 \qquad\text{to mean}\qquad (3 * 4) + (7 + 2)
+  \]
+  by the typical precedence convention.
+
+  We'd also like to have some conventions to omit brackets without any ambiguity.
+  E.g., one should be able to write
+  \[
+    \lam{x y}x\;y\;z \qquad\text{to mean}\qquad \lam{x}(\lam{y}((x\;y)\;z))
+  \]
+  since
+  \begin{enumerate}
+    \item multiple abstractions means a function with multiple arguments;
+    \item applying a function to multiple arguments can be achieved via applying a function to a single argument and get another function which is applied to the next argument;
+    \item applications occur more often than abstractions in a body.
+  \end{enumerate}
+\end{frame}
 \begin{frame}{Conventions}
   \begin{description}
     \item[Consecutive abstractions]
@@ -131,19 +262,8 @@ is justified by the following derivation
         M_1\;M_2\; M_3\; \dots\;M_n \equiv (\dots((M_1\;M_2)\;M_3) \dots )\; M_n
       \]
     \item[Function body extends as far right as possible]
-      \[
-        \lambda x.\, M\;N \defeq \lambda x.\,(M\; N)
-      \]
-      instead of $(\lambda x.\,M)\; N$.
+        $\lam{x}M\;N \quad\text{means}\quad \lambda x.\,(M\; N)$ instead of $(\lambda x.\,M)\; N$.
   \end{description}
-  For example, 
-      $\lambda x_1.\,(\lambda x_2.\, x_1) \equiv \lambda x_1\,x_2.\,x_1$
-      and
-      $\alert{x\;y\;z}$ means $\alert{(x\; y)\;z}$. 
-
-\end{frame}
-
-\begin{frame}{Examples}
   \begin{enumerate}
     \item $(x\;y)\;z \equiv x\;y\;z$
     \item $\lambda s.\,(\lambda z.\, (s \;z)) \equiv \lambda s\,z.\, s\;z$
@@ -151,398 +271,421 @@ is justified by the following derivation
     \item $(\lambda x.\, x)\;(\lambda y.\, y) \equiv (\lambda x.\, x)\;\lambda y.\, y$
   \end{enumerate}
 \end{frame}
+\begin{frame}{More Example}
 
-\begin{frame}{Meta-language and object-language}
-  \begin{itemize}
-    \item \emph{Meta-language} is the language we use to describe the object of
-      study. E.g. English, or naive set theory. 
-    \item \emph{Object-language} is the object of study. E.g., arithmetic
-      expressions and $\lambda$-terms.
-  \end{itemize}
-  Naming a function is \emph{not} supported in $\lambda$-calculus, so
-  the following
-    \[
-      \mathtt{id} \defeq \lambda x.\, x
-    \]
-  happens in the meta-language. 
-  \begin{enumerate}
-    \item $\mathtt{id}$ is a symbol different from `$\lambda x.\,x$' in the meta-language.
-    \item $\mathtt{id}$ and $\lambda x.\, x$ are \emph{syntactically equivalent} denoted by
-      \[
-        \mathtt{id} \equiv \lambda x.\, x
-      \]
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}
-  \begin{example}[Identity function]
-    \[
-      \mathtt{id} \defeq \lambda x.\, x
-    \]
-  \end{example}
-
-  \begin{example}[Projections]
-    \[
-      \mathtt{fst} \defeq \lambda x.\, \lambda y.\, x
-      \quad\text{and}\quad \mathtt{snd} \defeq \lambda x.\, \lambda y.\, y
-    \]
-  \end{example}
-  Remember that there are only three constructs in $\lambda$-calculus.
-  For convenience, we normally use a surface language to generate terms in the object-language.
-%  \begin{example}[Church encoding of Natural numbers]
-%    \begin{align*}
-%      &\bc_{0}   &&\defeq \;&& \lambda f\,x.\, x \\
-%      &\bc_{1} &&\defeq \;&& \lambda f\,x.\, f\,x \\
-%      &\bc_{2} &&\defeq \;&& \lambda f\,x.\, f\,(f\,x) \\
-%      &\bc_{3} &&\defeq \;&& \lambda f\,x.\, f\,(f\,(f(\,x))) \\
-%      && \vdots 
-%    \end{align*}
-%  \end{example}
-\end{frame}
-
-\begin{frame}{$\alpha$-equivalence, informally}
-  \begin{definition}
-    Two terms $M$ an $N$ are \alert{$\alpha$-equivalent} 
-    \[
-      M =_\alpha N
-    \]
-    if variables \emph{bound} by abstractions can be renamed to derive the same term. 
-  \end{definition}
-  \begin{example}
+  \begin{exercise*}
+    Draw the corresponding abstract syntax tree for each of the following terms:
     \begin{enumerate}
-      \item $\lambda x.\, x$ and $\lambda y.\, y$ are distinct $\lambda$-terms but $\lambda x.\, x
-        =_\alpha \lambda y.\, y$. 
-      \item $\lambda x.\, \lambda y.\, y =_\alpha 
-        \lambda z.\, \lambda y.\, y$. 
-      \item $\lambda x.\, \lambda y.\, x \mathrel{\neq}_\alpha
-        \lambda x.\, \lambda y.\, y$. 
+      \item $x\;(y\;z)$
+      \item $x\;y\;z$
+      \item $\lam{sz}s\;z$
+      \item $(\lambda x.\, x)\;(\lambda y.\, y)$
+      \item $\lam{a b}a\;(\lam{c}a\;b)$
     \end{enumerate}
-  \end{example}
-  
-  $\alpha$-equivalent terms are \emph{programs of the same structure modulo the name of bound variables}.
+  \end{exercise*}
 \end{frame}
 
-\begin{frame}{Evaluation, informally}
-  The \alert{evaluation} of $\lambda$-calculus is of this form 
+
+
+\begin{frame}{Variable binding}
+  Let us discuss an important notion of syntax in a language: \emph{variable binding}.
+
+  In the expression $f({\color{red}{x}}) = {\color{red}x}^2$, the variable $x$ in the expression $x^2$ is \alert{bound} to $x$ of $f$ and the \alert{meaning} of $f(x)$ is the same as $f({\color{red}y}) = {\color{red}y}^2$.
+
+  Similarly, following expressions demonstrate the variable binding in various forms:
+  \begin{enumerate}
+    \item $\sum_{\alert{x} = 0}^{n} \alert{x}$
+    \item $\int_{0}^{1} e^{\alert{y}}\; \mathrm{d}\alert{y}$
+    \item $f({\color{red}x}, {\color{blue}y}) = {\color{red}x}^2 + {\color{blue}y}^2$
+    \item \dots
+    \item $\lambda {\color{red}y}.\,(\lambda {\color{blue}x}.\, {\color{red}y})$ means a function that takes an argument $y$ returns a constant function at $y$
+    \item $\lambda {\color{red}x}.\,(\lambda {\color{blue}y}.\, {\color{blue}y})$ means a constant function that always returns an identity function
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Binding structure in an abstract syntax tree}
+  The binding structure can be visualised in an abstract syntax tree:
+  \begin{center}
+    \begin{tikzpicture}[
+          level distance=1.5cm,
+        level 1/.style={sibling distance=8cm},
+        level 2/.style={sibling distance=5cm},
+        level 3/.style={sibling distance=4cm}
+      ]
+
+      \node {$\lambda x$}
+        child {node {$\lambda y$}
+          child {node {$@$}
+            child {node {$@$}
+              child {node {$x$}}
+              child {node {$y$}}
+            }
+            child {node {$z$}}
+          }
+        };
+    \end{tikzpicture}
+  \end{center}
+
+
+\end{frame}
+
+\begin{frame}{$\alpha$-equivalence: renaming of bound variables}
+  It is common sense that renaming variables of a program should not alter its meaning: the point of having a name for a variable to look for where it applies to.
+
+  \vfill
+  Intuitively, two terms $t$ and $u$ are \alert{$\alpha$-equivalent}, written as
   \[
-    \fbox{$\cdots\underbrace{(\lambda x.\, M)\,N}_{\beta\text{-redex}} \cdots$} \longrightarrow_{\beta 1}
-    \fbox{$\cdots \underbrace{M\;\subst{N}{x}}_{\text{substitution of $N$ for $x$ in $M$}} \cdots$}
+    t =_\alpha u
   \]
-
-  For example, $(\lambda x.\, x +1)\;3 \to 3 + 1$.
-  \mode<presentation>{\vfill}
-  How to evaluate the following terms? 
-  \begin{enumerate}
-    \item $(\lambda x.x)\,z$
-    \item $(\lambda x\, y.\,x)\,y$
-    \item $(\lambda y\, y.\,y)\,x$
-  \end{enumerate}
+  if $t$ and $u$ have the same binding structure, \emph{regardless of their variable names}, in their abstract syntax trees.
+  \vfill
+  \begin{alertblock}{Quest}
+    How to define $\alpha$-equivalence formally?
+  \end{alertblock}
 \end{frame}
 
+\begin{frame}{First solution: de Bruijn representation}
+  \begin{idea}
+    The problem of variable renaming is the \emph{name}, so we may discard names and use indices $i'$ to represent variable bindings.
+  \end{idea}
 
-\begin{frame}{Structural recursion: Free variables}
-\begin{definition}
-  The set $\FV$ of free variables of a term $M$ is inductively defined by
-  \begin{align*}
-    \FV \colon  \term_V & \to \mathcal{P}(V) \\
-    \FV(x) & = \{x\} \\
-    \FV(\lambda x.\, M) & = \FV(M) - \{x\} \\
-    \FV(M\;N) & = \FV(M) \cup \FV(N)
-  \end{align*}
-\end{definition}
-\begin{definition}
-  \begin{enumerate}
-    \item A variable $y$ in $M$ is \alert{free} if $y \in \FV(M)$.
-    \item A $\lambda$-term~$M$ is \alert{\emph{closed}} if $\FV(M) = \emptyset$. 
-  \end{enumerate}
-\end{definition}
-
+  The index $i'$ points to the $i$-th innermost $\lambda$-node from the variable: 
+  \begin{center}
+    \begin{minipage}{.4\textwidth}
+      \begin{tikzpicture}[
+            level distance=0.8cm,
+          level 1/.style={sibling distance=6cm},
+          level 2/.style={sibling distance=4cm},
+          level 3/.style={sibling distance=2cm}
+        ]
+        \node {$\lambda x$}
+          child {node {$\lambda y$}
+            child {node {$@$}
+              child {node {$@$}
+                child {node {$x$}}
+                child {node {$y$}}
+              }
+              child {node {$z$}}
+            }
+          };
+      \end{tikzpicture}
+    \end{minipage}
+    becomes
+    \begin{minipage}{.4\textwidth}
+      \begin{tikzpicture}[
+            level distance=0.8cm,
+          level 1/.style={sibling distance=6cm},
+          level 2/.style={sibling distance=4cm},
+          level 3/.style={sibling distance=2cm}
+        ]
+        \node {$\lambda$}
+          child {node {$\lambda$}
+            child {node {$@$}
+              child {node {$@$}
+                child {node {$1'$}}
+                child {node {$0'$}}
+              }
+              child {node {$3'$}}
+            }
+          };
+      \end{tikzpicture}
+    \end{minipage}
+  \end{center}
+  This nameless representation is invented by a Dutch mathematician, N. G. de Bruijn, while implementing a language for formalising mathematics.
 \end{frame}
 
-\begin{frame}{Exercise}
-  The set of free variables of a term is calculated by definition readily, e.g., 
-    \begin{align*}
-      \FV(x\;(\lambda y.\, y)\;z) & = \FV(x\;(\lambda y.\, y)) \cup \FV(z) \\ 
-                                  & = \FV(x) \cup (\FV(y) - \{y\}) \cup \{z\} \\
-                                  & = \{x\} \cup (\{y\}-\{y\}) \cup \{z\} \\
-                                  & = \{x, z\}
-    \end{align*}
-
-  Calculate the set of free variables of following terms:
-  \begin{enumerate}
-    \item $x\;(y\; z) $
-    \item $\lambda x.\, y$
-    \item $\lambda x.\, x$
-    \item $\lambda s\,z.\, s \;z$
-    \item $(\lambda x.\, x)\;\lambda y.\, y$
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Exercise: Height}
-  The height of a term is given informally as follows:
-  \begin{enumerate}
-    \item the height of a variable is zero;
-    \item the height of an application is the maximum of the heights of its subterms plus 1;
-    \item the height of an abstraction is the height of its body plus 1.
-  \end{enumerate}
-  
-  Define the height function $h\colon \term_V \to \mathbb{N}$ inductively.
-\end{frame}
-
-\section{Untyped $\lambda$-Calculus: Substitution}
-
-\begin{frame}{Substitution}
-   A \alert{substitution} is a process of replacing \emph{free} variables by
-   another terms on the meta-level. Hence, a substitution of $N$ for a free
-   variable $x$ is a function
-   \[
-     {\_}\subst{N}{x}\colon \term_V \to \term_V
-   \]
-
-   The name of a variable does not matter but its location does.
-   \begin{enumerate}
-     \item bound variables should remain bound after substitution.
-     \item free variables which are not $x$ should remain free after substitution.
-   \end{enumerate}
-
-   Concretely, we want to avoid ...
-  \begin{enumerate}
-    \item $(\lambda y.\,y)[x/y] \equiv (\lambda y.\, x)$
-    \item $(\lambda y.\, x)[y/x] \equiv (\lambda y.\, y)$ 
-  \end{enumerate}
+\begin{frame}{Pros and cons of De Bruijn representation}
    
-  
-\end{frame}
-  
-\begin{frame}{Naive substitution I}
-    For $x \in V$ and $L : \term_V$, the substitution of $L$ for $x$ is
-    defined by
-    \begin{align*}
-      x\subst{L}{x} & = L \\
-      y\subst{L}{x} & = y & \text{if $x \neq y$} \\
-      (M\;N)\subst{L}{x}& = M\subst{L}{x} \; N\subst{L}{x} \\
-      (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M \subst{L}{x}
-    \end{align*}
-
-    A bound variable may become free after substitution, e.g.,\  
-    \[
-      (\lambda x.\, x)\subst{y}{x} = \lambda x.\, y
-    \]
-    so this is not the one we want.
-\end{frame}
-\begin{frame}{Naive substitution II}
-    For $x \in V$ and $L : \term_V$, the substitution
-    of $L$ for $x$ is defined by
-    \begin{align*}
-      x\subst{L}{x} & = L \\
-      y\subst{L}{x} & = y && \text{if $x \neq y$} \\
-      (M\,N)\subst{L}{x} & = M\subst{L}{x}\; N\subst{L}{x} \\
-      (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M\subst{L}{x} && \text{if $x \neq y$} \\
-      (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M && \text{if $x = y$} 
-    \end{align*}
-
-    A variable may be captured by an abstraction after substitution, e.g.,
-    \[
-      (\lambda x. y)\subst{x}{y} = \lambda x.\, x
-    \]
-    so again it is not the desired definition.
+  \begin{description}
+    \item[Good] This representation does solve many problems:
+      \begin{enumerate}
+        \item $\alpha$-equivalence coincides with syntactic equality, i.e.
+          \[
+            t =_\alpha u \iff t = u.
+          \]
+        \item Machine-readable.
+        \item No variable renaming is involved.
+      \end{enumerate}
+    \item[Bad] `Don't throw the baby out with the bathwater'.
+  \end{description}
 \end{frame}
 
+\begin{frame}{Second solution: Capture-avoidance renaming}
+  \begin{idea}
+    Using the nominal representation, we define $t =_\alpha u$ if variables $t$ and $u$ can be renamed `suitably' to exactly the same term.
+  \end{idea}
+  The problem with naive renaming is that a renamed variable might be \alert{captured} by another $\lambda$, breaking the binding structure.
 
-\begin{frame}{Capture-avoiding substitution}
-  \begin{definition}
-    Capture-avoiding substitution\footnote{Sigh, this definition is still not rigorous.} of $L$ for the \alert{free occurrences} of $x$ is a
-    \emph{partial} function $\_\subst{L}{x}\colon \term_V \to \term_V$ defined by
+  E.g., $y$ can be renamed to anything but $x$ in 
+  \[
+    \lambda x.\,(\lambda y.\, x \; y)
+  \]
+  to retain the same binding structure.
+
+  Hence, variable renaming has to be constrained to variables that do not \alert{occur} in the term to avoid changing the binding structure.
+  \begin{alertblock}{Quest}
+    How to define the \alert{occurrence} of a variable and variable \alert{renaming}?
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Structural recursion over $\lambda$-terms}
+  To define a function from $\lambda$-terms, we may use the '\alert{fold}':
+
+  \begin{theorem*}
+    Given a target set $X$ and functions
     \begin{align*}
-      x\subst{L}{x} & = L \\
-      y\subst{L}{x} & = y && \text{if $x \neq y$} \\
-      (M\, N)\subst{L}{x} & = M\subst{L}{x}\; N\subst{L}{x} \\
-      (\lambda x.\, M)\subst{L}{x} & = \lambda x.\, M \\
-      (\lambda y.\, M)\subst{L}{x} & = \lambda y.\, M\subst{L}{x}                                 &&\text{if $x \neq y$ and $y \not\in \FV(L)$}
+      f_1 & \colon V \to X \\
+      f_2 & \colon X \times X \to X \\
+      f_3 & \colon V \times X \to X
     \end{align*}
-  \end{definition}
+    there exists a unique $\hat{f}\colon \Lambda(V)  \to X$ such that
+    \begin{align*}
+      \hat{f}\,x    & = f_1\,x \\
+      \hat{f}(t\;u) & = f_2(\hat{f}\,t, \hat{f}\,u) \\
+      \hat{f}(\lambda x.\, t) & = f_3(x, \hat{f}\,t)
+    \end{align*}
+  \end{theorem*}
+\end{frame}
 
+%\begin{frame}{Exercise: Height}
+%
+%The \emph{height} of a term is given informally as follows:
+%\begin{enumerate}
+%  \item the height of a variable is 1;
+%  \item the height of an application is the maximum of the heights of its subterms plus 1;
+%  \item the height of an abstraction is the height of its body plus 1.
+%\end{enumerate}
+%
+%\begin{exercise*}
+%  Define the height function $h\colon \Lambda(V) \to \mathbb{N}$ by structural recursion.
+%\end{exercise*}
+%\end{frame}
+
+\begin{frame}{Variable occurrences}
+  We define the set $\Var(t)$ of variables in a term $t$ by structural recursion with the target set $\mathcal{P}V$ and
+\begin{align*}
+  \Var_1(x) & = \{x\} \\
+  \Var_2(S_1, S_2) & = S_1 \cup S_2 \\
+  \Var_3(x, S) & =  \{x\} \cup S
+\end{align*}
+  That is, $\Var$ is a function from $\Lambda(V)$ to $\mathcal{P}V$ such that 
+  \begin{align*}
+    \Var(x) & = \{x\} \\
+    \Var(t\;u) & = \Var(t) \cup \Var(u) \\
+    \Var(\lam{x} t) & = \{x\} \cup \Var(t) 
+  \end{align*}
+  \vfill
+  We say $x$ occurs in $t$ if $x \in \Var(t)$, i.e.\ $x$ appear in $t$ somewhere.
+\end{frame}
+
+
+\begin{frame}{Variable permutation}
+  A \emph{transposition} $(x\, y)$ is a function that swaps $x$ and $y$ but fixes everything else, i.e.\
+  \[
+    (x\, y)\;z = 
+    \begin{cases}
+      y & \text{$z$ = $x$} \\
+      x & \text{$z$ = $y$} \\
+      z & \text{otherwise}
+    \end{cases}
+  \]
+   \vfill
+   The \emph{variable permutation} by a transportation $\pi = (y\,z)$ is defined by
+   \begin{align*}
+     \pi\cdot x     & = \pi\;x \\
+     \pi\cdot(t\;u) & = (\pi\cdot t)\; (\pi\cdot u) \\
+     \pi\cdot(\lambda x.\, t) & = \lambda (\pi\;x).\, (\pi\cdot t)
+   \end{align*}
+   \vfill
+   E.g.,
+  \[
+    (z\,y) \cdot \lambda x.\,(\lambda y.\, y \; y) = \lambda x.\,(\lambda z.\, z \; z)
+  \]
 \end{frame}
 
 \begin{frame}{Renaming of bound variables}
-\begin{definition}[Freshness]
-  A variable $y$ is \alert{fresh} for $L$ if $y \notin \FV(L)$.  
-\end{definition}
+  Now we are ready to formulate what we mean by $\alpha$-equivalence
 
-If a variable $y$ is \emph{fresh} for $M$, the bound variable $x$ of~$\lambda
-x.\, M$ can be renamed to~$y$ without changing the meaning. 
-  \mode<presentation>{\vfill}
-\begin{definition}[$\alpha$-conversion]
-  \emph{$\alpha$-conversion} is an judgement $M \to_\alpha N$ between terms defined by
-  \begin{prooftree}
-    \AXC{$y$ is fresh for $M$}
-    \UIC{$\lambda x.\, M \longrightarrow_\alpha \lambda y.\, M\subst{y}{x}$}
-  \end{prooftree}
-\end{definition}
-
-Yet, $M\;(\lambda x.\, x) \longrightarrow_\alpha M\;(\lambda y.\, y)$ does
-not follow by definition, so we introduce a new judgement to allow
-$\alpha$-conversion in any subterm of a term.
-
-\end{frame}
-
-\begin{frame}{$\alpha$-equivalence}
-  \begin{definition}
+  \begin{definition}[$\alpha$-equivalence]
+    $\alpha$-equivalence is a relation $t =_\alpha u$ between terms $t$ and $u$ defined inductively as
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$x$ is a variable}
+      \AXC{\vphantom{$M_1$}}
+      \RightLabel{if $x \in V$}
       \UIC{$x =_\alpha x$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$M_1 \mathrel{\to_\alpha} M_2$}
-      \UIC{$M_1 \mathrel{=_\alpha} M_2$}
-    \end{prooftree}
-%    \begin{prooftree}
-%      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
-%      \UIC{$M_2 \mathrel{=_\alpha} M_1$}
-%    \end{prooftree}
-%    \begin{prooftree}
-%      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
-%      \AXC{$M_2 \mathrel{=_\alpha} M_3$}
-%      \BIC{$M_1 \mathrel{=_\alpha} M_3$}
-%    \end{prooftree}
-%    \begin{prooftree}
-%      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
-%      \UIC{$(M_1\,N) \mathrel{=_\alpha} (M_2\,N)$}
-%    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M_1 \mathrel{=_\alpha} M_2$}
-      \AXC{$N_1 \mathrel{=_\alpha} N_2$}
-      \BIC{$M_1\;N_1 \mathrel{=_\alpha} M_2\;N_2$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M_1 \mathrel{=_\alpha}M_2$}
-      \UIC{$\lambda x.\, M_1 \mathrel{=_\alpha} \lambda x.\, M_2$}
+      \AXC{$t_1 \mathrel{=_\alpha} t_2$}
+      \AXC{$u_1 \mathrel{=_\alpha} u_2$}
+      \BIC{$t_1\;u_1 \mathrel{=_\alpha} t_2\;u_2$}
     \end{prooftree}
   \end{multicols}
-\end{definition}
-
-$\alpha$-equivalence is an \emph{equivalence}, i.e.
-\begin{description}
-  \item[reflexivity] $M =_\alpha M$ for any term M;
-  \item[symmetry] $N =_\alpha M$ if $M =_\alpha N$;
-  \item[transitivity] $L =_\alpha N$ if $L =_\alpha M$ and $M =_\alpha N$. 
-\end{description}
-All of these can be proved by induction on the derivation of $M =_\alpha M$.
-
+  \begin{prooftree}
+    \AXC{$(z\;x)\cdot t \mathrel{=_\alpha} (z\;y)\cdot u$}
+    \RightLabel{if $z \not\in \Var(t, u)$}
+    \UIC{$\lam{x}t \mathrel{=_\alpha} \lam{y}u $}
+  \end{prooftree}
+  \end{definition}
+  The third case is the interesting one: $\lam{x}t$ and $\lam{y}u$ are equal up to renaming bound variables if the variables $x$ and $y$ can be swapped with a variable $z$ that does not exist in $t$ and $u$.
 \end{frame}
 
-%\begin{frame}{Proof of reflexivity}
-%      By induction on the formation of $M$.
-%      \begin{enumerate}
-%        \item $M = x$ for some $x \in V$. Then, by definition $x =_\alpha
-%          x$ holds.
-%
-%        \item $M = M_1\;M_2$. Then, by induction hypothesis, we have
-%          derivations $D_1$ and $D_2$ for $M_1 =_\alpha M_1$ and $M_2
-%          =_\alpha M_2$ respectively. Therefore, we have the desired derivation 
-%          \begin{prooftree}
-%            \AXC{$\vdots$}
-%            \RightLabel{$D_1$}
-%            \UIC{$M_1 \mathrel{=_\alpha} M_1$}
-%            \AXC{$\vdots$}
-%            \RightLabel{$D_2$}
-%            \UIC{$M_1 \mathrel{=_\alpha} M_2$}
-%            \BIC{$M_1\;M_2 \mathrel{=_\alpha} M_1\;M_2$}
-%          \end{prooftree}
-%        \item $M = \lambda x.\, M'$. By induction hypothesis, we have a derivation $D$ for $M' =_\alpha M'$. Hence, 
-%          \begin{prooftree}
-%            \AXC{$\vdots$}
-%            \RightLabel{$D$}
-%            \UIC{$M' \mathrel{=_\alpha}M'$}
-%            \UIC{$\lambda x.\, M' \mathrel{=_\alpha}\lambda x.\, M'$}
-%            
-%          \end{prooftree}
-%      \end{enumerate}
-%\end{frame}
+\begin{frame}{An example of $\alpha$-equivalent terms}
 
-%\begin{frame}{Proof of symmetry}
-%  By induction on the derivation $D$ of $M =_\alpha N$. The only interesting
-%  case is that $D$ is derived from an $\alpha$-conversion, i.e.
-%  \[
-%    \lambda x.\, M' \to_\alpha \lambda y.\, M'\subst{y}{x}
-%  \]
-%  and $y$ is fresh for $M'$. We know that $x \not\in \FV(M'\subst{y}{x})$ since 
-%  the substitution $\subst{y}{x}$ replaces\footnote{
-%    We actually need to show that $x \not\in \FV(M[y/x])$ whenever $\FV(M[y/x])$ is defined.}
-%  the free variable $x$ by $y$.  Therefore, we have $\lambda x.\,
-%  M'\subst{y}{x}\subst{x}{y} \equiv \lambda x.\, M'$. It follows that 
-%  \[
-%    \lambda y. M'\subst{y}{x} \to_\alpha \lambda x. M'
-%  \]
-%  Hence, $N =_\alpha M$.
-%\end{frame}
-%
-%\begin{frame}{Proof of transitivity}
-%  By induction on the derivations $D_1$ and $D_2$ of $L =_\alpha M$ and $M =_\alpha N$ respectively. The interesting case is when $D_i$'s are given by $\alpha$-conversion
-%  \[
-%    \lambda x.\,M' \to_\alpha \lambda y.\,M'\subst{y}{x} \to_\alpha \lambda z.\, M'\subst{y}{x}\subst{z}{y}. 
-%  \]
-%  
-%  It follows that 
-%  \[
-%    \lambda x.\,M' \to_\alpha \lambda z.\,M'\subst{z}{x}
-%  \]
-%  where the freshness condition clearly holds (why?)
-%  and also that
-%  \[
-%    M'\subst{y}{x}\subst{z}{y} \equiv M'\subst{z}{x}.
-%  \]
-%  Hence, transitivity holds for this case.
-%\end{frame}
-\begin{frame}
   \begin{example}
-    \[
-      (\lambda y.\, y)\;(\lambda x.\, x) =_\alpha (\lambda
-    x.\,x)\;(\lambda y.\,y) 
-    \]
+    Show that $(\lambda y.\, y)\;z =_\alpha (\lambda x.\,x)\;z$.
   \end{example}
 
-  Why? We use the fact that $=_\alpha$ is an equivalence!
   \begin{proof}
-  \begin{prooftree}
-    \AXC{}
-    \UIC{$\lambda x.\, x \to_\alpha \lambda y.\, x\subst{y}{x}$}
-    \UIC{$\lambda x.\, x =_\alpha \lambda y.\, y$}
-    \UIC{$(\lambda y.\, y)\; (\lambda x.\, x) =_\alpha (\lambda y.\, y)\; (\lambda y.\, y)$}
-    \AXC{}
-    \UIC{$\lambda y.\, y \to_\alpha \lambda x.\, y\subst{x}{y}$}
-    \UIC{$\lambda y.\, y =_\alpha \lambda x.\, x$}
-    \UIC{$(\lambda y.\, y)\; (\lambda y.\, y) =_\alpha (\lambda x.\, x)\; (\lambda y.\, y)$}
-    \BIC{$(\lambda y.\, y)\; (\lambda x.\, x) =_\alpha (\lambda x.\, x)\; (\lambda y.\, y)$}
-  \end{prooftree}
+    By definition
+    \begin{prooftree}
+      \AXC{}
+      \UIC{$(y\;y)\cdot y \mathrel{=_\alpha} (y\; x)\cdot x$}
+      \UIC{$\lambda y.\, y \mathrel{=_\alpha} \lambda x.\, x$}
+      \AXC{}
+      \UIC{$z \mathrel{=_\alpha} z$}
+      \BIC{$(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$}
+    \end{prooftree}
+  where $(y\;y)\cdot y = () \cdot y = y$ and $(y\;x)\cdot x = y$, so it follows that $(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$.
   \end{proof}
 \end{frame}
 
-\begin{frame}{Exercise}
 
-Which of the following pairs are $\alpha$-equivalent? Why?
+\begin{frame}{$\alpha$-equivalence is an equivalence}
+  $\alpha$-equivalence satisfies the following properties
+  \begin{description}
+    \item[reflexivity] $t =_\alpha t$ for any term $t$;
+    \item[symmetry] $u =_\alpha t$ if $t =_\alpha u$;
+    \item[transitivity] $t =_\alpha v$ if $t =_\alpha u$ and $u =_\alpha v$. 
+  \end{description}
+  Easy to prove reflexivity and symmetry (try it!) but tricky to prove transitivity.
+  \vfill
+  We are mainly in interested in \alert{terms up to $\alpha$-equivalence}, as the name of a bound variable does not matter. 
+  Hence, we consider $\lambda$-terms \emph{modulo} $\alpha$-equivalence, i.e.\
+  \[
+    [t]_{\alpha} = \{\, u \in \Lambda(V) \mid t =_\alpha u \,\}
+  \]
+  as well as the (quotient) set:
+  \[
+    \Lambda(V)/{=_\alpha} \defeq \{\, [t]_{\alpha} \mid t \in \Lambda(V) \,\}.
+  \]
+\end{frame}
+
+\begin{frame}{Exercise}
+Which of the following pairs are $\alpha$-equivalent? If so, prove it.
 \begin{enumerate}
-  \item $x$ and $y$
+  \item $x$ and $y$ if $x \neq y$ 
   \item $\lambda x\,y.\, y$ and $\lambda z\,y.\, y$
   \item $\lambda x\,y.\, x$ and $\lambda y\,x.\, y$
   \item $\lambda x\,y.\, x$ and $\lambda x\,y.\, y$
 \end{enumerate}
+\vfill
+\begin{block}{Challenge}
+Is it true that $\alpha$-equivalent terms have the same de Bruijn representation?
 
-  \mode<presentation>{\vfill}
-\begin{block}{Convention}
-  $\alpha$-equivalent terms are \alert{identified}. 
+Can you come up with a strategy to prove your conjecture?
 \end{block}
-
-In the following development, we do not distinguish $M$ and $N$ if $M
-=_\alpha N$ at all. Feel free to rename any bound variable whenever
-convenient.
 
 \end{frame}
 
-\section{Untyped $\lambda$-Calculus: Dynamics}
+
+
+\section{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus: Dynamics}
+
+\begin{frame}{Evaluation, informally}
+  The \alert{evaluation} of $\lambda$-calculus is of this form 
+  \[
+    \fbox{$\cdots\underbrace{(\lam{x}t)\,u}_{\beta\text{-redex}} \cdots$} \longrightarrow_{\beta 1}
+    \fbox{$\cdots \underbrace{t\;\subst{u}{x}}_{\text{substitution of $N$ for $x$ in $M$}} \cdots$}
+  \]
+
+  \mode<presentation>{\vfill}
+  In $\lambda$-calculus, defining substitution is subtle:
+
+  \begin{quote}
+    Variable $x$ in $u$ may be captured by an abstraction $\lam{x}t$, if the substitution $\subst{u}{x}(\lam{x}t)$ is naively carried out.
+  \end{quote}
+  How to evaluate the following terms? 
+  Remember that we shall not discriminate $\alpha$-variants.
+  \begin{enumerate}
+    \item $(\lambda x.x)\,z$
+    \item $(\lambda x\, y.\,y)\,x$
+    \item $(\lambda x\, y.\,y)\,(x\;y)$
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Free variables}
+  A notion of the \emph{scope} of a variable is needed to know which variable is available in scope to be substituted.
+
+  We use the notion of \emph{free variable}: a variable $y$ is \alert {free} if $y \in \FV(t)$ where $\FV(t)$ is defined by
+  \begin{align*}
+    \FV(x) & = \{x\} \\
+    \FV(t\;u) & = \FV(t) \cup \FV(u) \\
+    \FV(\lambda x.\, t) & = \FV(t) - \{x\}
+  \end{align*}
+
+  A variable $y$ is \alert{bound} in $t$ if it occurs in $t$ but is not free.
+  \vfill
+  \begin{proposition}
+    $\FV$ respects $\alpha$-equivalence, i.e.\ if $t =_\alpha u$, then $\FV(t) = \FV(u)$.
+  \end{proposition}
+  In particular, $\FV$ can be lifted to a function on $\alpha$-variants, i.e.
+  \[
+    \FV([t]_\alpha) \defeq \FV(t).
+  \]
+\end{frame}
+
+\begin{frame}{Free variables: Exercise}
+  Compute the set $\FV(t)$ of free variables for each subtree $t$ of the following abstract syntax tree:
+  \vfill
+  \begin{tikzpicture}[
+        level distance=0.8cm,
+      level 1/.style={sibling distance=6cm},
+      level 2/.style={sibling distance=4cm},
+      level 3/.style={sibling distance=2cm}
+    ]
+    \node {$\lambda x$}
+      child {node {$\lambda y$}
+        child {node {$@$}
+          child {node {$@$}
+            child {node {$x$}}
+            child {node {$y$}}
+          }
+          child {node {$z$}}
+        }
+      };
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Capture-avoiding substitution}
+  Given a term $t$ and a variable $x$, the \alert{capture-avoiding substitution}
+  \[
+    \_\subst{t}{x} \colon \Lambda \to \Lambda
+  \]
+  of $t$ for $x$ is defined on terms by
+  \begin{align*}
+    y\subst{t}{x}           & =
+                                \begin{cases*}
+                                  t & \text{if $x = y$} \\
+                                  y & \text{otherwise}
+                                \end{cases*} \\
+    (t_1\;t_2) \subst{t}{x} & = (t_1\subst{t}{x})\;(t_2\subst{t}{x}) \\
+    (\lam{y}u) \subst{t}{x} & =
+                                \begin{cases*}
+                                  \lam{y}(u\subst{t}{x}) & \text{if $x \neq y$ and $y \notin \FV(t)$} \\
+                                  ?                      & \text{otherwise}
+                                \end{cases*}
+  \end{align*}
+  If the clause $?$ is reached, then \emph{rename} the bound variable $y$ to some variable \alert{fresh} for $x$ and $t$, i.e.\ some $z$ such that $z \neq y$ and $z \notin \FV(t)$, before proceeding.
+  
+\end{frame}
+
+%\begin{frame}{$\alpha$-Structural recursion}
+%\end{frame}
 %
-%
+%\begin{frame}{Substitution}
+%\end{frame}
+
+
 %\begin{frame}{$\eta$-conversion}
 %  Pointy style is \emph{assumed} to be equivalent to point-free style. 
 %  \begin{description}
@@ -560,156 +703,129 @@ convenient.
 %  \]
 %\end{frame}
 
-\begin{frame}{$\beta$-conversion}
-\begin{definition}[$\beta$-conversion]
-  $\beta$-\emph{conversion} is a judgement $M \longrightarrow_\beta N$ defined by
-  \begin{prooftree}
-    \AXC{$M\subst{N}{x}$ is defined}
-    \UIC{$(\lambda x.\, M)\;N \longrightarrow_{\beta} M\subst{N}{x}$}
-  \end{prooftree}
-  for any $x$, $M$ and $N$.
-\end{definition}
+\begin{frame}{Single-step $\beta$-reduction}
 
-By definition, we can conclude that 
-  \begin{align*}
-    (\lambda x.\,\lambda y.\,x)\;M
-    & \longrightarrow_{\beta}
-    (\lambda y.\, x)\subst{M}{x} \\
-    & \equiv \lambda y.\, x\subst{M}{x} \equiv \lambda y.\, M \\
-  \end{align*}
-  but not $((\lambda x\, y.\, x)\; M)\;N \longrightarrow_{\beta} \, (\lambda
-  y.\, M)\;N$,
-  since the above judgement is defined only for \alert{$\beta$-redexes}.
-\end{frame}
-
-\begin{frame}{One-step $\beta$-reduction}
-
-One-step $\beta$-reduction extends $\beta$-conversion to any subterm of a
-term.  
+  A \alert{$\beta$-redex} is a term of the form $(\lam{x}t)\;u$ where computation can be performed upon and the application can be reduced to $t\subst{u}{x}$.
 
 \begin{definition}
-  The \emph{one-step (full) $\beta$-reduction} is defined inductively by
+  The \emph{one-step (full) $\beta$-reduction} is a relation between terms defined inductively by
+  following rules:
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$M\subst{N}{x}$ is defined}
-      \UIC{$(\lambda x.\, M)\;N \onereduce M\subst{N}{x}$}
+      \AXC{\vphantom{$M\subst{N}{x}$ is defined}}
+      \UIC{$(\lam{x}t)\;u \onereduce t\subst{u}{x}$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$M_1 \onereduce M_2$}
-      \UIC{$\lambda x.\, M_1 \onereduce \lambda x.\, M_2$}
+      \AXC{$t_1 \onereduce t_2$}
+      \UIC{$\lam x.\, t_1 \onereduce \lambda x.\, t_2$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$M_1 \onereduce M_2$}
-      \UIC{$M_1\;N \onereduce M_2\;N$}
+      \AXC{$t_1 \onereduce t_2$}
+      \UIC{$t_1\;u \onereduce t_2\;u$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$N_1\onereduce  N_2$}
-      \UIC{$M\;N_1 \onereduce M\;N_2$}
+      \AXC{$u_1\onereduce  u_2$}
+      \UIC{$t\;u_1 \onereduce t\;u_2$}
     \end{prooftree}
   \end{multicols}
 \end{definition}
-    $((\lambda x\, y.\, x)\; M)\;N \onereduce (\lambda y.\, M)\;N \onereduce M\subst{N}{y}$
+  E.g., 
+  \[
+    (\boxed{(\lam{x\,y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}
+  \]
 \end{frame}
+\begin{frame}{Exercise}
+  Write down a sequence of $\beta$-reductions and \emph{circle} all $\beta$-redexes while reducing a term:
+  \begin{enumerate}
+    \item $(\lam{x}x)\;z$
+    \item $\left((\lam{x}x)\;y\right)\;\left((\lam{z}z)\;x\right)$
+    \item $\lam{n\,x\,y}n\;(\lam{z}y)\;x$
+    \item $\left(\lam{n\,x\,y}n\;(\lam{z}y)\;x\right)\;\lam{f\,x}x$
+  \end{enumerate}
+\end{frame}
+
 
 \begin{frame}{Multi-step full $\beta$-reduction}
   It is convenient to represents a sequence
   of $\beta$-reductions
   \[
-    M \onereduce M_1 \onereduce \dots \onereduce N
+    t \onereduce t_1 \onereduce \dots \onereduce u
   \]
-  by a single judgement $M \reduce N$. 
+  by a single relation $t \reduce u$. 
 
   \begin{definition}
-    The \emph{multi-step (full) $\beta$-reduction} is defined inductively by
+    The \emph{multi-step (full) $\beta$-reduction} is a relation defined inductively by
     \begin{prooftree}
-      \AXC{$\vphantom{M_1}$}
+      \AXC{$\vphantom{t_1}$}
       \RightLabel{($0$-step)}
-      \UIC{$M \reduce M$}
+      \UIC{$t \reduce t$}
     \end{prooftree}
     \begin{prooftree}
-      \AXC{$L \onereduce M$}
-      \AXC{$M \reduce N$}
+      \AXC{$t \onereduce u$}
+      \AXC{$u \reduce v$}
       \RightLabel{($n+1$-step)}
-      \BIC{$L \reduce N$}
+      \BIC{$t \reduce v$}
     \end{prooftree}
     
   \end{definition}
 \end{frame}
 
-\begin{frame}{$M \reduce N$ is transitive}
+\begin{frame}{$t \reduce u$ is transitive}
   \begin{lemma}
-    For every derivations of $L \reduce M$ and $M \reduce N$, there
-    is a derivation of $L \reduce N$. 
+    For every derivations of $t \reduce u$ and $u \reduce v$, there
+    is a derivation of $t \reduce v$. 
   \end{lemma}
-  We often omit the term ``derivation'' and say ``if $L \reduce M$ and $M \reduce N$ then $L \reduce N$'' instead.
+  We often omit the term ``derivation'' and say ``if $t \reduce u$ and $u \reduce v$ then $t \reduce v$'' instead.
   \begin{proof}
-    By induction on the derivation $d$ of $L \reduce M$. 
+    By induction on the derivation $d$ of $t \reduce u$. 
     \begin{enumerate}
-      \item If $d$ is given by (0-step), then $L =_\alpha M$ (by convention).
-      \item If $d$ is given by (n+1-step), i.e.\ there exists $M'$ such that
-        $L \onereduce M'$ and $M' \reduce M$. By induction hypothesis,
-        every derivation $M \reduce N$ gives rise to a derivation of $M' \reduce N$.
-        Hence, by (n+1-step), we have a derivation of $L \reduce N$. 
+      \item If $d$ is given by (0-step), then $t =_\alpha u$.
+      \item If $d$ is given by (n+1-step), i.e.\ there is $u'$ s.t.\ 
+        $t \onereduce u'$ and $u' \reduce u$.
+
+        By induction hypothesis,
+        every derivation $u' \reduce u$ gives rise to a derivation of $u' \reduce v$.
+        Hence, by (n+1-step), we have a derivation of $t \reduce v$. 
     \end{enumerate}
   \end{proof}
   
 \end{frame}
-\begin{frame}{$\alpha$-conversion during $\beta$-reduction}
 
-  Renaming of bound variables may need to happen during reduction:
-  \begin{align*}
-    (\lambda y.\, y\; y)\; (\lambda z\,x.\, z\;x) 
-  & \onereduce && (\lambda z\,x.\, z\;x)\; (\lambda z\,x.\, z\;x) \\
-  & \onereduce && \lambda x.\, (\lambda z\,x.\, z\;x) \;x  \\
-  & =_\alpha   && \lambda x.\, (\lambda z\,y.\, z\;y) \;x  \\
-  & \onereduce && \lambda x.\, (\lambda y.\, x\;y)
-  \end{align*}
-  
-  Even worse, we actually need infinitely many variables:
-  \[
-    (\lambda y.\,y\; s\; y)\; (\lambda t\,z\,x.\, z\; (t\; x)\; z)
-  \]
-  \begin{exercise*}
-    Evaluate the above term.
-  \end{exercise*}
-\end{frame}
-
-\begin{frame}{Computational meaning}
-  Two terms $M$ and $N$ may not have the same structure or even not reducible
-  from one to the other, but they may have the same meaning with respect to
-  computation.
-
+\begin{frame}{$\beta$-equality}
+  The reduction relation $t \onereduce u$ is \alert{directed} or not symmetry, i.e.\ $t \onereduce u$ does not imply $u \onereduce t$.
+  We may consider a notion of \alert{undirected equality} based on $\beta$-reduction, while arguing the computational equality:
   \begin{definition}
-    $M$ and $N$ have the same \alert{\emph{computational meaning}} if $M =_\beta N$
-    which is defined inductively by
+    We say that $t$ and $u$ are $\beta$-equal, written $t =_\beta u$, if 
     \begin{multicols}{2}
       \begin{prooftree}
-        \AXC{$M \onereduce N$}
-        \UIC{$M =_\beta N$}
+        \AXC{$t \onereduce u$}
+        \UIC{$t =_\beta u$}
       \end{prooftree}
       \begin{prooftree}
-        \AXC{}
-        \UIC{$M =_\beta M$}
+        \AXC{\phantom{$t =_\beta u$}}
+        \UIC{$t =_\beta t$}
       \end{prooftree}
       \columnbreak
       \begin{prooftree}
-        \AXC{$M =_\beta N$}
-        \UIC{$N =_\beta M$}
+        \AXC{$t =_\beta u$}
+        \UIC{$u =_\beta t$}
       \end{prooftree}
       \begin{prooftree}
-        \AXC{$L =_\beta M$}
-        \AXC{$M =_\beta N$}
-        \BIC{$L =_\beta N$}
+        \AXC{$t =_\beta u$}
+        \AXC{$u =_\beta v$}
+        \BIC{$t =_\beta u$}
       \end{prooftree}
     \end{multicols}
   \end{definition}
+  It is clear that $t\reduce u$ implies $t =_\beta u$ (why?). 
+  How about the converse?
 \end{frame}
 
 \begin{frame}{Summary}
-  SUMMARISE HERE ALL THE RELATIONS JUST INTRODUCED.
+  SUMMARISE HERE ALL THE RELATIONS WE HAVE SEEN SO FAR.
 \end{frame}
 
-\section{Programming in $\lambda$-Calculus}
+\section{Programming in \texorpdfstring{$\lambda$}{λ}-Calculus}
 \begin{frame}{Church encoding of boolean values}
   
 Boolean and conditional can be encoded as combinators.
@@ -867,31 +983,31 @@ Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration.
   $G' \defeq ((\lambda x.\, G\;(x\;x))\;(\lambda x.\,G\;(x\;x)))$.
 \end{frame}
   
-\begin{frame}{Turing's fixed-point combinator}
-  Recall that $\mathbf{Y}G =_\beta G(\mathbf{Y}\;G)$ but $\mathbf{Y}G \reduce
-  G(\mathbf{Y}\;G)$ does not hold.  Here is a fixed-point operator such that
-  $\Theta F \reduce F(\Theta F)$.
-\begin{proposition}
-  Define 
-  \[
-    \Theta \defeq 
-    (\lambda x\,f.\,f\,(x\,x\,f))\;
-    (\lambda x\,f.\,f\,(x\,x\,f))
-  \]
-  Then, 
-  \[
-    \Theta F \reduce F (\Theta F)
-  \]
-\end{proposition}
-Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
-\begin{align*}
-  G \defeq{} &
-  \lambda f\,n.\,
-  \mathtt{ifz}\;n\;\bc_0\;
-  (\add\;n\;(f\,(\mathtt{pred}\;n))) \\
-  \mathtt{sum} \defeq\; & \Theta\,G 
-\end{align*}
-\end{frame}
+%\begin{frame}{Turing's fixed-point combinator}
+%  Recall that $\mathbf{Y}G =_\beta G(\mathbf{Y}\;G)$ but $\mathbf{Y}G \reduce
+%  G(\mathbf{Y}\;G)$ does not hold.  Here is a fixed-point operator such that
+%  $\Theta F \reduce F(\Theta F)$.
+%\begin{proposition}
+%  Define 
+%  \[
+%    \Theta \defeq 
+%    (\lambda x\,f.\,f\,(x\,x\,f))\;
+%    (\lambda x\,f.\,f\,(x\,x\,f))
+%  \]
+%  Then, 
+%  \[
+%    \Theta F \reduce F (\Theta F)
+%  \]
+%\end{proposition}
+%Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
+%\begin{align*}
+%  G \defeq{} &
+%  \lambda f\,n.\,
+%  \mathtt{ifz}\;n\;\bc_0\;
+%  (\add\;n\;(f\,(\mathtt{pred}\;n))) \\
+%  \mathtt{sum} \defeq\; & \Theta\,G 
+%\end{align*}
+%\end{frame}
 
 \begin{frame}{Exercise}
   \begin{enumerate}
@@ -900,118 +1016,23 @@ Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
   \end{enumerate}
 \end{frame}
 
-
-\section{Properties of $\lambda$-Calculus}
-
-\begin{frame}
-  \begin{example}
-    Suppose $M \; \term_\lambda$ and $y \not\in \FV(M)$. 
-    Then, consider 
-    \[
-      (\lambda y.\, M)\, ((\lambda x.\, x\,x)(\lambda x.\, x\, x))
-    \]
-  \end{example}
-  \mode<presentation>{\vfill}
-  Observations:
-  \begin{itemize}
-    \item Some evaluation may diverge while some may converge.
-    \item Full $\beta$-reduction lacks for determinacy. 
-  \end{itemize}
-  Question:
-  \begin{itemize}
-    \item Does every path give the same evaluation?
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Confluence}
-\begin{theorem}[Church-Rosser]
-  Given $N_1$ and $N_2$ with $M \reduce N_1$ and $M\reduce N_2$, there is $L$
-  such that $N_1 \reduce L$ and $N_2 \reduce L$. 
-  \[
-    \xymatrix{
-      & M \ar[rd]^{\beta*} \ar[ld]_{\beta*} \\
-      N_1 \ar[rd]_{\beta*} & & N_2 \ar[ld]^{\beta*} \\
-      & L
-    }
-  \]
-\end{theorem}
-
-No matter which way we choose we can always find a \alert{confluent}
-term. 
-
-\end{frame}
-
-\begin{frame}{Normal form}
-  \begin{definition}
-    $M$ is \emph{in normal form} if 
-    there is no $N$ such that $M \onereduce N$, abbreviated to $M \notonereduce$.
-    
-  \end{definition}
-  \begin{lemma}
-    Suppose that $M$ is in normal form. Then 
-      $M \reduce N$ implies $M =_\alpha N$.
-  \label{lem:normal-no-reduction}%
-  \end{lemma}
-  \begin{proof}
-    By induction on the derivation $d$ of $M \reduce N$.
-    \begin{enumerate}
-      \item If $d$ is given by (0-step), then
-        $M \reduce N$ where $M =_\alpha N$ by definition.
-
-      \item If $d$ is given by (n+1-step), then
-        $M \onereduce M'$ and $M' \reduce N$ are derivable for some $M'$. By
-        assumption $M \onereduce N$ is not derivable for any $N$, so by
-        contradiction the statement follows.
-    \end{enumerate}
-  \end{proof}
-
-\end{frame}
-
-\begin{frame}{Corollaries of confluence}
-  \begin{corollary}[Uniqueness of normal forms]
-    Let $M$ be a term with $M \reduce N_1$ and $M\reduce N_2$ where
-     $N_i$'s are in normal form. Then, $N_1 =_\alpha N_2$.
-    \label{coro:uniqueness-normal}%
-  \end{corollary}
-  
-
-  \begin{corollary}[Computationally equal terms have a confluent term]
-    If $M =_\beta N$, then there exists $L$ satisfying
-  \[
-    \xymatrix{
-      M \ar[rd]_{\beta*} \ar@{}[rr]|{=_\beta} & & N \ar[ld]^{\beta*} \\
-      & L
-    }
-  \]
-  \label{coro:computational-meanting-confluence}
-  \end{corollary}
-  \begin{proof}[Proof sketch]
-    By induction on the derivation of $M =_\beta N$. 
-  \end{proof}
-
-%\begin{corollary}
-%  Let $=_\beta$ denote the congruence closure of $\onereduce$. 
-%  \begin{enumerate}
-%    \item If $M =_\beta N$, then there exists $L$ such that 
-%      \[
-%        M \reduce L
-%        \; _{\beta*}\longleftarrow N
-%      \]
-%    \item If in addition $N$ is in normal form, then 
-%      $M \reduce N$. 
-%  \end{enumerate}
-%\end{corollary}
-%\begin{block}{Homework}
-%  Show this corollary.
-%\end{block}
-\end{frame}
-
-
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item (2.5\%) Show Corollary~\ref{coro:uniqueness-normal}
-    \item (2.5\%) Show Corollary~\ref{coro:computational-meanting-confluence}.
+    \item (2.5\%) Show that $t \reduce u$ implies $t =_\alpha u$. 
+    \item (2.5\%) Suppose that the Church-Rosser property holds (see below).
+      Then, $t =_\alpha u$ implies that there exists a \emph{confluent} term $v$ of $t$ and $u$, i.e.\ $t \reduce v$ and $u \reduce v$.
   \end{enumerate}
+  \begin{theorem}[Church-Rosser]
+    Given $u_1$ and $u_2$ with $t \reduce u_1$ and $t\reduce u_2$, there is $v$
+    such that $u_1 \reduce v$ and $u_2 \reduce v$. 
+    \[
+      \xymatrix{
+        & t \ar@{->>}[rd]^{\beta} \ar@{->>}[ld]_{\beta} \\
+        u_1 \ar@{->>}[rd]_{\beta} & & u_2 \ar@{->>}[ld]^{\beta} \\
+        & v
+      }
+    \]
+  \end{theorem}
 \end{frame}
 
 \appendix 
@@ -1127,6 +1148,108 @@ using the call-by-value and the call-by-name strategy respectively.
 %  for further detail. Therefore, $\lambda$-calculus is Turing-complete. 
 %\end{frame}
 
+
+
+\section{Appendix: Takahashi's Proof of Confluence}
+
+\begin{frame}{Takahashi's Proof of Confluence}
+  Proving the Church-Rosser property (or \alert{confluence}) can be quite tricky.
+  This section presents a straightforward strategy based on a notion of complete development, which unfolds as many $\beta$-redexes as possible \emph{statically}.
+
+  The \emph{complete development} $M^*$ of a $\lambda$-term $M$ is defined by
+  \begin{align*}
+    x^*      & = x \\
+    (\lambda x.\, M)^* & = \lambda x.\, M^* \\
+    \left((\lambda x.\, M)\;N\right)^* & = M^*\subst{N^*}{x} \\
+    (M\;N)^* & = M^*\;N^* && \text{ if $M \not\equiv \lambda x.\,M'$ } 
+  \end{align*}
+\end{frame}
+\begin{frame}{Confluence: Parallel reduction}
+  Let $M \parreduce N$ denote the \emph{parallel reduction} defined by
+  \begin{multicols}{2}
+    \begin{prooftree}
+      \AXC{$\vphantom{M\reduce M}$}
+      \UIC{$x \parreduce x$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M \parreduce N$}
+      \UIC{$\lambda x.\, M \parreduce \lambda x.\, N$}
+    \end{prooftree}
+    \columnbreak
+    \begin{prooftree}
+      \AXC{$M \parreduce M'$}
+      \AXC{$N \parreduce N'$}
+      \BIC{$M\;N \parreduce M'\;N'$}
+    \end{prooftree}
+    \begin{prooftree}
+      \AXC{$M \parreduce M'$}
+      \AXC{$N \parreduce N'$}
+      \BIC{$(\lambda x.\, M)\;N \parreduce M'\subst{N'}{x}$}
+    \end{prooftree}
+  \end{multicols}
+  For example, 
+  \[
+    \underline{(\lambda x.\, (\lambda y.\, y)\;x)}\;\underline{((\lambda x.\, x)\;\false)}
+    \parreduce
+    \false
+  \]
+  because $(\lambda y.\,y)\;x \parreduce x$ and $(\lambda x.\,x)\;\false \parreduce \false$.
+\end{frame}
+
+\begin{frame}{Confluence: Properties of parallel reduction}
+  \begin{lemma}
+    \begin{enumerate}
+      \item $M \parreduce M$ holds for any term~$M$, 
+      \item $M \onereduce N$ implies $M \parreduce N$, and
+      \item $M \parreduce N$ implies $M \reduce N$.
+    \end{enumerate}
+    In particular, $M \parreduce^* N$ if and only if $M \reduce N$. 
+  \end{lemma}
+  \begin{lemma}[Substitution respects parallel reduction]
+      $M \parreduce M'$ and $N \parreduce N'$ imply $M\subst{N}{x} \parreduce
+      M'\subst{N'}{x}$. 
+  \end{lemma}
+  \begin{theorem}[Triangle property]
+    If $M \parreduce N$, then $N \parreduce M^*$.
+  \end{theorem}
+  \begin{proof}[Proof sketch]
+    By induction on $M \parreduce N$.
+  \end{proof}
+\end{frame}
+
+\begin{frame}{Strip Lemma}
+  \begin{theorem}
+    If $L \parreduce^* M_1$ and $L \parreduce M_2$, then there exists $N$
+    satisfying that $M_1 \parreduce N$ and $M_2 \parreduce^* N$, i.e.\
+    \[
+      \xymatrix{
+        & L \ar@{=>}[rd] \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+        M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+            & N
+      }
+    \]
+  \end{theorem}
+  \begin{proof}[Proof sketch]
+    By induction on $L \parreduce^* M_1$. 
+  \end{proof}
+\end{frame}
+
+\begin{frame}{Confluence}
+  \begin{theorem}
+    If $L \parreduce^* M_1$ and $L \parreduce^* M_2$, then there exists $N$ such that $M_1 \parreduce^* N$ and $M_2 \parreduce^* N$.
+    \[
+      \xymatrix{
+        & L \ar@{=>}[rd]^(.8){*}_(.8){\beta} \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+        M_1 \ar@{=>}[rd]^(.8){*}_(.8){\beta} & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+            & N
+      }
+    \]
+  \end{theorem}
+  \begin{corollary}
+    The confluence of $\reduce$ holds. 
+  \end{corollary}
+  
+\end{frame}
 
 %\begin{frame}[allowframebreaks]{References}
 %  \bibliographystyle{amsalpha}

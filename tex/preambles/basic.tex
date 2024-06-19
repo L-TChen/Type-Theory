@@ -1,36 +1,56 @@
-\usetheme[block=fill]{metropolis}
+\usetheme[block=fill,titleformat=smallcaps,progressbar=foot]{metropolis}
+
+\author[L.-T. Chen]{陳亮廷 Chen, Liang-Ting }
+\institute{Institute of Information Science\\Academia Sinica}
+\date[FLOLAC'24]{Formosan Summer School on Logic, Language, and Computation 2024}
+
+\setbeamercolor{frame}{fg=black}
 
 \newcounter{saveenumi}
 \newcommand{\seti}{\setcounter{saveenumi}{\value{enumi}}}
 \newcommand{\conti}{\setcounter{enumi}{\value{saveenumi}}}
 \mode<presentation>{\resetcounteronoverlays{saveenumi}}
 
- 
 \usepackage[british]{babel}
 \mode<article>{\usepackage[a4paper]{geometry}}
 \usepackage{bussproofs}
 \EnableBpAbbreviations
+\usepackage{mathpartir}
 \usepackage{multicol}
 \usepackage{centernot}
 \usepackage{mathtools}
+\usepackage{xspace}
 
 \usepackage{graphicx}
 \usepackage[all,cmtip]{xy}
-
-\mode<article>{\usepackage{fontspec}}
 \mode<article>{\usepackage{hyperref}}
-\mode<article>{\usepackage{microtype}}
-\mode<article>{\setmonofont{PragmataPro Mono Liga}}
-\setbeamertemplate{theorems}[numbered]
+\usepackage{tikz}
+\usetikzlibrary{trees,decorations.pathreplacing}
 
+\usepackage{microtype}
+
+\setbeamertemplate{theorems}[numbered]
 \theoremstyle{plain}
+\newtheorem*{theorem*}{Theorem}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{convention}[theorem]{Convention}
+\newtheorem*{convention*}{Convention}
+\newtheorem*{quiz*}{Quiz}
 \newtheorem{remark}{Remark}[section]
 \theoremstyle{definition}
 \newtheorem*{exercise*}{Exercise}
 
-\newfontfamily\CJKtext{Noto Sans CJK TC DemiLight}
+\newenvironment<>{idea}[1]{\begin{block}{Idea}#1}{\end{block}}
+
+\usepackage{fontspec}
+\usepackage{xeCJK}
+
+%\setmainfont{Fira Sans}
+\setsansfont[BoldFont={Fira Sans Light}]{Fira Sans}
+\setmonofont{Fira Code}
+\setCJKmainfont{Noto Serif TC}
+\setCJKsansfont{Noto Sans TC}
+\setCJKmonofont{Fira Code}
 
 \newcommand{\FV}{\mathbf{FV}}
 \newcommand{\Var}{\mathbf{Var}}
@@ -51,6 +71,10 @@
 \newcommand{\op}{\mathrm{op}}
 \newcommand{\subst}[2]{[{#1}/{#2}]}
 
+\newcommand{\Hask}{\textsc{Haskell}\xspace}
+\newcommand{\Python}{\textsc{Python}}
+\newcommand{\OCaml}{\textsc{OCaml}}
+
 \newcommand{\leftexp}[2]{{\vphantom{#2}}^{#1}{#2}}
 \newcommand{\set}[2]{\{\,#1\mid#2\,\}}
 \newcommand{\sem}[1]{[\![#1]\!]} 
@@ -61,10 +85,13 @@
 \newcommand{\V}{\mathsf{V}}
 \newcommand{\T}{\mathbb{T}}
 
-% Macros for PCF
-\newcommand{\reduce}{\longrightarrow_{\beta*}}
+% Macros for lambda calculus
+\DeclareRobustCommand\longtwoheadrightarrow
+     {\relbar\joinrel\twoheadrightarrow}
+
+\newcommand{\reduce}{\longtwoheadrightarrow_{\beta}}
 \newcommand{\parreduce}{\Longrightarrow_{\beta}}
-\newcommand{\onereduce}{\longrightarrow_{\beta1}}
+\newcommand{\onereduce}{\longrightarrow_{\beta}}
 \newcommand{\nat}{\mathtt{nat}}
 \newcommand{\bool}{\mathtt{bool}}
 \newcommand{\List}{\mathtt{list}}
@@ -89,10 +116,26 @@
 \newcommand{\PCF}{{\textbf{PCF}}}
 
 \newcommand{\notimplies}{\centernot\implies}
-\newcommand{\notonereduce}{{\centernot\longrightarrow}_{\beta1}}
+\newcommand{\notonereduce}{\centernot\onereduce}
 
 \newcommand {\textplus}{\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}}
 
-\author[L.-T. Chen]{{\CJKtext 陳亮廷} Chen, Liang-Ting}
-\institute{Institute of Information Science, Academia Sinica}
-\date[FLOLAC'22]{Formosan Summer School on Logic, Language, and Computation 2022}
+\makeatletter
+%%% Lambda abstractions.
+% Each variable being abstracted over is a separate argument.  If
+% there is more than one such argument, they *must* be enclosed in
+% braces.  Arguments can be untyped, as in \lam{x}{y}, or typed with a
+% colon, as in \lam{x:A}{y:B}. In the latter case, the colons are
+% automatically noticed and (with current implementation) the space
+% around the colon is reduced.  You can even give more than one variable
+% the same type, as in \lam{x,y:A}.
+\def\lam#1{{\lambda}\@lamarg#1:\@endlamarg\@ifnextchar\bgroup{.\,\lam}{.\,}}
+\def\@lamarg#1:#2\@endlamarg{\if\relax\detokenize{#2}\relax #1\else\@lamvar{\@lameatcolon#2},#1\@endlamvar\fi}
+\def\@lamvar#1,#2\@endlamvar{(#2\,{:}\,#1)}
+% \def\@lamvar#1,#2{{#2}^{#1}\@ifnextchar,{.\,{\lambda}\@lamvar{#1}}{\let\@endlamvar\relax}}
+\def\@lameatcolon#1:{#1}
+\let\lamt\lam
+% This version silently eats any typing annotation.
+\def\lamu#1{{\lambda}\@lamuarg#1:\@endlamuarg\@ifnextchar\bgroup{.\,\lamu}{.\,}}
+\def\@lamuarg#1:#2\@endlamuarg{#1}
+\makeatother
