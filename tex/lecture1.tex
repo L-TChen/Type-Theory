@@ -38,7 +38,7 @@
 %  \end{enumerate}
 %\end{frame}
 
-\section{Untyped $\lambda$-Calculus: Introduction}
+\section{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus: Introduction}
 \begin{frame}[fragile]{The idea of anonymous functions}
 Anonymous functions can be defined in many languages, e.g.,
 \begin{description}
@@ -313,20 +313,23 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
         level 3/.style={sibling distance=4cm}
       ]
 
-      \node {$\lambda x$}
-        child {node {$\lambda y$}
+      \node (root) {$\lambda x$}
+        child {node (lamy) {$\lambda y$}
           child {node {$@$}
             child {node {$@$}
-              child {node {$x$}}
-              child {node {$y$}}
+              child {node (x) {$x$}}
+              child {node (y) {$y$}}
             }
             child {node {$z$}}
           }
         };
+
+        % Draw the arc from x to root
+      \draw[red, ->, thick, dashed, bend left=60] (x) to (root);
+      \draw[red, ->, thick, dashed, bend left=40] (y) to (lamy);
+
     \end{tikzpicture}
   \end{center}
-
-
 \end{frame}
 
 \begin{frame}{$\alpha$-equivalence: renaming of bound variables}
@@ -358,16 +361,20 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
           level 2/.style={sibling distance=4cm},
           level 3/.style={sibling distance=2cm}
         ]
-        \node {$\lambda x$}
-          child {node {$\lambda y$}
+        \node (root) {$\lambda x$}
+          child {node (lamy) {$\lambda y$}
             child {node {$@$}
               child {node {$@$}
-                child {node {$x$}}
-                child {node {$y$}}
+                child {node (x) {$x$}}
+                child {node (y) {$y$}}
               }
               child {node {$z$}}
             }
           };
+
+        % Draw the arc from x to root
+        \draw[red, ->, thick, dashed, bend left=60] (x) to (root);
+        \draw[red, ->, thick, dashed, bend left=40] (y) to (lamy);
       \end{tikzpicture}
     \end{minipage}
     becomes
@@ -378,16 +385,20 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
           level 2/.style={sibling distance=4cm},
           level 3/.style={sibling distance=2cm}
         ]
-        \node {$\lambda$}
-          child {node {$\lambda$}
+        \node (root) {$\lambda$}
+          child {node (lamy) {$\lambda$}
             child {node {$@$}
               child {node {$@$}
-                child {node {$1'$}}
-                child {node {$0'$}}
+                child {node (x) {$1'$}}
+                child {node (y) {$0'$}}
               }
               child {node {$3'$}}
             }
           };
+
+        % Draw the arc from x to root
+        \draw[red, ->, thick, dashed, bend left=60] (x) to (root);
+        \draw[red, ->, thick, dashed, bend left=40] (y) to (lamy);
       \end{tikzpicture}
     \end{minipage}
   \end{center}
@@ -637,23 +648,34 @@ Can you come up with a strategy to prove your conjecture?
 \begin{frame}{Free variables: Exercise}
   Compute the set $\FV(t)$ of free variables for each subtree $t$ of the following abstract syntax tree:
   \vfill
-  \begin{tikzpicture}[
-        level distance=0.8cm,
-      level 1/.style={sibling distance=6cm},
-      level 2/.style={sibling distance=4cm},
-      level 3/.style={sibling distance=2cm}
-    ]
-    \node {$\lambda x$}
-      child {node {$\lambda y$}
-        child {node {$@$}
-          child {node {$@$}
-            child {node {$x$}}
-            child {node {$y$}}
+  \begin{center}
+    \begin{tikzpicture}[
+          level distance=1.2cm,
+        level 1/.style={sibling distance=6cm},
+        level 2/.style={sibling distance=6cm},
+        level 3/.style={sibling distance=4cm}
+      ]
+      \node (root) {$\lambda x$}
+        child {node (lamy) {$\lambda y$}
+          child {node (app1) {$@$}
+            child {node (app2) {$@$}
+              child {node (x) {$x$}}
+              child {node (y) {$y$}}
+            }
+            child {node (z) {$z$}}
           }
-          child {node {$z$}}
-        }
-      };
-  \end{tikzpicture}
+        };
+
+      % Boxes around each subterm
+      \node[draw=red, dashed, fit=(root) (lamy) (app1) (app2) (x) (y) (z) ] {};
+      \node[draw=red, dashed, fit=(lamy) (app1) (app2) (x) (y) (z) ] {};
+      \node[draw=red, dashed, fit=(app1) (app2) (x) (y) (z) ] {};
+      \node[draw=red, dashed, fit=(z) ] {};
+      \node[draw=red, dashed, fit=(app2) (x) (y) ] {};
+      \node[draw=red, dashed, fit=(x)] {};
+      \node[draw=red, dashed, fit=(y)] {};
+    \end{tikzpicture}
+  \end{center}
 \end{frame}
 
 \begin{frame}{Capture-avoiding substitution}
@@ -1098,18 +1120,18 @@ $\beta$-reduction $\onereduce$.
 \end{proposition}
 \end{frame}
 
-\begin{frame}{Exercise}
-  Define following terms
-\begin{align*}
-  \Omega &\defeq (\lambda x.\, x\,x)\;(\lambda x.\,x\,x) \\
-  \mathbf{K}_1 & \defeq \lambda x\,y.\;x
-\end{align*}
-Evaluate 
-\[
-  \mathbf{K}_1\;z\;\Omega
-\]
-using the call-by-value and the call-by-name strategy respectively.
-\end{frame}
+%\begin{frame}{Exercise}
+%  Define following terms
+%\begin{align*}
+%  \Omega &\defeq (\lambda x.\, x\,x)\;(\lambda x.\,x\,x) \\
+%  \mathbf{K}_1 & \defeq \lambda x\,y.\;x
+%\end{align*}
+%Evaluate 
+%\[
+%  \mathbf{K}_1\;z\;\Omega
+%\]
+%using the call-by-value and the call-by-name strategy respectively.
+%\end{frame}
 
 \begin{frame}{Normalisation}
 \begin{definition}
