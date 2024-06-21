@@ -299,13 +299,13 @@
 %%System $F$ is more expressive than simply typed lambda calculus.
 %\end{frame}
 
-\section{Polymorphic Typed \texorpdfstring{$\lambda$}{λ}-Calculus: Static}
+\section{Polymorphic \texorpdfstring{$\lambda$}{λ}-Calculus: Static}
 \begin{frame}{Polymorphic types}
     Given a set $\mathbb{V}$ of type variables, the judgement $A : \type$ is defined by
     defined by
       \begin{prooftree}
-        \AXC{$X \in \mathbb{V}$}
-        \RightLabel{(tvar)}
+        \AXC{}
+        \RightLabel{(tvar), if $X \in \mathbb{V}$}
         \UIC{$X : \type$}
       \end{prooftree}
       \begin{prooftree}
@@ -381,10 +381,10 @@
 \end{frame}
 
 \begin{frame}{Typed terms}
-  Terms in System F are extended with types.
+  Terms in polymorphic $\lambda$-calculus are extended with types.
   We define the set of terms from scratch here:
 \begin{definition}
-  The set $\Lambda_{\forall}(V, \mathbb{V})$ of terms in System F is defined inductively: 
+  The set $\Lambda_{\forall}(V, \mathbb{V})$ of terms in polymorphic $\lambda$-calculus is defined inductively: 
   \begin{description}
     \item[variable] $x \in \Lambda_{\forall}(V, \mathbb{V})$ if $x$ is in $V$
     \item[application] $t@u \in \Lambda_{\forall}(V, \mathbb{V})$ if $t, u \in \Lambda_{\forall}(V, \mathbb{V})$
@@ -394,12 +394,12 @@
   \end{description}
 \end{definition}
 
-  N.B.\ $\lam{x:A}t$ now includes the type of the variable $x$ as part of term.
-  In addition to substitution of a term, we have \emph{substitution $t\subst{A}{X}$ of a type $A$ for a type variable $X$} in a term $t$.
+  N.B.\ $\lam{x:A}t$ includes the type of $x$ as part of term.
+  We have additionally a \emph{substitution $t\subst{A}{X}$ of a type $A$ for a type variable $X$} in $t$.
 \end{frame}
 
 \begin{frame}{Typing judgement: Overview}
-  System F has two kinds of typing judgements.
+  Polymorphic $\lambda$-calculus has two kinds of typing judgements.
   \begin{itemize}
     \item $\Delta \vdash A$ stands for a type $A$ under the type context $\Delta$;
     \item $\Delta; \Gamma \vdash t : A$ stands for a term $t$ of type $A$ under the context $\Gamma$ and the type context~$\Delta$
@@ -414,7 +414,8 @@
   The judgement $\Delta \vdash A$ is constructed inductively by following rules.
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$\Delta \ni X$}
+      \AXC{}
+      \RightLabel{if $\Delta \ni X$}
       \UIC{$\Delta \vdash X$}
     \end{prooftree}
     \columnbreak
@@ -441,7 +442,8 @@
   The judgement $\Delta; \Gamma \vdash t : A$ is defined inductively by following rules.
   \begin{multicols}{2} 
   \begin{prooftree}
-    \AXC{$\Gamma \ni x : A$}
+    \AXC{}
+    \RightLabel{if $\Gamma \ni x : A$}
     \UIC{$\Delta ; \Gamma \vdash x : A$}
   \end{prooftree}
   \begin{prooftree}
@@ -468,7 +470,6 @@
   \end{prooftree}
   \end{multicols}
 
-  $\vdash t : A$ stands for $\cdot ; \cdot \vdash t : \tau$ where both contexts are empty.
 
   \begin{theorem}[Type safety]
     Suppose $\Delta; \Gamma \vdash t : A$. Then, 
@@ -482,7 +483,7 @@
 \begin{frame}{Undecidability of type inference}
   \begin{theorem}[Wells, 1999]
      It is undecidable whether, given a closed term $t$ of the untyped
-     $lambda$-calculus, there is a well-typed term $t'$ in System F such that
+     $lambda$-calculus, there is a well-typed term $t'$ in polymorphic $\lambda$-calculus such that
      $|t'| = t$.  
   \end{theorem}
 
@@ -509,14 +510,18 @@ The typing judgement ${}\vdash \lam{X} \lam{x : X} x : \forall X.\,X \to X$ is d
 \vfill
 \begin{prooftree}
   \LARGE 
-  \AXC{$(\cdot, X) \ni X$}
+  \AXC{}
   \UIC{$X \vdash X$}
-  \AXC{$(\cdot, x : X)\ni x : X$}
+  \AXC{}
   \UIC{$X; x : X \vdash x : X $}
   \BIC{$X ; \cdot \vdash \lam{x : X} x : X \to X$}
   \UIC{$\vdash \lam{X}\lam{x : X} x : \forall X. X \to X$}
 \end{prooftree}
 \vfill
+
+\begin{convention}
+  $\vdash t : A$ stands for $\cdot ; \cdot \vdash t : \tau$ where both contexts are empty.
+\end{convention}
 \end{frame}
 
 \begin{frame}{Exercise}
@@ -525,7 +530,7 @@ The typing judgement ${}\vdash \lam{X} \lam{x : X} x : \forall X.\,X \to X$ is d
     \item $\vdash (\lam{X\,Y}\lam{x : X}{y : Y} x) : \forall X.\,\forall Y.\, X \to Y \to X$
     \item $\vdash\lam{X}\lam{f : t \to t}{x : t} f\;(f\;x) : \forall X.\;(X\to X) \to X\to X$
     \end{enumerate}
-  Hint.\, System F is syntax-directed, so the type inversion holds. 
+  Hint.\, polymorphic $\lambda$-calculus F is syntax-directed, so the type inversion holds. 
   
 \end{frame}
 %\begin{frame}{Self application}
@@ -543,11 +548,11 @@ The typing judgement ${}\vdash \lam{X} \lam{x : X} x : \forall X.\,X \to X$ is d
 %  \end{block}
 %\end{frame}
 
-\section{Polymorphic Typed \texorpdfstring{$\lambda$}{λ}-Calculus: Dynamics and Programming}
+\section{Polymorphic \texorpdfstring{$\lambda$}{λ}-Calculus: Dynamics and Programming}
 
 \begin{frame}{Reduction}
   
-$\beta$-reduction for System F has two rules apart from other structural rules:
+$\beta$-reduction for polymorphic $\lambda$-calculus has two rules apart from other structural rules:
 \[
   (\lam{x : A} t)\,u \onereduce t\subst{u}{x}
   \quad\text{and}\quad
@@ -697,7 +702,7 @@ The type of Church numerals is defined by
        \ifz & \defeq\,?
       \end{align*}
   \end{description}
-System $F$ allows us to define \emph{recursor} like \texttt{fold} in Haskell.
+Polymorphic $\lambda$-calculus allows us to define \emph{recursor} like \texttt{fold} in Haskell.
 \begin{align*}
   \mathtt{fold}_{\nat} & : \forall X.\, (X \to X) \to X \to \nat \to X  \\
   \mathtt{fold}_{\nat} & \defeq \lam{X}{f : t \to t}{e_0 : t}{n : \nat} n\;X\;f\;e_0
@@ -812,7 +817,7 @@ of type $A \to \List(A) \to \List(A)$.
 %\end{frame}
 
 \begin{frame}{Impredicative encodings of inductive types} 
-  \emph{All inductive types} can be defined in System F and we have demonstrated this expressiveness for sums, natural numbers, and lists, using the universal type.
+  \emph{All inductive types} can be defined in Polymorphic $\lambda$-calculus and we have demonstrated this expressiveness for sums, natural numbers, and lists, using the universal type.
 
 \end{frame}
 
@@ -829,7 +834,7 @@ of type $A \to \List(A) \to \List(A)$.
 \end{definition}
 
 \begin{proposition}
-  Within System F, if ${}\vdash t : A$ and $|t| \onereduce u'$, then there exists a well-typed term~$u$ with
+  Within polymorphic $\lambda$-calculus, if ${}\vdash t : A$ and $|t| \onereduce u'$, then there exists a well-typed term~$u$ with
   ${}\vdash u : A$ and $|u| = u'$.
 \end{proposition}
 Well-typed terms can be evaluated with types erased safely.
@@ -1140,7 +1145,7 @@ Well-typed terms can be evaluated with types erased safely.
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item (2.5\%) Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list in System F.
+    \item (2.5\%) Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list in polymorphic $\lambda$-calculus.
     
   \end{enumerate}
   

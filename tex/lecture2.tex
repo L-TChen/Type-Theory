@@ -256,8 +256,8 @@ We say that $A$ is a type if $A : \type$ is derivable.
   inference rules with its conclusion a typing judgement:
   
   \begin{prooftree}
-    \AXC{$\Gamma \ni (x : A)$}
-    \RightLabel{(var)}
+    \AXC{}
+    \RightLabel{(var)\quad if $\Gamma \ni (x : A)$\quad }
     \UIC{$\Gamma \vdash_i x : A$}
   \end{prooftree}
   \begin{prooftree}
@@ -271,7 +271,7 @@ We say that $A$ is a type if $A : \type$ is derivable.
     \RightLabel{(app)}
     \BIC{$\Gamma \vdash_i t\;u : B$}
   \end{prooftree}
-  We say that $t$ is a \alert{closed term} or a \alert{program} of type $A$ if $\vdash t : A$ is derivable. 
+  We say that $t$ is a \alert{closed term} if $\vdash t : A$ is derivable. 
 
   N.B.\ Whether a term $t$ has a typing derivation is a \emph{property} of $t$.
 \end{frame}
