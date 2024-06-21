@@ -6,7 +6,7 @@
 \begin{document}
 
 \bgroup
-  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+  \usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{banner.pdf}}
   \begin{frame}[plain,noframenumbering]
     \maketitle
   \end{frame}
@@ -209,21 +209,20 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \end{frame}
 
 \begin{frame}{Formal justification}
-  The validity of the same expression 
+  The validity of the expression can be justified by its very definition:
   \[
     \lam{x}(\lam{y}((x@y)@z))
   \]
-  can be justified by its very definition:
   \begin{enumerate}
     \item $x$, $y$, and $z$ are in $V$, so $x$, $y$, $z$ are terms;
-    \item $x@y$ is a term since $x$ and $y$ are terms;
+    \item $x$ and $y$ are terms, so $x@y$ is a term;
     \item $(x@y)@z$ is a term since $x@y$ is a term and $z$ is a term;
-    \item $\lam{y}((x@y)@z)$ is a term since $(x@y)@z$ is a term and $y$ is a variable;
-    \item $\lam{x}(\lam{y}((x@y)@z))$ is a term since $\lam{y}((x@y)@z)$ is a term and $x$ is a variable.
+    \item {\small $\lam{y}((x@y)@z)$ is a term since $(x@y)@z$ is a term and $y$ is a variable;}
+    \item {\footnotesize $\lam{y}((x@y)@z)$ is a term and $x$ is a variable, so $\lam{x}(\lam{y}((x@y)@z))$ is a term.}
   \end{enumerate}
 
   \begin{convention*}
-    $@$ is omitted when a term is written as a sequence of symbols, so we write
+    $@$ is omitted if a term is written as a sequence of symbols, so we write
     \[
       t\;u
       \qquad\text{instead of}\qquad
@@ -288,7 +287,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
 
 \begin{frame}{Variable binding}
-  Let us discuss an important notion of syntax in a language: \emph{variable binding}.
+  Let's discuss an important notion of syntax: \emph{variable binding}.
 
   In the expression $f({\color{red}{x}}) = {\color{red}x}^2$, the variable $x$ in the expression $x^2$ is \alert{bound} to $x$ of $f$ and the \alert{meaning} of $f(x)$ is the same as $f({\color{red}y}) = {\color{red}y}^2$.
 
@@ -307,7 +306,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   The binding structure can be visualised in an abstract syntax tree:
   \begin{center}
     \begin{tikzpicture}[
-          level distance=1.5cm,
+          level distance=1.3cm,
         level 1/.style={sibling distance=8cm},
         level 2/.style={sibling distance=5cm},
         level 3/.style={sibling distance=4cm}
@@ -356,7 +355,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \begin{center}
     \begin{minipage}{.4\textwidth}
       \begin{tikzpicture}[
-            level distance=0.8cm,
+            level distance=0.74cm,
           level 1/.style={sibling distance=6cm},
           level 2/.style={sibling distance=4cm},
           level 3/.style={sibling distance=2cm}
@@ -380,7 +379,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     becomes
     \begin{minipage}{.4\textwidth}
       \begin{tikzpicture}[
-            level distance=0.8cm,
+            level distance=0.74cm,
           level 1/.style={sibling distance=6cm},
           level 2/.style={sibling distance=4cm},
           level 3/.style={sibling distance=2cm}
@@ -402,7 +401,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
       \end{tikzpicture}
     \end{minipage}
   \end{center}
-  This nameless representation is invented by a Dutch mathematician, N. G. de Bruijn, while implementing a language for formalising mathematics.
+  This representation is invented by a Dutch mathematician, N. G. de Bruijn, while implementing a language for formalising mathematics.
 \end{frame}
 
 \begin{frame}{Pros and cons of De Bruijn representation}
@@ -639,10 +638,6 @@ Can you come up with a strategy to prove your conjecture?
   \begin{proposition}
     $\FV$ respects $\alpha$-equivalence, i.e.\ if $t =_\alpha u$, then $\FV(t) = \FV(u)$.
   \end{proposition}
-  In particular, $\FV$ can be lifted to a function on $\alpha$-variants, i.e.
-  \[
-    \FV([t]_\alpha) \defeq \FV(t).
-  \]
 \end{frame}
 
 \begin{frame}{Free variables: Exercise}
@@ -751,10 +746,8 @@ Can you come up with a strategy to prove your conjecture?
     \end{prooftree}
   \end{multicols}
 \end{definition}
-  E.g., 
-  \[
-    (\boxed{(\lam{x\,y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}
-  \]
+For example, 
+  $(\boxed{(\lam{x\,y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}$.
 \end{frame}
 \begin{frame}{Exercise}
   Write down a sequence of $\beta$-reductions and \emph{circle} all $\beta$-redexes while reducing a term:
@@ -797,24 +790,22 @@ Can you come up with a strategy to prove your conjecture?
     For every derivations of $t \reduce u$ and $u \reduce v$, there
     is a derivation of $t \reduce v$. 
   \end{lemma}
-  We often omit the term ``derivation'' and say ``if $t \reduce u$ and $u \reduce v$ then $t \reduce v$'' instead.
+  We often say ``if $t \reduce u$ and $u \reduce v$ then $t \reduce v$'' instead.
   \begin{proof}
-    By induction on the derivation $d$ of $t \reduce u$. 
+    By induction on the derivation $d$ of $t \reduce u$:
     \begin{enumerate}
       \item If $d$ is given by (0-step), then $t =_\alpha u$.
       \item If $d$ is given by (n+1-step), i.e.\ there is $u'$ s.t.\ 
         $t \onereduce u'$ and $u' \reduce u$.
 
         By induction hypothesis,
-        every derivation $u' \reduce u$ gives rise to a derivation of $u' \reduce v$.
-        Hence, by (n+1-step), we have a derivation of $t \reduce v$. 
+        every derivation $u' \reduce u$ gives rise to a derivation of $u' \reduce v$, so by (n+1-step) $t \reduce v$. 
     \end{enumerate}
   \end{proof}
-  
 \end{frame}
 
 \begin{frame}{$\beta$-equality}
-  The reduction relation $t \onereduce u$ is \alert{directed} or not symmetry, i.e.\ $t \onereduce u$ does not imply $u \onereduce t$.
+  The reduction relation $t \onereduce u$ is \alert{directed}, i.e.\ $t \onereduce u$ does not imply $u \onereduce t$.
   We may consider a notion of \alert{undirected equality} based on $\beta$-reduction, while arguing the computational equality:
   \begin{definition}
     We say that $t$ and $u$ are $\beta$-equal, written $t =_\beta u$, if 
@@ -928,13 +919,11 @@ This \alert{cannot} be done in $\lambda$-calculus directly. (Why?)
 
 \begin{block}{Observation}
   If $\mathit{sum}$ is unfolded as many times as it requires, then
-
 \[
   \mathit{sum}(n) =
     \begin{cases} 
      0 & \text{if } n = 0 \\
      1 + \mathit{sum}(0) & n = 1 \\
-     2 + \mathit{sum}(1) & n = 2 \\
      \cdots \\
      n + \mathit{sum}(n - 1)  & \text{otherwise}.
     \end{cases}
@@ -992,7 +981,6 @@ Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration.
   so that $\mathtt{sum} \defeq \mathbf{Y}G$. For example, 
   \begin{align*}
     \mathtt{sum}\;\bc_1
-      &\equiv  (\mathbf{Y}G)\;\bc_1 \\
       &\onereduce G'\;\bc_1 \\
       &\onereduce G\;G'\;\bc_1 \\
       &\onereduce (\lambda n.\, \mathtt{ifz}\;n\;\bc_0\;
@@ -1039,22 +1027,22 @@ Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration.
 \end{frame}
 
 \begin{frame}{Homework}
-  \begin{enumerate}
-    \item (2.5\%) Show that $t \reduce u$ implies $t =_\alpha u$. 
-    \item (2.5\%) Suppose that the Church-Rosser property holds (see below).
-      Then, $t =_\alpha u$ implies that there exists a \emph{confluent} term $v$ of $t$ and $u$, i.e.\ $t \reduce v$ and $u \reduce v$.
-  \end{enumerate}
   \begin{theorem}[Church-Rosser]
     Given $u_1$ and $u_2$ with $t \reduce u_1$ and $t\reduce u_2$, there is $v$
     such that $u_1 \reduce v$ and $u_2 \reduce v$. 
     \[
-      \xymatrix{
+      \xymatrix@-4.8pt{
         & t \ar@{->>}[rd]^{\beta} \ar@{->>}[ld]_{\beta} \\
         u_1 \ar@{->>}[rd]_{\beta} & & u_2 \ar@{->>}[ld]^{\beta} \\
         & v
       }
     \]
   \end{theorem}
+  \begin{enumerate}
+    \item (2.5\%) Show that $t \reduce u$ implies $t =_\alpha u$. 
+    \item (2.5\%) Suppose that the Church-Rosser property holds.
+      Then, $t =_\alpha u$ implies that there exists a \emph{confluent} term $v$ of $t$ and $u$, i.e.\ $t \reduce v$ and $u \reduce v$.
+  \end{enumerate}
 \end{frame}
 
 \appendix 
