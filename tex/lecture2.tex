@@ -163,7 +163,8 @@ Assume $\mathbb{V}$ is a set of type variables different from variables in untyp
   The judgement $A : \type$ is defined inductively as follows.
   \begin{multicols}{2}
     \begin{prooftree}
-      \AXC{$X$ is a type variable}
+      \AXC{\vphantom{$X$}}
+      \RightLabel{if $X \in \mathbb{V}$}
       \UIC{$X : \type$}
     \end{prooftree}
     \begin{prooftree}
@@ -305,15 +306,12 @@ We say that $A$ is a type if $A : \type$ is derivable.
   \vfill
   By being syntax-directed, every typing derivation can be inverted:
   \begin{lemma}[Typing inversion]
-    Suppose 
-    \[
-      \Gamma \vdash_i t : A
-    \]
-    is derivable. If 
+    Suppose that $\Gamma \vdash_i t : A$ is derivable.
+    Then,
     \begin{description}
-      \item[$t \equiv x$] then $x : A$ occurs in $\Gamma$.
-      \item[$t \equiv \lambda x.\, t'$] then $A = B \to C$ and $\Gamma, x: B \vdash_i u' : C$.
-      \item[$t \equiv u\;v$] there is some $A$ such that $\Gamma \vdash_i u : A \to B$ and $\Gamma \vdash_i v : B$.
+      \item[$t \equiv x$] implies $x : A$ occurs in $\Gamma$.
+      \item[$t \equiv \lambda x.\, t'$] implies $A = B \to C$ and $\Gamma, x: B \vdash_i u' : C$.
+      \item[$t \equiv u\;v$] implies there is some $A$ such that $\Gamma \vdash_i u : A \to B$ and $\Gamma \vdash_i v : B$.
     \end{description}
   \end{lemma}
   This lemma is particularly useful when constructing a typing derivation by hand.
@@ -820,18 +818,18 @@ By combing the above two properties, we can extend the progress theorem to $\red
 
 \begin{frame}{General Recursion: Static}
   Self-applicative term cannot be typed in simply typed $\lambda$-calculus.
-  For example, 
+  E.g., 
   \[
     \lambda x.\, x\,x
   \]
   cannot be typed, since $A \to A$ is not equal to $A$.
   Hence, the $Y$-combinator in untyped $\lambda$-calculus cannot be typed.
 
-  We introduce a new construct explicitly for general recursion:
+  A construct is introduced explicitly for general recursion:
 
-  Let $\Lambda_{\fix}(V)$ be the set of terms defined inductively with a construct additional to $\Lambda(V)$:
+  Let $\Lambda_{\fix}(V)$ be the set of terms defined with an additional construct:
   \begin{description}
-    \item[fixpoint] $\fix\,f.\, t$ is a term in $\Lambda_{\fix}(V)$, if $t$ is a term in $\Lambda_{\fix}(V)$ and $f$ is a variable in $V$
+    \item[fixpoint] $\fix\,f.\, t$ is a term in $\Lambda_{\fix}(V)$, if $t \in \Lambda_{\fix}(V)$ and $f \in V$
   \end{description}
 
   An additional typing rule is added to simply typed $\lambda$-calculus:
@@ -862,11 +860,11 @@ By combing the above two properties, we can extend the progress theorem to $\red
 \begin{frame}{Natural numbers: Static}
   While Church numerals can have multiple types $\nat_A$, for any $A$, we extend the calculus with a single type of natural numbers instead.
 
-  Let $\Lambda_{\fix, \N}(V)$ be the set of terms defined inductively with constructs additional to $\Lambda_{\fix}(V)$:
+  Let $\Lambda_{\fix, \N}(V)$ be the set of terms defined with additional constructs:
   \begin{itemize}
     \item $\zero$ is a term in $\Lambda_{\fix, \N}(V)$
     \item $\suc(t)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t$ is
-    \item $\ifz(t; x.\,u)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t$ and $u$ are terms and $x$ is a variable.
+    \item $\ifz(t; x.\,u)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t, u \in \Lambda_{\fix, \N}(V)$ and $x \in V$
   \end{itemize}
   with additional typing rules
   \begin{multicols}{2}

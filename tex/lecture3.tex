@@ -441,6 +441,7 @@
 \begin{frame}{Typing rules}
   The judgement $\Delta; \Gamma \vdash t : A$ is defined inductively by following rules.
   \begin{multicols}{2} 
+    \small
   \begin{prooftree}
     \AXC{}
     \RightLabel{if $\Gamma \ni x : A$}
@@ -469,7 +470,6 @@
     \BIC{$\Delta; \Gamma \vdash t\;B : A\subst{B}{x}$}
   \end{prooftree}
   \end{multicols}
-
 
   \begin{theorem}[Type safety]
     Suppose $\Delta; \Gamma \vdash t : A$. Then, 
@@ -725,15 +725,14 @@ Polymorphic $\lambda$-calculus allows us to define \emph{recursor} like \texttt{
   \List(A) \defeq \forall X.\, X \to (A \to X \to X) \to X
 \]
 \end{definition}
-with ``list constructors'':
+with list constructors:
 \[
   \mathtt{nil}_A \defeq \lam{X}{h : t}{f : A \to t \to t} h
 \]
-and  
+and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 \[
-  \mathtt{cons}_A \defeq \lam{x : A}{xs : \List(A)}{X}{h : X}{f : A \to X \to X}f\,x\,(xs\; X\; h\; f)
+  \lam{x : A}{xs : \List(A)}{X}{h : X}{f : A \to X \to X}f\,x\,(xs\; X\; h\; f)
 \]
-of type $A \to \List(A) \to \List(A)$.
 
 
 \end{frame}
