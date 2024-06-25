@@ -674,19 +674,19 @@ By combing the above two properties, we can extend the progress theorem to $\red
         \UIC{$\normal\;t$}
       \end{prooftree}
       \begin{prooftree}
-        \AXC{$\normal\;t$}
-        \UIC{$\normal\;\lambda x.\,t$}
+        \AXC{$\normal\;u$}
+        \UIC{$\normal\;\lambda x.\,u$}
       \end{prooftree}
     \end{multicols}
   \end{definition}
-  \textbf{Idea.} $\neutral\;u$ (resp.\, $\normal\;t$) is derivable
+  \textbf{Idea.} $\neutral\;u$ and $\normal\;t$ are derivable
   iff 
   \[
-    u \equiv x\;t_1 \cdots t_k
-    \quad\text{(resp.\ }\quad
-    t \equiv \lam{x_1 \cdots x_n}x\;u_1 \cdots u_k).
+    t \equiv x\;u_1 \cdots u_n
+    \quad\text{and}\quad
+    u \equiv \lam{x_1 \cdots x_n}x\;u_1 \cdots u_m.
   \]
-  That is, $\beta$-redex cannot exist in $t$ if $t$ is normal.
+  That is, $\beta$-redex cannot exist in $u$ if $u$ is normal.
 \end{frame}
 
 \begin{frame}{Soundness and completeness of the inductive characterisation}
@@ -749,7 +749,7 @@ By combing the above two properties, we can extend the progress theorem to $\red
     $t$ is \emph{strongly normalising} denoted by $t \Downarrow$ if 
     \begin{prooftree}
       \AXC{$\forall u.\, (t \onereduce u \implies u \Downarrow)$}
-      \UIC{$u \Downarrow$}
+      \UIC{$t \Downarrow$}
     \end{prooftree}
     
   \end{definition}
