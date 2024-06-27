@@ -13,12 +13,18 @@
 
 \usepackage[british]{babel}
 \mode<article>{\usepackage[a4paper]{geometry}}
+\usepackage{mathtools}
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+\setmathfont{NewCMMath-Regular.otf}
+%\usepackage{newcomputermodern}
+
 \usepackage{bussproofs}
 \EnableBpAbbreviations
 \usepackage{mathpartir}
 \usepackage{multicol}
+\usepackage{manfnt}
 \usepackage{centernot}
-\usepackage{mathtools}
 \usepackage{xspace}
 
 \usepackage{graphicx}
@@ -36,6 +42,7 @@
 \newtheorem*{convention*}{Convention}
 \newtheorem*{quiz*}{Quiz}
 \newtheorem{remark}{Remark}[section]
+\newtheorem*{remark*}{Remark}
 \theoremstyle{definition}
 \newtheorem*{exercise*}{Exercise}
 
@@ -112,12 +119,18 @@
 \newcommand{\neutral}{\mathtt{Neutral}}
 \newcommand{\normal}{\mathtt{Normal}}
 
+\newcommand{\btt}{\mathit{tt}}
+\newcommand{\bff}{\mathit{ff}}
+
 \newcommand{\PCF}{{\textbf{PCF}}}
 
 \newcommand{\notimplies}{\centernot\implies}
 \newcommand{\notonereduce}{\centernot\onereduce}
 
 \newcommand {\textplus}{\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}}
+
+\DeclarePairedDelimiter\Brackets{\lBrack}{\rBrack}
+\DeclarePairedDelimiter\Parens{\lParen}{\rParen}
 
 \makeatletter
 %%% Lambda abstractions.

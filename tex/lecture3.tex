@@ -9,42 +9,13 @@
 {\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
 \begin{frame}\maketitle\end{frame}}
 
-%\begin{frame}[fragile]{Polymorphism}
-%  \emph{Abstraction principle~\cite{Pierce2002}}:
-%  \begin{quotation}
-%    Each significant piece of functionality in a program should be implemented
-%    in just one place in the source code. Where similar functions are carried
-%    out by distinct pieces of code, it is generally beneficial to combine them
-%    into one by abstracting out the varying parts.
-%  \end{quotation}
-%
-%  In Haskell
-%  \begin{semiverbatim}
-%    head :: [a] -> a
-%    head (x:_) = x
-%  \end{semiverbatim}
-%\end{frame}
+%\bgroup
+%  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+%  \begin{frame}[plain,noframenumbering]
+%    \maketitle
+%  \end{frame}
+%\egroup
 
-%\section{G\"odel's \textbf{T}: Simply typed $\lambda$-calculus with naturals
-%and primitive recursion}
-%\begin{frame}{The un defineability of $\lambda_\to$}
-%  Can you write this in $\lambda_\to$ using Church numerals?
-%  \begin{align*}
-%    \mathit{sum}(0)     & = 0 \\
-%    \mathit{sum}(1 + n) & = (1 + n) + \mathit{sum}(n)
-%  \end{align*}
-%  It is not definable in $\lambda_\to$, since fixpoint operator is not allowed any more. 
-%
-%  But, this is definable via \emph{primitive recursion}:
-%  for some $c$ and function $g$
-%  \begin{align*}
-%    \mathit{prec}(0, c, g(x, y))       &= c \\
-%    \mathit{prec}(1 + n, c, g(x, y))   &= g(n, \mathit{prec}(n, c, g(x, y)))
-%  \end{align*}
-%
-%  $\lambda_\to$ with primitive recursion is called G\"odel's \textbf{T}.
-%\end{frame}
-%
 %\begin{frame}{\textbf{T}: Types and terms}
 %  \begin{definition}[Types]
 %    \begin{multicols}{2}
@@ -375,7 +346,7 @@
     Y\subst{A}{X} & = Y && \text{if $X \neq Y$}\\
     (B \to C)\subst{A}{X} & = (B\subst{A}{X}) \to (C\subst{A}{X}) \\
     (\forall Y.B)\subst{A}{X} & = \forall Y. B\subst{A}{X} &&
-    \text{if $Y \neq X, Y \not\in \FV(X)$} 
+    \text{if $Y \neq X, Y \not\in \FV(A)$} 
   \end{align*}
   \end{definition}
 \end{frame}
@@ -528,7 +499,7 @@ The typing judgement ${}\vdash \lam{X} \lam{x : X} x : \forall X.\,X \to X$ is d
   Derive the following judgements:
   \begin{enumerate}
     \item $\vdash (\lam{X\,Y}\lam{x : X}{y : Y} x) : \forall X.\,\forall Y.\, X \to Y \to X$
-    \item $\vdash\lam{X}\lam{f : t \to t}{x : t} f\;(f\;x) : \forall X.\;(X\to X) \to X\to X$
+    \item $\vdash\lam{X}\lam{f : X \to X}{x : X} f\;(f\;x) : \forall X.\;(X\to X) \to X\to X$
     \end{enumerate}
   Hint.\, polymorphic $\lambda$-calculus F is syntax-directed, so the type inversion holds. 
   
@@ -610,6 +581,20 @@ Similarly, $\beta$-reduction extends to subterms of a given term, introducing re
 %$\longrightarrow_\beta$.
 %\end{frame}
 
+\begin{frame}{Empty type}
+  \begin{definition}
+    The \emph{empty type} is defined by
+    \[
+      \bot \defeq \forall X.\, X
+    \]
+  \end{definition}
+  \vfill
+  No closed term $t$ has this type! (Why?)
+\begin{exercise*}
+  Suppose that $\vdash t : \forall X.\, X$.
+  Can we derive a contradiction?
+\end{exercise*}
+\end{frame}
 
 \begin{frame}{Sum type}
 
@@ -705,7 +690,7 @@ The type of Church numerals is defined by
 Polymorphic $\lambda$-calculus allows us to define \emph{recursor} like \texttt{fold} in Haskell.
 \begin{align*}
   \mathtt{fold}_{\nat} & : \forall X.\, (X \to X) \to X \to \nat \to X  \\
-  \mathtt{fold}_{\nat} & \defeq \lam{X}{f : t \to t}{e_0 : t}{n : \nat} n\;X\;f\;e_0
+  \mathtt{fold}_{\nat} & \defeq \lam{X}{f : X \to X}{e_0 : X}{n : \nat} n\;X\;f\;e_0
 \end{align*}
 
 \begin{block}{Exercise}
@@ -727,7 +712,7 @@ Polymorphic $\lambda$-calculus allows us to define \emph{recursor} like \texttt{
 \end{definition}
 with list constructors:
 \[
-  \mathtt{nil}_A \defeq \lam{X}{h : t}{f : A \to t \to t} h
+  \mathtt{nil}_A \defeq \lam{X}{h : X}{f : A \to X \to X} h
 \]
 and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 \[
@@ -816,55 +801,232 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 %\end{frame}
 
 \begin{frame}{Impredicative encodings of inductive types} 
-  \emph{All inductive types} can be defined in Polymorphic $\lambda$-calculus and we have demonstrated this expressiveness for sums, natural numbers, and lists, using the universal type.
+  \emph{All inductive types} can be defined in polymorphic $\lambda$-calculus and we have demonstrated this expressiveness for sums, natural numbers, and lists, using the universal type.
 
 \end{frame}
 
-\begin{frame}{Type erasure}
-\begin{definition}
-  The \emph{erasing map} is a function defined by
+%\begin{frame}{Type erasure}
+%\begin{definition}
+%  The \emph{erasing map} is a function defined by
+%  \begin{align*}
+%    |x| & = x \\
+%    |\lam{x : A} t| & = \lam{x} |t| \\
+%    |t\;u| & = |t|\;|u| \\
+%    |\lam{X} t| & = |t| \\
+%    |t\;A| & = |t|
+%  \end{align*}
+%\end{definition}
+%
+%\begin{proposition}
+%  Within polymorphic $\lambda$-calculus, if ${}\vdash t : A$ and $|t| \onereduce u'$, then there exists a well-typed term~$u$ with
+%  ${}\vdash u : A$ and $|u| = u'$.
+%\end{proposition}
+%Well-typed terms can be evaluated with types erased safely.
+%\end{frame}
+
+\section{Reasoning with Types}
+
+\begin{frame}{What can types tell?}
+  The \emph{typing discipline} of a language does not only check if a program makes sense but also enforce safety properties such as \emph{type safety} and \emph{strong normalisation}.
+
+  In fact, types can be used to tell what functions are \emph{definable} or what equations a term should satisfy with respect to a given type.
+
+  What terms can be defined for the following types?
+  \begin{enumerate}
+    \item $\forall X. X$
+    \item $\forall X.\, X \to X$
+    \item $\forall X Y.\, X \to Y \to X$
+    \item $\forall X.\, X \to \nat$
+  \end{enumerate}
+
+  Let's start with functions definable in simply $\lambda$-calculus first.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{$\lambda$-Definability in simply typed $\lambda$-calculus}
+  \begin{idea}
+    Each term $\Gamma \vdash t : A$ can be interpreted as a \emph{set-theoretic} function $f$ to $\Brackets{A}$, a designated interpretation of $A$, from $\Brackets{\Gamma} = \prod_{x : A \in \Gamma} \Brackets{A}$.
+  \end{idea}
+
+  In detail, we assign a set $O_X$ to each $X \in \mathbb{V}$ and then extend the interpretation to all types~$A$:
   \begin{align*}
-    |x| & = x \\
-    |\lam{x : A} t| & = \lam{x} |t| \\
-    |t\;u| & = |t|\;|u| \\
-    |\lam{X} t| & = |t| \\
-    |t\;A| & = |t|
+    \Brackets{X}       & = O_X     \\
+    \Brackets{A \to B} & = \Brackets{A} \to \Brackets{B}
   \end{align*}
-\end{definition}
+  as well as contexts $\Gamma$:
+  \begin{align*}
+    \Brackets{\cdot}         & = \{*\} \\
+    \Brackets{\Gamma, x : A} & = \Brackets{\Gamma} \times \Brackets{A}.
+  \end{align*}
 
-\begin{proposition}
-  Within polymorphic $\lambda$-calculus, if ${}\vdash t : A$ and $|t| \onereduce u'$, then there exists a well-typed term~$u$ with
-  ${}\vdash u : A$ and $|u| = u'$.
-\end{proposition}
-Well-typed terms can be evaluated with types erased safely.
+  Each term $\Gamma \vdash t : A$ is then interpreted as a set-theoretic function
+  \[
+    \Brackets{t}\colon \Brackets{\Gamma} \to \Brackets{A}
+  \]
+  defined inductively (modulo $\alpha$-equivalence) by
+  \begin{align*}
+    \Brackets{\Gamma \vdash x_i : A}(\rho) & = \rho(i) \\
+    \Brackets{\Gamma \vdash t\; u : B}(\rho) & = \Brackets{\Gamma \vdash t : A \to B}(\rho)\left(\Brackets{\Gamma \vdash u : A}(\rho)\right) \\
+    \Brackets{\Gamma \vdash \lam{x}t : A \to B}(\rho) & = \left( v \mapsto \Brackets{\Gamma, x : A \vdash t}(\rho , v) \right)
+  \end{align*}
+  where $\rho \in \Brackets{\Gamma}$ is called an \emph{environment}.
+
+  N.B.\ for $\Brackets{\cdot \vdash t : A}(*)$ we simply write $\Brackets{t}$.
+  \begin{definition}
+    A set-theoretic function $f\colon X \to Y$ is \alert{$\lambda$-definable} w.r.t.\ some interpretation if there is a closed term $t : A \to B$ such that $f = \Brackets{t}$.
+  \end{definition}
 \end{frame}
 
-%\section{Parametricity}
+\begin{frame}{Quiz time}
+  Suppose that there is only one type variable $X$ and $O_X = \{ \btt, \bff \}$. 
+
+  Which of the following functions $f\colon O_X \to O_X$ are $\lambda$-definable?
+  \begin{enumerate}
+    \item the identity function $f(x) = x$
+    \item the constant function $f(x) = \btt$
+    \item the constant function $f(x) = \bff$
+    \item the negation function $f(\btt) = \bff$ and $f(\bff) = \btt$
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Logical relation}
+  \begin{idea}
+    If a pair $(v_1, v_2)$ of elements are indistinguishable, then $\Brackets{t}(v_1)$ and $\Brackets{t}(v_2)$ should also be indistinguishable.
+  \end{idea}
+  A family $\{R^A \subseteq \Brackets{A} \times \Brackets{A} \}_{A : \type}$ of binary relations is \alert{logical} if 
+  \[
+    R^{A \to B}(f_1, f_2) \quad\text{iff}\quad \forall x_1 x_2.\, R^{A}(x_1, x_2) \implies R^{B}(f_1(x_1), f_2(x_2)).
+  \]
+
+  N.B.\ A logical relation is determined by $R^X$ for type variables $X$.
+  \begin{exercise*}
+    \begin{enumerate}
+      \item What is $R^{X \to X}$, if $R^X = \emptyset$?
+      \item What is $R^{X \to X}$, if $R^X = O_X \times O_X$?
+      \item What is $R^{X \to X}$, if $R^X = \{(t, f)\}$?
+    \end{enumerate}
+  \end{exercise*}
+\end{frame}
+
+\begin{frame}{The fundamental theorem of logical relations}
+  \begin{theorem}[Fundamental Theorem of Logical Relations]\label{thm:fundamental_thm}
+    Let $\{R^A\}_{A : \type}$ be a logical relation.
+    Then, 
+    \begin{equation}\label{eq:fundamental_thm}
+      R^A(\Brackets{\Gamma \vdash t : A}(\rho_1), \Brackets{\Gamma \vdash t : A}(\rho_2))
+      \tag{$\ast$}
+    \end{equation}
+    for every $\Gamma \vdash t : A$ and environments $\rho_1, \rho_2 \in \Brackets{\Gamma}$ satisfying $R^{A_i}(\rho_1(i), \rho_2(i))$ for every $x_i : A_i \in \Gamma$.
+  \end{theorem}
+  \begin{proof}[Proof sketch]
+    By induction on the typing derivation of $\Gamma \vdash t : A$.
+%    \footnotesize
 %
-%\begin{frame}{Parametricity}
-%  What functions can you write for the following type?
-%  \[
-%    \forall X.\,X \to X 
-%  \]
-%  Since $X$ is arbitrary, we cannot inspect the content of $X$.
-%  What we can do with $X$ is simply return it.
-%  \begin{theorem}
-%    Every term $t$ of type $\forall X.\, X \to X$ is \emph{observationally equivalent}%
-%    \footnote{The notion of observational equivalence is beyond the scope of this lecture.}
-%      to $\lam{X}{x : t} x$. 
-%  \end{theorem}
-%\end{frame}
+%    For example, consider $\Gamma \vdash t\;u : B$.
+%    Then, we have $\Gamma \vdash t : A \to B$ and $\Gamma \vdash u : A$ for some $A$.
+%    By the induction hypothesis,
+%    \[
+%      (\Brackets{\Gamma \vdash u : A}(\rho_1), \Brackets{\Gamma \vdash u : A}(\rho_2))
+%      \;\text{and}\;
+%      (\Brackets{\vdash t : A \to B}(\rho_1), \Brackets{\vdash t : A \to B}(\rho_2))
+%    \]
+%    are related by $R^A$ and $R^{A \to B}$, respectively.
+%    By definition, $\Brackets{\vdash t : A \to B}(\rho_1)(\Brackets{\Gamma \vdash u : A}(\rho_1))$ and $\Brackets{\vdash t : A \to B}(\rho_2)(\Brackets{\Gamma \vdash u : A}(\rho_2))$ are related by $R^B$.
+%    Hence, \eqref{eq:fundamental_thm} holds for $\Gamma \vdash t\;u : B$.
+  \end{proof}
+  In particular, $R^A(\Brackets{t}, \Brackets{t})$ for any closed term $t$ of type $A$. 
+\end{frame}
 
-%\begin{frame}{Parametricity: Theorems for free\footnote{Philip Wadler. 1989. Theorems for free! In \emph{Proceedings of the fourth international conference on Functional programming languages and computer architecture (FPCA ’89)}. ACM, New York, NY, USA, 347–359.}}
-%  Assume \textbf{F} extended with the list type~$\List\;\tau$ for $\tau$ and
-%  the type $\mathbb{N}$ of naturals, denoted $\mathbf{F}_{\List, \mathbb{N}}$.
-%
-%  Then $\mathtt{head} \circ \mathtt{map}\; f = f \circ \mathtt{head}$
-%      for any $f : \tau \to \sigma$ where $\mathtt{head} : \forall t.\, \List\;t \to t$
-%  can be proved by just reading the type of $\mathtt{head}$ and $\mathtt{tail}$!
-%\end{frame}
+\begin{frame}{Quiz, Revisited}
+  Consider $O_X = \{\btt, \bff\}$ and the logical relation $\{R^A\}_{A}$ determined by
+  \[
+    R^{X} = \{(\bff, \btt)\}
+  \]
+  i.e.\ $R^X(\bff, \btt)$ and nothing else.
 
+  \begin{enumerate}
+    \item Suppose that the constant function $f(x) = \btt$ is $\lambda$-definable, then $R^{X \to X}(\Brackets{t}, \Brackets{t})$ by the fundamental theorem.
+      By definition of being logical $R^{X}(\Brackets{t}(\btt), \Brackets{t}(\bff))$, i.e.\ $R^{X}(\btt, \btt)$---a contradiction.
+      That is, $f(x) = \btt$ is not $\lambda$-definable.
 
+    \item Similarly, the constant function $f(x) = \bff$ is not definable; otherwise $R^X(\Brackets{t}(\bff, \Brackets{t}(\btt)) \iff R^X(\bff, \bff)$ which is not possible.
+    \item The negation $\neg$ is also not definable.
+  \end{enumerate}
+
+  \begin{exercise*}
+    Why is the negation function $\neg$ not $\lambda$-definable?
+  \end{exercise*}
+\end{frame}
+
+\begin{frame}{No set-theoretic model for polymorphic $\lambda$-calculus}
+  We would like to apply the same approach of arguing $\lambda$-definability to polymorphic $\lambda$-calculus, but it is not obvious:
+  \begin{enumerate}
+    \item the universal quantification  $\forall X. A$ is \alert{impredicative} and
+    \item $\Brackets{\forall X. A}$ should be $\Brackets{A \subst{B}{X}}$ for any $B : \type$,
+    \item including $B = \forall X. A$.
+  \end{enumerate}
+
+  In fact, there is no set-theoretic interpretation for polymorphic $\lambda$-calculus \cite{Reynolds1984} in classical set theory, due to the \emph{cardinality issue} (a set which includes itself could be defined).
+
+  Instead, we have to consider \emph{other models} rather than sets, and no \emph{na\"ive} model exists for polymorphic $\lambda$-calculus.
+\end{frame}
+
+\begin{frame}{Parametricity in polymorphic $\lambda$-calculus}
+  Following Girard's \emph{reducibility candidate}~\cite{Girard1989}, assume $\mathcal{U}$ a set of \alert{relation candidates} in some model.
+
+  A family of $\{ R_{\Phi}^{A} \}_{\Delta \vdash A}$ is logical if
+  \begin{align*}
+    R^{X}_{\Phi}(x_1, x_2)        & \quad\text{iff} \quad\Phi(X)(x_1, x_2)  \\
+    R^{A \to B}_{\Phi}(f_1, f_2)  & \quad \text{iff} \quad \forall x_1 x_2.\, R^{A}_{\Phi}(x_1, x_2) \implies R^{B}_{\Phi}(f_1(x_1), f_2(x_2)) \\
+    R^{\forall X.\, A}_{\Phi}(x_1, x_2) & \quad\text{iff}\quad \alert{\forall U \in \mathcal{U}.\, R^{A}_{\Phi; X \mapsto U}(x_1, x_2)}
+  \end{align*}
+  where $\Phi\colon \Delta \to \mathcal{U}$ is a map and $\Phi; X \mapsto U$ means a map s.t.\ $Y$ is mapped to $U$ if $Y = X$ or $\Phi(Y)$ otherwise.
+
+  If $\Delta$ is empty, then the subscript $\Phi$ in $R^A_{\Phi}$ is omitted, i.e.\ $R^A$ instead.
+  \begin{theorem}
+    The fundamental theorem holds for logical relations i.e.\ $R^A(\Brackets{t}, \Brackets{t})$ holds for any closed term $t$ of type $A$ in polymorphic $\lambda$-calculus. 
+  \end{theorem}
+  
+\end{frame}
+
+\begin{frame}{Examples: $\forall X.\, X$}
+  The type $\forall X.\, X$ is not inhabited.
+
+  Suppose that $\vdash t : \forall X.\, X$.
+  Then, by the fundamental theorem of logical relations,
+  \[
+    R^{\forall X.\, X}(\Brackets{t}, \Brackets{t}).
+  \]
+  By definition, $R^{\forall X.\, X}(\Brackets{t}, \Brackets{t})$ is equal to
+  \[
+    \forall U \in \mathcal{U}.\, R^X_{X \mapsto U}(\Brackets{t}, \Brackets{t})
+    \quad\text{or, equivalently,}\quad
+    \forall U \in \mathcal{U}.\, U(\Brackets{t}, \Brackets{t})
+  \]
+  Choosing $U$ to be the empty relation $\emptyset$, it follows that
+  \[
+    (\Brackets{t}, \Brackets{t}) \in \emptyset,
+  \]
+  clearly a contradiction.
+  Hence, there is closed term of type $\forall X.\, X$.
+\end{frame}
+
+\begin{frame}{Naturality for Free \cite{Wadler1989}}
+  Consider the special case that the type variable $X$ is instantiated as $\{\,(x, f\;x) \mid x \in A \,\}$ of some $f\colon A \to B$ and apply the fundamental theorem to derive, e.g.,
+  \begin{enumerate}
+    \item $\mathtt{map}\;f(\Brackets{t}_A(\mathit{xs}))
+      = \Brackets{t}_B(\mathtt{map}\;f(\mathit{xs}))$ for $t : \forall X.\, \List(X) \to \List(X)$ in some model;
+    \item that is, $\Brackets{t}_A$ is natural in $A$:
+      \[
+        \xymatrix{
+          \List(A) \ar[r]^{\Brackets{t}_A} \ar[d]_{\mathtt{map}\;f} & \List(A) \ar[d]^{\mathtt{map}\;f} \\
+          \List(B) \ar[r]_{\Brackets{t}_B }& \List(B)
+        }
+      \]
+  \end{enumerate}
+  N.B.\ The naturality is derived in the working model, not necessarily implying computational equality between $\lambda$-terms.
+
+  The fundamental theorem is well known for this specialised form, dubbed as \emph{free theorems}. 
+\end{frame}
 
 %\section{Nameless Representation}
 %
@@ -1141,18 +1303,18 @@ Well-typed terms can be evaluated with types erased safely.
 %
 %
 %\subsection*{Exercise}
-
 \begin{frame}{Homework}
   \begin{enumerate}
     \item (2.5\%) Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list in polymorphic $\lambda$-calculus.
-    
+    \item (5\%) Prove Theorem~\ref{thm:fundamental_thm}.
   \end{enumerate}
   
 \end{frame}
 
-%\begin{frame}{References}
-%\bibliographystyle{amsalpha}
-%\bibliography{library} 
-%\end{frame}
+\begin{frame}[allowframebreaks]{References}
+  \bibliographystyle{plainnat}
+  \bibliography{reference} 
+\end{frame}
 
 \end{document}
+
