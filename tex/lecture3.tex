@@ -6,15 +6,15 @@
 \subtitle{Parametric Polymorphism}
 \begin{document}
 
-{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
-\begin{frame}\maketitle\end{frame}}
+%{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+%\begin{frame}\maketitle\end{frame}}
 
-%\bgroup
-%  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
-%  \begin{frame}[plain,noframenumbering]
-%    \maketitle
-%  \end{frame}
-%\egroup
+\bgroup
+  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{banner.pdf}}
+  \begin{frame}[plain,noframenumbering]
+    \maketitle
+  \end{frame}
+\egroup
 
 %\begin{frame}{\textbf{T}: Types and terms}
 %  \begin{definition}[Types]
@@ -801,8 +801,10 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 %\end{frame}
 
 \begin{frame}{Impredicative encodings of inductive types} 
-  \emph{All inductive types} can be defined in polymorphic $\lambda$-calculus and we have demonstrated this expressiveness for sums, natural numbers, and lists, using the universal type.
+  \emph{Inductive types} can be defined in polymorphic $\lambda$-calculus~\cite{Bohm1985}, including the empty type, the types of sums, natural numbers, and lists.
 
+  The Church encoding shows the expressiveness of polymorphic $\lambda$-calculus but is not efficient~\cite{Koopman2014}.
+  Other styles of encoding have been proposed~\cite{Firsov2018} to improve the efficiency and the size and used in implementations.
 \end{frame}
 
 %\begin{frame}{Type erasure}
@@ -839,7 +841,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
     \item $\forall X.\, X \to \nat$
   \end{enumerate}
 
-  Let's start with functions definable in simply $\lambda$-calculus first.
+  Let's start with functions definable in simply typed $\lambda$-calculus first.
 \end{frame}
 
 \begin{frame}[allowframebreaks]{$\lambda$-Definability in simply typed $\lambda$-calculus}
@@ -847,7 +849,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
     Each term $\Gamma \vdash t : A$ can be interpreted as a \emph{set-theoretic} function $f$ to $\Brackets{A}$, a designated interpretation of $A$, from $\Brackets{\Gamma} = \prod_{x : A \in \Gamma} \Brackets{A}$.
   \end{idea}
 
-  In detail, we assign a set $O_X$ to each $X \in \mathbb{V}$ and then extend the interpretation to all types~$A$:
+  In detail, we assign a set $O_X$ to each $X \in \mathbb{V}$ and then extend the interpretation to all types:
   \begin{align*}
     \Brackets{X}       & = O_X     \\
     \Brackets{A \to B} & = \Brackets{A} \to \Brackets{B}
@@ -858,7 +860,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
     \Brackets{\Gamma, x : A} & = \Brackets{\Gamma} \times \Brackets{A}.
   \end{align*}
 
-  Each term $\Gamma \vdash t : A$ is then interpreted as a set-theoretic function
+  Each term $\Gamma \vdash t : A$ is interpreted as a set-theoretic function
   \[
     \Brackets{t}\colon \Brackets{\Gamma} \to \Brackets{A}
   \]
@@ -870,7 +872,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
   \end{align*}
   where $\rho \in \Brackets{\Gamma}$ is called an \emph{environment}.
 
-  N.B.\ for $\Brackets{\cdot \vdash t : A}(*)$ we simply write $\Brackets{t}$.
+  N.B.\ For $\Brackets{\cdot \vdash t : A}(*)$ we simply write $\Brackets{t}$.
   \begin{definition}
     A set-theoretic function $f\colon X \to Y$ is \alert{$\lambda$-definable} w.r.t.\ some interpretation if there is a closed term $t : A \to B$ such that $f = \Brackets{t}$.
   \end{definition}
@@ -890,7 +892,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 
 \begin{frame}{Logical relation}
   \begin{idea}
-    If a pair $(v_1, v_2)$ of elements are indistinguishable, then $\Brackets{t}(v_1)$ and $\Brackets{t}(v_2)$ should also be indistinguishable.
+    If $v_1$ and $v_2$ are related, $\Brackets{t}(v_1)$ and $\Brackets{t}(v_2)$ should also be related.
   \end{idea}
   A family $\{R^A \subseteq \Brackets{A} \times \Brackets{A} \}_{A : \type}$ of binary relations is \alert{logical} if 
   \[
@@ -899,10 +901,11 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 
   N.B.\ A logical relation is determined by $R^X$ for type variables $X$.
   \begin{exercise*}
+    What is $R^{X \to X}$, if \dots
     \begin{enumerate}
-      \item What is $R^{X \to X}$, if $R^X = \emptyset$?
-      \item What is $R^{X \to X}$, if $R^X = O_X \times O_X$?
-      \item What is $R^{X \to X}$, if $R^X = \{(t, f)\}$?
+      \item $R^X = \emptyset$?
+      \item $R^X = O_X \times O_X$?
+      \item $R^X = \{(\btt, \bff)\}$?
     \end{enumerate}
   \end{exercise*}
 \end{frame}
@@ -911,10 +914,9 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
   \begin{theorem}[Fundamental Theorem of Logical Relations]\label{thm:fundamental_thm}
     Let $\{R^A\}_{A : \type}$ be a logical relation.
     Then, 
-    \begin{equation}\label{eq:fundamental_thm}
+    \[
       R^A(\Brackets{\Gamma \vdash t : A}(\rho_1), \Brackets{\Gamma \vdash t : A}(\rho_2))
-      \tag{$\ast$}
-    \end{equation}
+    \]
     for every $\Gamma \vdash t : A$ and environments $\rho_1, \rho_2 \in \Brackets{\Gamma}$ satisfying $R^{A_i}(\rho_1(i), \rho_2(i))$ for every $x_i : A_i \in \Gamma$.
   \end{theorem}
   \begin{proof}[Proof sketch]
@@ -939,35 +941,33 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 \begin{frame}{Quiz, Revisited}
   Consider $O_X = \{\btt, \bff\}$ and the logical relation $\{R^A\}_{A}$ determined by
   \[
-    R^{X} = \{(\bff, \btt)\}
+    R^{X} = \{(\bff, \btt)\}.
   \]
-  i.e.\ $R^X(\bff, \btt)$ and nothing else.
 
   \begin{enumerate}
     \item Suppose that the constant function $f(x) = \btt$ is $\lambda$-definable, then $R^{X \to X}(\Brackets{t}, \Brackets{t})$ by the fundamental theorem.
-      By definition of being logical $R^{X}(\Brackets{t}(\btt), \Brackets{t}(\bff))$, i.e.\ $R^{X}(\btt, \btt)$---a contradiction.
+      By definition of being logical $R^{X}(\Brackets{t}(\bff), \Brackets{t}(\btt))$, i.e.\ $R^{X}(\btt, \btt)$---a contradiction.
       That is, $f(x) = \btt$ is not $\lambda$-definable.
-
-    \item Similarly, the constant function $f(x) = \bff$ is not definable; otherwise $R^X(\Brackets{t}(\bff, \Brackets{t}(\btt)) \iff R^X(\bff, \bff)$ which is not possible.
-    \item The negation $\neg$ is also not definable.
   \end{enumerate}
-
   \begin{exercise*}
-    Why is the negation function $\neg$ not $\lambda$-definable?
+    \begin{enumerate}
+      \item Show that the constant function $f(x) = \bff$ is not $\lambda$-definable.
+      \item Show that the negation function $\neg$ is not $\lambda$-definable.
+    \end{enumerate}
   \end{exercise*}
 \end{frame}
 
 \begin{frame}{No set-theoretic model for polymorphic $\lambda$-calculus}
-  We would like to apply the same approach of arguing $\lambda$-definability to polymorphic $\lambda$-calculus, but it is not obvious:
+  We would like to apply the same approach of arguing $\lambda$-definability to polymorphic $\lambda$-calculus, but it is apparently circular: 
   \begin{enumerate}
     \item the universal quantification  $\forall X. A$ is \alert{impredicative} and
-    \item $\Brackets{\forall X. A}$ should be $\Brackets{A \subst{B}{X}}$ for any $B : \type$,
+    \item $\Brackets{\forall X. A}$ should depend on $\Brackets{A \subst{B}{X}}$ for any $B : \type$,
     \item including $B = \forall X. A$.
   \end{enumerate}
 
-  In fact, there is no set-theoretic interpretation for polymorphic $\lambda$-calculus \cite{Reynolds1984} in classical set theory, due to the \emph{cardinality issue} (a set which includes itself could be defined).
+  In fact, there is no set-theoretic interpretation for polymorphic $\lambda$-calculus \cite{Reynolds1984} in classical set theory, due to the \emph{cardinality issue}.
 
-  Instead, we have to consider \emph{other models} rather than sets, and no \emph{na\"ive} model exists for polymorphic $\lambda$-calculus.
+  Thus, we have to consider \emph{other models} rather than sets, some constructive set theory~\cite{Pitts1987}, or a weaker but predicative version of parametric polymorphism~\cite{Leivant1991}.
 \end{frame}
 
 \begin{frame}{Parametricity in polymorphic $\lambda$-calculus}
@@ -992,40 +992,38 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
   The type $\forall X.\, X$ is not inhabited.
 
   Suppose that $\vdash t : \forall X.\, X$.
-  Then, by the fundamental theorem of logical relations,
+  Then, by the fundamental theorem,
   \[
     R^{\forall X.\, X}(\Brackets{t}, \Brackets{t}).
   \]
-  By definition, $R^{\forall X.\, X}(\Brackets{t}, \Brackets{t})$ is equal to
+  By definition, $R^{\forall X.\, X}(\Brackets{t}, \Brackets{t})$ if and only if
   \[
     \forall U \in \mathcal{U}.\, R^X_{X \mapsto U}(\Brackets{t}, \Brackets{t})
-    \quad\text{or, equivalently,}\quad
+    \quad\text{or equivalently,}\quad
     \forall U \in \mathcal{U}.\, U(\Brackets{t}, \Brackets{t})
   \]
-  Choosing $U$ to be the empty relation $\emptyset$, it follows that
+  Choosing $U$ to be the empty relation $\emptyset$,
   \[
     (\Brackets{t}, \Brackets{t}) \in \emptyset,
   \]
-  clearly a contradiction.
-  Hence, there is closed term of type $\forall X.\, X$.
+  a contradiction.
+  Hence, there is \emph{no} closed term of type $\forall X.\, X$.
 \end{frame}
 
-\begin{frame}{Naturality for Free \cite{Wadler1989}}
-  Consider the special case that the type variable $X$ is instantiated as $\{\,(x, f\;x) \mid x \in A \,\}$ of some $f\colon A \to B$ and apply the fundamental theorem to derive, e.g.,
-  \begin{enumerate}
-    \item $\mathtt{map}\;f(\Brackets{t}_A(\mathit{xs}))
-      = \Brackets{t}_B(\mathtt{map}\;f(\mathit{xs}))$ for $t : \forall X.\, \List(X) \to \List(X)$ in some model;
-    \item that is, $\Brackets{t}_A$ is natural in $A$:
+\begin{frame}{Theorems for Free}
+  Consider the case that $R^X$ is instantiated as $\{\,(x, f(x)) \mid x \in A \,\}$ of some $f\colon A \to B$ and apply the fundamental theorem to derive, e.g.,
+  \begin{itemize}
+    \item the following equation for any $t : \forall X.\, \List(X) \to \List(X)$:
       \[
         \xymatrix{
-          \List(A) \ar[r]^{\Brackets{t}_A} \ar[d]_{\mathtt{map}\;f} & \List(A) \ar[d]^{\mathtt{map}\;f} \\
-          \List(B) \ar[r]_{\Brackets{t}_B }& \List(B)
+          \Brackets{\List(A)} \ar[r]^{\Brackets{t}_A} \ar[d]_{\mathtt{map}\;f} & \Brackets{\List(A)} \ar[d]^{\mathtt{map}\;f} \\
+          \Brackets{\List(B)} \ar[r]_{\Brackets{t}_B }& \Brackets{\List(B)}
         }
       \]
-  \end{enumerate}
-  N.B.\ The naturality is derived in the working model, not necessarily implying computational equality between $\lambda$-terms.
+  \end{itemize}
+  N.B.\ The equation is derived in the working model, not necessarily implying $=_{\beta}$ between $\lambda$-terms.
 
-  The fundamental theorem is well known for this specialised form, dubbed as \emph{free theorems}. 
+  The fundamental theorem is well known for this specialised form, dubbed as \emph{free theorems}~\cite{Wadler1989}. 
 \end{frame}
 
 %\section{Nameless Representation}
@@ -1312,8 +1310,13 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References}
-  \bibliographystyle{plainnat}
-  \bibliography{reference} 
+  \setbeamerfont{bibliography item}{size=\footnotesize}
+  \setbeamerfont{bibliography entry author}{size=\footnotesize}
+  \setbeamerfont{bibliography entry title}{size=\footnotesize}
+  \setbeamerfont{bibliography entry location}{size=\footnotesize}
+  \setbeamerfont{bibliography entry note}{size=\footnotesize}
+  \bibliographystyle{apalike}
+  \bibliography{ref} 
 \end{frame}
 
 \end{document}
