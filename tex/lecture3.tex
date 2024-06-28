@@ -222,54 +222,6 @@
 %  \end{block}
 %\end{frame}
 
-%\section{Polymorphic Typed \texorpdfstring{$\lambda$}{λ}-Calculus: Introduction}
-%
-%\begin{frame}{Polymorphism}
-%
-%  For example, the type $\forall t.\, t \to t$ corresponds to a type variable
-%  universally quantified in GHC with extension \texttt{RankNType}
-%  \begin{semiverbatim}
-%    forall a. a -> a
-%  \end{semiverbatim}
-%  or simply 
-%  \begin{semiverbatim}
-%    a -> a
-%  \end{semiverbatim}
-%
-%%\framebreak
-%%GHC with the extension \texttt{ScopedTypeVariables} allows you to use type
-%%variables. 
-%%\begin{semiverbatim}
-%% f :: forall a. [a] -> [a]
-%%
-%% f = \\(xs :: [a]) -> reverse xs
-%%\end{semiverbatim}
-%%GHC with the extension \texttt{TypeApplications} allows you to apply a type
-%%argument.
-%%\begin{semiverbatim}
-%%  Prelude> :t id
-%%
-%%  id :: a -> a
-%%
-%%  Prelude> :t id @Int
-%%
-%%  id @Int :: Int -> Int
-%%\end{semiverbatim}
-%%
-%%\framebreak
-%%  Can you see the corresponding untyped/simply typed $\lambda$-terms of the
-%%  following $\lambda$-terms in System F? 
-%%
-%%  \begin{enumerate}
-%%    \item $\Lambda t.\,\lambda (x : t).\, x$
-%%    \item $\Lambda t.\, \lambda (x : t)(y : t).\, x$
-%%    \item $(\Lambda t.\, \lambda (x : t)(y : t).\, x)\;\sigma\;M\;N$
-%%     where  $M, N$ are terms and $\sigma$ a type.
-%%    \item $\Lambda t.\, \lambda (f : t \to t)(x : t).\, f\;(f\;x)$
-%%  \end{enumerate}
-%%System $F$ is more expressive than simply typed lambda calculus.
-%\end{frame}
-
 \section{Polymorphic \texorpdfstring{$\lambda$}{λ}-Calculus: Static}
 \begin{frame}{Polymorphic types}
     Given a set $\mathbb{V}$ of type variables, the judgement $A : \type$ is defined by
@@ -1258,49 +1210,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 %    
 %  \end{block}
 %\end{frame}
-%\section{Parametricity}
-%Polymorphism in System F is \emph{parametric} in the sense that every
-%instance is uniformly defined. To put it differently, it cannot depend on any
-%specific type. It is different from the \emph{ad hoc} polymorphism adopted in
-%programming languages like C++ where programmers are allowed to give a
-%specific implementation for some type.
-%
-%Why is a uniform definition important? Not only we can assure ourselves that a
-%polymorphic function has a uniform result for each instance, but also it
-%automatically satisfies certain properties which only depends on its type (not
-%its instance).
-%
-%In the end of this lecture, we state a powerful result informally, originally
-%called \emph{Abstraction Theorem} by Reynolds~\cite{Reynolds1983} and nowadays
-%known as \emph{parametricity}. After that, we apply this theorem to characterise
-%some data types introduced so far.
-%
-%\begin{proposition}
-%  Let $\sigma$ be a type without any free variable and $\sigma^+$ the relation
-%  on~$\sigma$ lifted from~$\sigma$ (defined below). Then, 
-%  \[
-%    \vdash F : \sigma
-%    \implies (F, F) \in \sigma^+.
-%  \]
-%\end{proposition}
-%
-%To decode this proposition, we introduce a new notation: a relation $R_\sigma
-%\subset \sigma_1 \times \sigma_2$ is denoted by $R_\sigma\colon \sigma_1
-%\not\to\sigma_2$. For each type in System F, we define its lifted relation
-%$\sigma^+$
-%\begin{definition}
-%  For each type formation (construct), we define its corresponding formation of
-%  relations 
-%  \begin{enumerate}
-%    \item For $f_i:\sigma_i \to \tau_i$, $(f_1, f_2) \in R_\sigma \to S_\tau$ if
-%      and only if for every $(M_1, M_2) \in R_\Sigma$ we have $(f_1\;M_1,
-%      f_2\;M_2) \in S_\tau$.
-%  \end{enumerate}
-%\end{definition}
-%
-%
-%
-%\subsection*{Exercise}
+
 \begin{frame}{Homework}
   \begin{enumerate}
     \item (2.5\%) Define $\mathtt{length}_\sigma : \List\;\sigma \to \nat$ calculating the length of a list in polymorphic $\lambda$-calculus.
