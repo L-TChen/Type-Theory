@@ -311,7 +311,7 @@ We say that $A$ is a type if $A : \type$ is derivable.
     \begin{description}
       \item[$t \equiv x$] implies $x : A$ occurs in $\Gamma$.
       \item[$t \equiv \lambda x.\, t'$] implies $A = B \to C$ and $\Gamma, x: B \vdash_i u' : C$.
-      \item[$t \equiv u\;v$] implies there is some $A$ such that $\Gamma \vdash_i u : A \to B$ and $\Gamma \vdash_i v : B$.
+      \item[$t \equiv u\;v$] implies there is some $B$ such that $\Gamma \vdash_i u : B \to A$ and $\Gamma \vdash_i v : B$.
     \end{description}
   \end{lemma}
   This lemma is particularly useful when constructing a typing derivation by hand.
@@ -517,8 +517,6 @@ for every type $A$.
         \vdash {} & \ifz : ?
       \end{align*}
   \end{description}
-The type of~$\ifz$ may not be as obvious as you may expect.
-Try to find one and justify your guess.
 
 \end{frame}
 \begin{frame}{Church encodings of boolean values}
