@@ -867,7 +867,7 @@ By combing the above two properties, we can extend the progress theorem to $\red
   \begin{itemize}
     \item $\zero$ is a term in $\Lambda_{\fix, \N}(V)$
     \item $\suc(t)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t$ is
-    \item $\ifz(t; x.\,u)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t, u \in \Lambda_{\fix, \N}(V)$ and $x \in V$
+    \item $\ifz(t; x.\,u; v)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t, u, v \in \Lambda_{\fix, \N}(V)$ and $x \in V$
   \end{itemize}
   with additional typing rules
   \begin{multicols}{2}
@@ -885,7 +885,7 @@ By combing the above two properties, we can extend the progress theorem to $\red
     \AXC{$\Gamma \vdash v : \mathbb{N}$}
     \AXC{$\Gamma \vdash t : A$}
     \AXC{$\Gamma, x : \mathbb{N} \vdash u : A$}
-    \TrinaryInfC{$\Gamma \vdash \ifz(t; x.\,u)\;v : A$}
+    \TrinaryInfC{$\Gamma \vdash \ifz(t; x.\,u; v) : A$}
   \end{prooftree}
   The third rule is akin to pattern matching on natural numbers.
 \end{frame}
@@ -893,8 +893,8 @@ By combing the above two properties, we can extend the progress theorem to $\red
 \begin{frame}{Natural numbers: Dynamic}
   $\beta$-reduction for natural numbers is extended with two rules:
   \begin{align*}
-    \ifz(t; x.\, u)\;\zero   & \onereduce t \\
-    \ifz(t; x.\, u)\;\suc(n) & \onereduce u\subst{n}{x}
+    \ifz(t; x.\, u;\zero)   & \onereduce t \\
+    \ifz(t; x.\, u;\suc(n)) & \onereduce u\subst{n}{x}
   \end{align*}
 \end{frame}
 
