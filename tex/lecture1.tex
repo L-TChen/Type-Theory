@@ -734,7 +734,7 @@ Can you come up with a strategy to prove your conjecture?
     \end{prooftree}
     \begin{prooftree}
       \AXC{$t_1 \onereduce t_2$}
-      \UIC{$\lam x.\, t_1 \onereduce \lambda x.\, t_2$}
+      \UIC{$\lam{x} t_1 \onereduce \lam{x} t_2$}
     \end{prooftree}
     \begin{prooftree}
       \AXC{$t_1 \onereduce t_2$}
@@ -747,7 +747,7 @@ Can you come up with a strategy to prove your conjecture?
   \end{multicols}
 \end{definition}
 For example, 
-  $(\boxed{(\lam{x\,y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}$.
+  $(\boxed{(\lam{x y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}$.
 \end{frame}
 \begin{frame}{Exercise}
   Write down a sequence of $\beta$-reductions and \emph{circle} all $\beta$-redexes while reducing a term:
