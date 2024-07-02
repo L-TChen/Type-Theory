@@ -141,7 +141,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \end{description}
 
   \vfill
-  Each construct can be represented as a node in a tree where variables are leafs, e.g.,
+  Each construct can be represented as a node in a tree, i.e.\ 
   \begin{center}
     \begin{minipage}[t]{.32\textwidth}
       \centering
@@ -213,6 +213,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \[
     \lam{x}(\lam{y}((x@y)@z))
   \]
+  \vskip -8pt
   \begin{enumerate}
     \item $x$, $y$, and $z$ are in $V$, so $x$, $y$, $z$ are terms;
     \item $x$ and $y$ are terms, so $x@y$ is a term;
@@ -236,20 +237,21 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \[
     3 * 4 + 7 *2 \qquad\text{to mean}\qquad (3 * 4) + (7 + 2)
   \]
-  by the typical precedence convention.
+  by the precedence convention.
 
   We'd also like to have some conventions to omit brackets without any ambiguity.
   E.g., one should be able to write
   \[
     \lam{x y}x\;y\;z \qquad\text{to mean}\qquad \lam{x}(\lam{y}((x\;y)\;z))
   \]
-  since
+  because
   \begin{enumerate}
     \item multiple abstractions means a function with multiple arguments;
-    \item applying a function to multiple arguments can be achieved via applying a function to a single argument and get another function which is applied to the next argument;
+    \item applying a function to multiple arguments can be achieved by applying a function to an argument to get another function for the next argument;
     \item applications occur more often than abstractions in a body.
   \end{enumerate}
 \end{frame}
+
 \begin{frame}{Conventions}
   \begin{description}
     \item[Consecutive abstractions]
@@ -291,14 +293,14 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
   In the expression $f({\color{red}{x}}) = {\color{red}x}^2$, the variable $x$ in the expression $x^2$ is \alert{bound} to $x$ of $f$ and the \alert{meaning} of $f(x)$ is the same as $f({\color{red}y}) = {\color{red}y}^2$.
 
-  Similarly, following expressions demonstrate the variable binding in various forms:
+  Similarly, following expressions exhibit the variable binding in various forms:
   \begin{enumerate}
     \item $\sum_{\alert{x} = 0}^{n} \alert{x}$
     \item $\int_{0}^{1} e^{\alert{y}}\; \mathrm{d}\alert{y}$
     \item $f({\color{red}x}, {\color{blue}y}) = {\color{red}x}^2 + {\color{blue}y}^2$
     \item \dots
     \item $\lambda {\color{red}y}.\,(\lambda {\color{blue}x}.\, {\color{red}y})$ means a function that takes an argument $y$ returns a constant function at $y$
-    \item $\lambda {\color{red}x}.\,(\lambda {\color{blue}y}.\, {\color{blue}y})$ means a constant function that always returns an identity function
+    \item $\lambda {\color{red}x}.\,(\lambda {\color{blue}y}.\, {\color{blue}y})$ means a constant function that always returns the identity
   \end{enumerate}
 \end{frame}
 
@@ -348,14 +350,14 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
 \begin{frame}{First solution: de Bruijn representation}
   \begin{idea}
-    The problem of variable renaming is the \emph{name}, so we may discard names and use indices $i'$ to represent variable bindings.
+    We discard names completely and use indices $i'$ to represent variable bindings.
   \end{idea}
 
   The index $i'$ points to the $i$-th innermost $\lambda$-node from the variable: 
   \begin{center}
     \begin{minipage}{.4\textwidth}
       \begin{tikzpicture}[
-            level distance=0.74cm,
+            level distance=0.75cm,
           level 1/.style={sibling distance=6cm},
           level 2/.style={sibling distance=4cm},
           level 3/.style={sibling distance=2cm}
@@ -379,7 +381,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     becomes
     \begin{minipage}{.4\textwidth}
       \begin{tikzpicture}[
-            level distance=0.74cm,
+            level distance=0.75cm,
           level 1/.style={sibling distance=6cm},
           level 2/.style={sibling distance=4cm},
           level 3/.style={sibling distance=2cm}
@@ -401,7 +403,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
       \end{tikzpicture}
     \end{minipage}
   \end{center}
-  This representation is invented by a Dutch mathematician, N. G. de Bruijn, while implementing a language for formalising mathematics.
+  This representation is invented by a Dutch mathematician, N. G. de Bruijn, while implementing a system for formalising mathematics.
 \end{frame}
 
 \begin{frame}{Pros and cons of De Bruijn representation}
@@ -424,13 +426,12 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \begin{idea}
     Using the nominal representation, we define $t =_\alpha u$ if variables $t$ and $u$ can be renamed `suitably' to exactly the same term.
   \end{idea}
-  The problem with naive renaming is that a renamed variable might be \alert{captured} by another $\lambda$, breaking the binding structure.
-
-  E.g., $y$ can be renamed to anything but $x$ in 
+  With naive renaming, a renamed variable might be \alert{captured} by some $\lambda$, breaking the binding structure.
+  For example, $y$ can be renamed to anything but $x$ in 
   \[
     \lambda x.\,(\lambda y.\, x \; y)
   \]
-  to retain the same binding structure.
+  to preserve the same binding structure.
 
   Hence, variable renaming has to be constrained to variables that do not \alert{occur} in the term to avoid changing the binding structure.
   \begin{alertblock}{Quest}
@@ -450,9 +451,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     \end{align*}
     there exists a unique $\hat{f}\colon \Lambda(V)  \to X$ such that
     \begin{align*}
-      \hat{f}\,x    & = f_1\,x \\
-      \hat{f}(t\;u) & = f_2(\hat{f}\,t, \hat{f}\,u) \\
-      \hat{f}(\lambda x.\, t) & = f_3(x, \hat{f}\,t)
+      \hat{f}\,x    & = f_1\,x & \hat{f}(t\;u) & = f_2(\hat{f}\,t, \hat{f}\,u) & \hat{f}(\lambda x.\, t) & = f_3(x, \hat{f}\,t)
     \end{align*}
   \end{theorem*}
 \end{frame}
@@ -809,26 +808,12 @@ For example,
   We may consider a notion of \alert{undirected equality} based on $\beta$-reduction, while arguing the computational equality:
   \begin{definition}
     We say that $t$ and $u$ are $\beta$-equal, written $t =_\beta u$, if 
-    \begin{multicols}{2}
-      \begin{prooftree}
-        \AXC{$t \onereduce u$}
-        \UIC{$t =_\beta u$}
-      \end{prooftree}
-      \begin{prooftree}
-        \AXC{\phantom{$t =_\beta u$}}
-        \UIC{$t =_\beta t$}
-      \end{prooftree}
-      \columnbreak
-      \begin{prooftree}
-        \AXC{$t =_\beta u$}
-        \UIC{$u =_\beta t$}
-      \end{prooftree}
-      \begin{prooftree}
-        \AXC{$t =_\beta u$}
-        \AXC{$u =_\beta v$}
-        \BIC{$t =_\beta v$}
-      \end{prooftree}
-    \end{multicols}
+    \begin{mathpar}
+      \inferrule{t \onereduce u}{t =_\beta u}(\beta) \and
+      \inferrule{ }{t =_\beta t}(\text{refl}) \and
+      \inferrule{t =_\beta u}{u =_\beta t}(\text{sym}) \and
+      \inferrule{t =_\beta u \\ u =_\beta v}{t =_\beta v} (\text{trans})
+    \end{mathpar}
   \end{definition}
   It is clear that $t\reduce u$ implies $t =_\beta u$ (why?). 
   How about the converse?
@@ -906,8 +891,8 @@ Boolean and conditional can be encoded as combinators.
 \end{frame}
 \begin{frame}{General Recursion via self-reference}
 
-  The summation $\sum_{i = 0}^{n} i$ for $n \in \mathbb{N}$ is usually
-  described by self-reference in mathematics as follows.
+  The summation $\sum_{i = 0}^{n} i$ for $n \in \mathbb{N}$ is typically
+  described by self-reference as
 \[
   \mathit{sum}(n) =
     \begin{cases} 
@@ -917,8 +902,7 @@ Boolean and conditional can be encoded as combinators.
 \]
 This \alert{cannot} be done in $\lambda$-calculus directly. (Why?)
 
-\begin{block}{Observation}
-  If $\mathit{sum}$ is unfolded as many times as it requires, then
+Note that unfolding $\mathit{sum}$ as many times as it requires gives
 \[
   \mathit{sum}(n) =
     \begin{cases} 
@@ -928,9 +912,6 @@ This \alert{cannot} be done in $\lambda$-calculus directly. (Why?)
      n + \mathit{sum}(n - 1)  & \text{otherwise}.
     \end{cases}
 \]
-  
-\end{block}
-
 
 
 %We can avoid self-reference by considering a functional
@@ -974,11 +955,11 @@ Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration.
        n + \mathit{sum}(n - 1)  & \text{otherwise}.
       \end{cases}
   \]
-  by generalising each iteration $G$ with an additional function $f$
+  by defining each iteration $G$ with an additional function $f$ so that $\mathtt{sum} \defeq \mathbf{Y}G$:
   \[
     G \defeq \lambda f\,n.\, \mathtt{ifz}\;n\;\bc_0\; (\add\;n\;(f\;(\mathtt{pred}\;n)))
   \]
-  so that $\mathtt{sum} \defeq \mathbf{Y}G$. For example, 
+  For example, letting $G' \defeq ((\lambda x.\, G\;(x\;x))\;(\lambda x.\,G\;(x\;x)))$, we have
   \begin{align*}
     \mathtt{sum}\;\bc_1
       &\onereduce G'\;\bc_1 \\
@@ -989,8 +970,6 @@ Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration.
       (\add\;\bc_1\;(G'\;(\mathtt{pred}\;\bc_1))) \\
       &\onereduce \dots
   \end{align*}
-  where
-  $G' \defeq ((\lambda x.\, G\;(x\;x))\;(\lambda x.\,G\;(x\;x)))$.
 \end{frame}
   
 %\begin{frame}{Turing's fixed-point combinator}
@@ -1040,8 +1019,7 @@ Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration.
   \end{theorem}
   \begin{enumerate}
     \item (2.5\%) Show that $t \reduce u$ implies $t =_\beta u$. 
-    \item (2.5\%) Suppose that the Church-Rosser property holds.
-      Then, $t =_\alpha u$ implies that there exists a \emph{confluent} term $v$ of $t$ and $u$, i.e.\ $t \reduce v$ and $u \reduce v$.
+    \item (2.5\%) Show that if $t =_\beta u$ then there is a \emph{confluent} term $v$ of $t$ and $u$, i.e.\ $t \reduce v$ and $u \reduce v$.
   \end{enumerate}
 \end{frame}
 

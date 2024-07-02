@@ -272,12 +272,9 @@
     \FV(A \to B)        & = \FV(A) \cup \FV(B) \\
     \FV(\forall X.\, A) & = \FV(A) - \{X\}
   \end{align*}
-  For convenience, the function extends to contexts:
-  \[
-    \FV(\Gamma) = \set{ X \in \mathbb{V}}{ \exists (x : A) \in \Gamma
-      \wedge X \in \FV(A) }.
-  \]
 \end{definition}
+The function extends to contexts:
+$\FV(\Gamma) = \set{ X \in \mathbb{V}}{ \exists (x : A) \in \Gamma \wedge X \in \FV(A) }$.
 \begin{exercise*}
 
   \begin{enumerate}
@@ -289,10 +286,9 @@
 
 \begin{frame}{Capture-avoiding substitution for type}
   Permutation of type variables and $\alpha$-equivalence between types are defined similarly. 
-
-  In particular, the substitution is also defined to avoid any capture of free type variables:
+  In particular, the substitution is defined to avoid any capture of free type variables:
   \begin{definition}
-  The \emph{capture-avoiding substitution} of a type $A$ for a type variable~$X$ is defined on types by 
+  The \emph{capture-avoiding substitution} $\_\subst{A}{X}$ of a type $A$ for a type variable~$X$ is defined by 
   \begin{align*}
     X\subst{A}{X} & = A \\
     Y\subst{A}{X} & = Y && \text{if $X \neq Y$}\\
@@ -364,7 +360,7 @@
 \begin{frame}{Typing rules}
   The judgement $\Delta; \Gamma \vdash t : A$ is defined inductively by following rules.
   \begin{multicols}{2} 
-    \small
+%    \small
   \begin{prooftree}
     \AXC{}
     \RightLabel{if $\Gamma \ni x : A$}
@@ -396,6 +392,7 @@
 
   \begin{theorem}[Type safety]
     Suppose $\Delta; \Gamma \vdash t : A$. Then, 
+    \vskip -1pt
     \begin{enumerate}
       \item $t \onereduce u$ implies $\Delta; \Gamma \vdash u : A$; 
       \item $t$ is in normal form or there exists $u$ such that $t \onereduce u$
@@ -597,6 +594,7 @@ The pairing function is defined by
 \begin{align*}
   \left< \_, \_\right>_{A, B} \defeq \lam{x : A}{y : B}\lam{X}\lam{f : A \to B \to X} f\;x\;y
 \end{align*}
+\vskip -1pt
 \begin{block}{Exercise}
 Define projections 
 \[
@@ -923,8 +921,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
 \end{frame}
 
 \begin{frame}{Parametricity in polymorphic $\lambda$-calculus}
-  Following Girard's \emph{reducibility candidate}~\cite{Girard1989}, assume $\mathcal{U}$ a set of \alert{relation candidates} in some model.
-
+  Following Girard's \emph{reducibility candidate}~\cite{Girard1989}, assume a set $\mathcal{U}$ of \alert{relation candidates} in some model.
   A family of $\{ R_{\Phi}^{A} \}_{\Delta \vdash A}$ is logical if
   \begin{align*}
     R^{X}_{\Phi}(x_1, x_2)        & \quad\text{iff} \quad\Phi(X)(x_1, x_2)  \\
@@ -1219,6 +1216,10 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
   
 \end{frame}
 
+\begin{frame}{Acknowledgement}
+  I would like to thank 薛盛安, 曾顯恩, 蔡子濬 (Gene Tsai), 游書泓, and many other students at FLOLAC for their efforts in reading and correcting the material carefully.  
+\end{frame}
+
 \begin{frame}[allowframebreaks]{References}
   \setbeamerfont{bibliography item}{size=\footnotesize}
   \setbeamerfont{bibliography entry author}{size=\footnotesize}
@@ -1228,6 +1229,7 @@ and $\mathtt{cons}_A$ of type $A \to \List(A) \to \List(A)$ defined as
   \bibliographystyle{apalike}
   \bibliography{ref} 
 \end{frame}
+
 
 \end{document}
 

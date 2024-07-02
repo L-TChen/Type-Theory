@@ -653,7 +653,6 @@ By combing the above two properties, we can extend the progress theorem to $\red
 \end{frame}
 
 \begin{frame}{Normal form}
-  The notion of normal form can be characterised syntactically:
   \begin{definition}
     Define judgements $\texttt{Neutral}\;t$ and $\texttt{Normal}\;u$ mutually by
     \begin{multicols}{2}
@@ -677,14 +676,13 @@ By combing the above two properties, we can extend the progress theorem to $\red
       \end{prooftree}
     \end{multicols}
   \end{definition}
-  \textbf{Idea.} $\neutral\;u$ and $\normal\;t$ are derivable
-  iff 
+  \textbf{Idea.} $\neutral\;u$ and $\normal\;t$ are derivable iff 
   \[
     t \equiv x\;u_1 \cdots u_n
     \quad\text{and}\quad
-    u \equiv \lam{x_1 \cdots x_n}x\;u_1 \cdots u_m.
+    u \equiv \lam{x_1 \cdots x_n}x\;u_1 \cdots u_m
   \]
-  That is, $\beta$-redex cannot exist in $u$ if $u$ is normal.
+  where $\beta$-redex cannot exist in $u$ if $u$ is normal.
 \end{frame}
 
 \begin{frame}{Soundness and completeness of the inductive characterisation}
@@ -870,23 +868,28 @@ By combing the above two properties, we can extend the progress theorem to $\red
     \item $\ifz(t; x.\,u; v)$ is a term in $\Lambda_{\fix, \N}(V)$ if $t, u, v \in \Lambda_{\fix, \N}(V)$ and $x \in V$
   \end{itemize}
   with additional typing rules
-  \begin{multicols}{2}
-    \begin{prooftree}
-      \AXC{$\vphantom{\Gamma}$}
-      \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$\Gamma \vdash t : \mathbb{N}$}
-      \UIC{$\Gamma \vdash \suc(t) : \mathbb{N}$}
-    \end{prooftree}
-  \end{multicols}
+  \begin{mathpar}
+    \inferrule{ }{\Gamma \vdash \zero : \mathbb{N}} \and
+    \inferrule{\Gamma \vdash t : \mathbb{N}}{\Gamma \vdash \suc(t) : \mathbb{N}} \and
+    \inferrule{\Gamma \vdash v : \mathbb{N} \\ \Gamma \vdash t : A \\ \Gamma, x : \mathbb{N} \vdash u : A}{\Gamma \vdash \ifz(t; x.\,u; v) : A}
+  \end{mathpar}
+%  \begin{multicols}{3}
+%    \begin{prooftree}
+%      \AXC{$\vphantom{\Gamma}$}
+%      \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \AXC{$\Gamma \vdash t : \mathbb{N}$}
+%      \UIC{$\Gamma \vdash \suc(t) : \mathbb{N}$}
+%    \end{prooftree}
+%  \begin{prooftree}
+%    \AXC{$\Gamma \vdash v : \mathbb{N}$}
+%    \AXC{$\Gamma \vdash t : A$}
+%    \AXC{$\Gamma, x : \mathbb{N} \vdash u : A$}
+%    \TrinaryInfC{$\Gamma \vdash \ifz(t; x.\,u; v) : A$}
+%  \end{prooftree}
+%  \end{multicols}
 
-  \begin{prooftree}
-    \AXC{$\Gamma \vdash v : \mathbb{N}$}
-    \AXC{$\Gamma \vdash t : A$}
-    \AXC{$\Gamma, x : \mathbb{N} \vdash u : A$}
-    \TrinaryInfC{$\Gamma \vdash \ifz(t; x.\,u; v) : A$}
-  \end{prooftree}
   The third rule is akin to pattern matching on natural numbers.
 \end{frame}
 
@@ -1001,10 +1004,9 @@ By combing the above two properties, we can extend the progress theorem to $\red
 
 \begin{frame}{Homework}
   \begin{enumerate}
-    \item (2.5\%) Complete the proof of the Preservation Theorem.
     \item (5\%) Show the Progress Theorem.
     \item (2.5\%) Show that if $t$ is in normal form then $\normal\;t$ is derivable.
-    \item (5\%) Extend $\Lambda_{\fix, \N}(V)$ further with product types $A \times B$, for any $A$ and $B$ where additional constructs should include pairs $(t, u)$ and a construct to pattern match on a pair.
+    \item (2.5\%) Extend $\Lambda_{\fix, \N}(V)$ further with product types $A \times B$, for any $A$ and $B$ where additional constructs should include pairs $(t, u)$ and a construct to pattern match on a pair.
 
   \end{enumerate}
   
