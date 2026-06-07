@@ -1,0 +1,105 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\newcommand{\lam}[1]{\lambda #1.\,}
+\newcommand{\Lam}[1]{\Lambda #1.\,}
+\newcommand{\List}{\mathsf{List}}
+\newcommand{\nat}{\mathsf{nat}}
+
+\title{Lecture 3 In-Class Worksheet\\Polymorphic Lambda Calculus}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Learning objectives}
+By the end of this three-hour unit, students should be able to:
+\begin{enumerate}[nosep]
+  \item explain the difference between term abstraction and type abstraction;
+  \item typecheck simple System F terms;
+  \item instantiate polymorphic functions using type application;
+  \item read Church encodings of sums, products, naturals, and lists as eliminators;
+  \item state the basic intuition of parametricity without proving the full theorem.
+\end{enumerate}
+
+\section*{Suggested pacing}
+\begin{center}
+\begin{tabular}{r p{0.68\linewidth}}
+0--20 min & From STLC to explicit polymorphism.\\
+20--50 min & System F syntax and typing rules.\\
+50--75 min & Exercise 1: type derivations.\\
+75--85 min & Break.\\
+85--125 min & Programming with polymorphic encodings.\\
+125--150 min & Exercise 2: products and sums.\\
+150--175 min & Parametricity as a reasoning principle.\\
+175--180 min & Exit check.\\
+\end{tabular}
+\end{center}
+
+\section*{Exercise 1: polymorphic derivations}
+Derive or explain the following judgments.
+\begin{enumerate}
+  \item $\vdash \Lam{X}\lam{x:X}x : \forall X. X \to X$
+  \item $\vdash \Lam{X}\Lam{Y}\lam{x:X}\lam{y:Y}x : \forall X.\forall Y. X \to Y \to X$
+  \item Why is $\Lam{X}\lam{x:X}x\;X$ ill-formed as written?
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item Introduce type variable $X$, derive $x:X \vdash x:X$, abstract over $x$, then over $X$.
+  \item Same pattern with two type variables and two term variables.
+  \item Type application applies a term to a type only when the term has a universal type; here $x : X$, not $\forall Y.A$.
+\end{enumerate}
+
+\section*{Exercise 2: Church encodings as eliminators}
+Use the encodings
+\[
+  A \times B \equiv \forall X. (A \to B \to X) \to X,
+  \qquad
+  A + B \equiv \forall X. (A \to X) \to (B \to X) \to X.
+\]
+Define:
+\begin{enumerate}
+  \item $\mathsf{proj}_1 : A \times B \to A$;
+  \item $\mathsf{proj}_2 : A \times B \to B$;
+  \item $\mathsf{either} : \forall X. (A \to X) \to (B \to X) \to A + B \to X$.
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item $\mathsf{proj}_1\;p \equiv p\;A\;(\lam{x}\lam{y}x)$.
+  \item $\mathsf{proj}_2\;p \equiv p\;B\;(\lam{x}\lam{y}y)$.
+  \item $\mathsf{either}\;X\;f\;g\;s \equiv s\;X\;f\;g$.
+\end{enumerate}
+
+\section*{Exercise 3: parametricity intuition}
+For each type, list the closed terms students should expect before seeing any implementation.
+\begin{enumerate}
+  \item $\forall X. X$
+  \item $\forall X. X \to X$
+  \item $\forall X. X \to \nat$
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item No closed total term in pure System F.
+  \item The identity function is the canonical inhabitant.
+  \item Such a term cannot inspect an arbitrary $X$; it must return a fixed natural number.
+\end{enumerate}
+
+\section*{Exit check}
+Students should be able to answer these without notes:
+\begin{enumerate}[nosep]
+  \item What is the difference between $\lambda x.t$ and $\Lambda X.t$?
+  \item What does universal elimination do?
+  \item Why does $\forall X. X \to X$ strongly suggest the identity function?
+\end{enumerate}
+
+\section*{Instructor notes}
+For a no-homework version, choose one main application: either Church encodings or parametricity. If both are included, keep parametricity at the level of examples and free-theorem intuition, not the full logical-relations proof.
+
+\end{document}
