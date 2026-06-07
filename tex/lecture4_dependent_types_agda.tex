@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\title{Lecture 4 Plan\\Basic Dependent Type Theory and an Agda Demo}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Learning objectives}
+By the end of this three-hour unit, students should be able to:
+\begin{enumerate}[nosep]
+  \item explain how dependent types extend STLC and System F;
+  \item read a dependent function type $(x : A) \to B\;x$;
+  \item understand indexed families through length-indexed vectors;
+  \item see propositions-as-types through the equality type and \texttt{refl};
+  \item use Agda's type checker as a small proof checker.
+\end{enumerate}
+
+\section*{Connection to previous units}
+\begin{center}
+\begin{tabular}{l l}
+STLC & terms depend on terms; types classify terms.\\
+System F & terms can abstract over types.\\
+Dependent type theory & types may depend on terms.\\
+Agda & type checking can verify programs and proofs.\\
+\end{tabular}
+\end{center}
+
+\section*{Suggested pacing}
+\begin{center}
+\begin{tabular}{r p{0.68\linewidth}}
+0--20 min & From function types to dependent function types.\\
+20--45 min & Indexed families: vectors indexed by length.\\
+45--65 min & Exercise 1: read vector types.\\
+65--75 min & Break.\\
+75--105 min & Equality as a type and proof by computation.\\
+105--145 min & Live Agda demo: \texttt{Nat}, \texttt{Vec}, \texttt{append}, \texttt{head}.\\
+145--170 min & Exercise 2: fill small definitions and predict rejected cases.\\
+170--180 min & Summary and further directions.\\
+\end{tabular}
+\end{center}
+
+\section*{Core ideas}
+\subsection*{Dependent functions}
+Ordinary function type:
+\[
+  A \to B
+\]
+Dependent function type:
+\[
+  (x : A) \to B\;x
+\]
+The return type may mention the input value.
+
+\subsection*{Indexed families}
+A vector type can mention its length:
+\[
+  \mathsf{Vec}\;A\;n
+\]
+This should be read as: vectors of elements of type $A$ whose length is $n$.
+
+\subsection*{Propositions as types}
+A proposition is represented by a type, and a proof is represented by an inhabitant. Equality has the canonical proof:
+\[
+  \mathsf{refl} : x \equiv x.
+\]
+
+\section*{Live demo}
+Use \texttt{agda/DependentDemo.agda}. The demo is intentionally self-contained and does not depend on the Agda standard library.
+
+\begin{enumerate}[nosep]
+  \item Define natural numbers.
+  \item Define addition.
+  \item Define vectors indexed by length.
+  \item Define append with type \texttt{Vec A m -> Vec A n -> Vec A (m + n)}.
+  \item Define head only for non-empty vectors.
+  \item Show that some equalities are proved by \texttt{refl} because both sides compute to the same normal form.
+\end{enumerate}
+
+\section*{Exercise 1: reading dependent types}
+Explain what each type promises.
+\begin{enumerate}
+  \item \texttt{Vec Nat zero}
+  \item \texttt{Vec Nat (suc zero)}
+  \item \texttt{\{A : Set\} \{n : Nat\} -> Vec A (suc n) -> A}
+  \item \texttt{Vec A m -> Vec A n -> Vec A (m + n)}
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item Empty vectors of naturals.
+  \item Singleton vectors of naturals.
+  \item A function that extracts an element from a statically non-empty vector.
+  \item A function that appends two vectors and statically preserves the length equation.
+\end{enumerate}
+
+\section*{Exercise 2: Agda discussion prompts}
+After the live demo, ask students:
+\begin{enumerate}
+  \item Why is there no \texttt{head []} case?
+  \item Why does \texttt{append [] ys = ys} typecheck?
+  \item Why does the recursive case of \texttt{append} produce \texttt{Vec A (suc (m + n))}?
+  \item What does \texttt{refl} prove in \texttt{ex2}? What computation is Agda using?
+\end{enumerate}
+
+\section*{Instructor notes}
+Keep the unit focused on dependent types as a practical extension of earlier typing judgments. Avoid universes, identity elimination, Cubical Agda, HoTT, and normalization proofs unless there is substantial extra time.
+
+\end{document}
