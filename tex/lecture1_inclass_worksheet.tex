@@ -1,0 +1,104 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\newcommand{\lam}[1]{\lambda #1.\,}
+\newcommand{\FV}{\mathrm{FV}}
+\newcommand{\reduce}{\twoheadrightarrow_\beta}
+\newcommand{\onereduce}{\to_\beta}
+\newcommand{\subst}[2]{[#1/#2]}
+
+\title{Lecture 1 In-Class Worksheet\\Untyped Lambda Calculus}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Learning objectives}
+By the end of this three-hour unit, students should be able to:
+\begin{enumerate}[nosep]
+  \item parse lambda terms using the binding and application conventions;
+  \item identify free and bound variables;
+  \item perform simple capture-avoiding substitutions;
+  \item reduce a term by one or more beta steps;
+  \item distinguish $=_\alpha$, $\onereduce$, $\reduce$, and $=_\beta$.
+\end{enumerate}
+
+\section*{Suggested pacing}
+\begin{center}
+\begin{tabular}{r p{0.68\linewidth}}
+0--20 min & Motivation, syntax, and parsing conventions.\\
+20--45 min & Abstract syntax trees and binding.\\
+45--65 min & Exercise 1: parsing and binding.\\
+65--75 min & Break.\\
+75--105 min & Free variables and capture-avoiding substitution.\\
+105--135 min & Exercise 2: substitution.\\
+135--165 min & Beta-reduction and multi-step reduction.\\
+165--180 min & Exit check and summary of relations.\\
+\end{tabular}
+\end{center}
+
+\section*{Exercise 1: parsing and binding}
+Expand the conventions and mark the binders for each occurrence of a variable.
+\begin{enumerate}
+  \item $\lam{x y} x\;y\;z$
+  \item $(\lam{x}x)\;(\lam{y}y)$
+  \item $\lam{a b} a\;(\lam{c}a\;b)$
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item $\lam{x}(\lam{y}((x\;y)\;z))$; $z$ is free.
+  \item Application of two abstractions; both $x$ and $y$ are bound in their own bodies.
+  \item $\lam{a}(\lam{b}(a\;(\lam{c}(a\;b))))$; $c$ does not occur in the body.
+\end{enumerate}
+
+\section*{Exercise 2: free variables and substitution}
+Compute the free variables first, then perform the substitution if it is safe.
+\begin{enumerate}
+  \item $\FV(\lam{x}(x\;z))$
+  \item $(\lam{y}(x\;y))\subst{z}{x}$
+  \item $(\lam{z}(x\;z))\subst{z}{x}$
+  \item $(\lam{y}(x\;y))\subst{y}{x}$
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item $\{z\}$.
+  \item $\lam{y}(z\;y)$.
+  \item The binder $z$ conflicts with the substituting term; alpha-rename first, e.g. $\lam{w}(x\;w)$, then substitute to obtain $\lam{w}(z\;w)$.
+  \item Alpha-rename $y$ first, e.g. $\lam{w}(x\;w)$, then substitute to obtain $\lam{w}(y\;w)$.
+\end{enumerate}
+
+\section*{Exercise 3: beta-reduction}
+Circle every beta-redex and reduce to normal form when possible.
+\begin{enumerate}
+  \item $(\lam{x}x)\;z$
+  \item $((\lam{x}x)\;y)\;((\lam{z}z)\;x)$
+  \item $(\lam{x y}x)\;u\;v$
+  \item $(\lam{x y}y)\;x$
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item $z$.
+  \item $y\;x$ after reducing both visible redexes.
+  \item $u$.
+  \item $\lam{y}y$ after avoiding capture by alpha-renaming if necessary.
+\end{enumerate}
+
+\section*{Exit check}
+Students should be able to answer these without notes:
+\begin{enumerate}[nosep]
+  \item Give two alpha-equivalent but syntactically different terms.
+  \item Give a substitution example where alpha-renaming is necessary.
+  \item Explain why $\onereduce$ is directed but $=_\beta$ is symmetric.
+\end{enumerate}
+
+\section*{Instructor notes}
+For a no-homework version of the course, treat Church encodings, the Y combinator, and confluence as optional or appendix material unless the class finishes the core exercises early.
+
+\end{document}
