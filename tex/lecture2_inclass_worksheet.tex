@@ -1,0 +1,110 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\newcommand{\lam}[1]{\lambda #1.\,}
+\newcommand{\type}{\mathsf{type}}
+\newcommand{\normal}{\mathsf{Normal}}
+\newcommand{\neutral}{\mathsf{Neutral}}
+\newcommand{\onereduce}{\to_\beta}
+
+\title{Lecture 2 In-Class Worksheet\\Simply Typed Lambda Calculus}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Learning objectives}
+By the end of this three-hour unit, students should be able to:
+\begin{enumerate}[nosep]
+  \item read and construct STLC typing derivations;
+  \item use inversion to decompose a typing judgment;
+  \item explain preservation and progress at the level of statements and examples;
+  \item distinguish the pure STLC from extensions such as fixpoints and primitive naturals.
+\end{enumerate}
+
+\section*{Suggested pacing}
+\begin{center}
+\begin{tabular}{r p{0.68\linewidth}}
+0--15 min & Recap untyped lambda calculus and motivate types.\\
+15--45 min & Types, contexts, and typing rules.\\
+45--70 min & Exercise 1: small derivation trees.\\
+70--80 min & Break.\\
+80--115 min & Syntax-directedness and inversion.\\
+115--145 min & Exercise 2: derive a higher-order term.\\
+145--170 min & Preservation/progress examples and non-examples.\\
+170--180 min & Exit check.\\
+\end{tabular}
+\end{center}
+
+\section*{Exercise 1: basic derivations}
+Construct typing derivations for the following judgments.
+\begin{enumerate}
+  \item $x : A \vdash x : A$
+  \item $\vdash \lam{x}x : A \to A$
+  \item $\vdash \lam{x y}x : A \to B \to A$
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item Use the variable rule directly.
+  \item Use the variable rule under context $x:A$, then abstraction.
+  \item Use the variable rule under context $x:A,y:B$, then abstract over $y$, then abstract over $x$.
+\end{enumerate}
+
+\section*{Exercise 2: higher-order derivation}
+Derive
+\[
+  \vdash \lam{f\,g\,x} f\;x\;(g\;x)
+  : (A \to B \to C) \to (A \to B) \to A \to C .
+\]
+
+\paragraph{Derivation skeleton.}
+Work inside the context
+\[
+  f : A \to B \to C,
+  \quad g : A \to B,
+  \quad x : A.
+\]
+Fill in the following checkpoints:
+\begin{enumerate}[nosep]
+  \item $x : A$ by variable.
+  \item $g\;x : B$ by application.
+  \item $f\;x : B \to C$ by application.
+  \item $f\;x\;(g\;x) : C$ by application.
+  \item Abstract over $x$, then $g$, then $f$.
+\end{enumerate}
+
+\section*{Exercise 3: preservation and progress by example}
+For each term, decide whether it is typable, whether it reduces, and whether the reduct has the same type.
+\begin{enumerate}
+  \item $(\lam{x}x)\;(\lam{y}y)$
+  \item $(\lam{x y}x)\;(\lam{z}z)$
+  \item $(\lam{x}x\;x)$
+  \item $(\lam{x}x)\;y$ under context $y:A$
+\end{enumerate}
+
+\paragraph{Solution checkpoints.}
+\begin{enumerate}[nosep]
+  \item Typable at a suitable function type and reduces to $\lam{y}y$.
+  \item Typable and reduces to a constant function.
+  \item Not typable in STLC because self-application requires solving $A = A \to B$.
+  \item Typable and reduces to $y$ with the same type.
+\end{enumerate}
+
+\section*{Exit check}
+Students should be able to answer these without notes:
+\begin{enumerate}[nosep]
+  \item What information does inversion give for a judgment about an application?
+  \item State preservation in one sentence.
+  \item State progress in one sentence.
+  \item Why does adding a general fixpoint construct change normalization?
+\end{enumerate}
+
+\section*{Instructor notes}
+For a no-homework version of the course, present weak and strong normalization as conceptual contrasts after the core exercises, not as proof obligations. Treat primitive naturals, booleans, and fixpoints as extensions that illustrate how language features are added by syntax, typing rules, and reduction rules.
+
+\end{document}
