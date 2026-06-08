@@ -2,7 +2,9 @@ outdir  = output
 
 tex = latexmk -xelatex -outdir=$(outdir)
 
-lectures = lecture1 lecture2 lecture3 
+lectures = lecture1 lecture2 lecture3 lecture4
+
+.PHONY: all note clean $(lectures) $(lectures:=_note)
 
 all: $(lectures)
 
