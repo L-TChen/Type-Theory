@@ -98,11 +98,11 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \begin{frame}{What to expect next?}
   For $\lambda$-calculus, we will consider the following topics in programming languages in a style of mathematical formalism.
   \begin{enumerate}
-    \item How programs are identified \emph{up to variable renaming}?
+    \item How are programs identified \emph{up to variable renaming}?
       E.g., $\lambda x.\, x$ should be `equal' to $\lambda y.\, y$.
     \item How do programs \emph{compute}?
       E.g., the application $(\lambda x.\, x)\;3$ of the identity to $3$ should compute to $3$.
-    \item How programs are identified \emph{computationally}?
+    \item How are programs identified \emph{computationally}?
       E.g.,
       \[
         (\lambda x.\, x)\;3 \quad\text{and}\quad (\lambda y.\, 3)\;10
@@ -353,7 +353,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
   In the expression $f({\color{red}{x}}) = {\color{red}x}^2$, the variable $x$ in the expression $x^2$ is \alert{bound} to $x$ of $f$ and the \alert{meaning} of $f(x)$ is the same as $f({\color{red}y}) = {\color{red}y}^2$.
 
-  Similarly, following expressions exhibit the variable binding in various forms:
+  Similarly, the following expressions exhibit the variable binding in various forms:
   \begin{enumerate}
     \item $\sum_{\alert{x} = 0}^{n} \alert{x}$
     \item $\int_{0}^{1} e^{\alert{y}}\; \mathrm{d}\alert{y}$
@@ -646,7 +646,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
 \begin{frame}{Variable permutation}
   \begin{alertblock}{Idea}
-    To rename a binder safely, we swap it with a fresh variable $z \notin \Var(t)$.
+    To rename a binder safely, we swap the binder with a fresh variable $z \notin \Var(t)$.
   \end{alertblock}
   
   A \emph{transposition} $(x\, y)$ is a function that swaps $x$ and $y$ but fixes everything else, i.e.\
@@ -1006,10 +1006,12 @@ For example,
         & $x$ is a variable term over $V$ \\
 
       $t @ u \in \Lambda(V)$
-        & application of $t$ to $u$ \\
+        & application of $t$ to $u$, with $t, u\in \Lambda(V)$ \\
+
+      $t\;u$ & conventional notation for \(t @ u\) \\
 
       $\lambda x.\,t \in \Lambda(V)$
-        & abstraction, with $x \in V$ \\
+        & abstraction, with $x \in V$ and $t \in \Lambda(V)$ \\
 
       $t =_\alpha u$
         & $t$ and $u$ have the same binding structure \\
