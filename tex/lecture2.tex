@@ -16,11 +16,12 @@
   We have covered so far
   \begin{itemize}
     \item Terms: variables, abstractions, and applications.
-    \item $\beta$-reduction: $(\lambda x.\,M)\;N \onereduce M\subst{N}{x}$.
     \item $\alpha$-equivalence avoids dependence on bound-variable names.
+    \item $\beta$-reduction: $(\lambda x.\,M)\;N \onereduce M\subst{N}{x}$.
   \end{itemize}
 
-  Today, we will use $\lambda$-calculus for programming, recursion, confluence, and evaluation strategy.
+  Today, we will use $\lambda$-calculus as a programming language, then study
+two properties of reduction: evaluation strategy and confluence.
 \end{frame}
 
 \section{Defining data in \texorpdfstring{$\lambda$}{λ}-Calculus}
@@ -51,9 +52,10 @@
         \mathtt{if}\;\mathtt{True}\;t\;u &\reduce t \\
         \mathtt{if}\;\mathtt{False}\;t\;u &\reduce u
       \end{align*}
-      for any two $\lambda$-terms $M$ and~$N$.
+      for any two $\lambda$-terms $t$ and~$u$.
   \end{description}
-  where variables $x$ and $y$ of $\lambda\,x\,y$ are `used' as $\mathtt{true}$ and $\mathtt{false}$ and a Bool value is itself a conditional expression.
+  Thus a Boolean value is represented by its eliminator: it receives the
+`then' branch and the `else' branch, and selects one of them.
 \end{frame}
 
 \begin{frame}{Example}
@@ -68,12 +70,12 @@
 \begin{frame}[t]
   \frametitle{Exercise}
   Define the following terms directly without using $\mathtt{if}$.
+  Hint: a Boolean value is already a conditional.  
   \begin{itemize}
     \item Negation: $\mathtt{not}$ such that $\mathtt{not}\;\mathtt{True} \reduce \mathtt{False}$ and $\mathtt{not}\;\mathtt{False} \reduce \mathtt{True}$.
     \item Conjunction $\mathtt{and}$.
     \item Disjunction $\mathtt{or}$.
   \end{itemize}
-  
   
 \end{frame}
 
@@ -92,8 +94,10 @@
       where $f^1(x) \defeq f\;x$ and
       $f^{n+1}(x) \defeq f\;(f^n(x))$.
   \end{description}
-  where variables $f$ and $x$ in $\bc_0$ and $\bc_{n+1}$ are used as the successor and zero under the lambda abstraction.
+
+  A Church numeral receives a function $f$ and an initial value $x$; the numeral $\bc_n$ applies $f$ to $x$ exactly $n$ times.
 \end{frame}
+
 
 \begin{frame}{Church encoding of natural numbers, II}
   \begin{description}
@@ -135,6 +139,8 @@
     \item Evaluate $\mathtt{succ}\;\bc_0$ and $\add\;\bc_1\;\bc_2$.
     \item Define the multiplication $\mul$ over Church numerals.
     \item (Hard) Define the predecessor $\mathtt{pred}$, i.e.\ $\mathtt{pred}\;\bc_{1+n} =_\beta \bc_n$.
+
+      Hint: use pairs to keep track of both the current and previous numeral.
   \end{enumerate}
 \end{frame}
 
@@ -155,12 +161,12 @@
   \[
     \mathit{sum} = \lambda n.\,\ifz\;n\;\bc_0\;(\add\;n\;(\mathit{sum}\;(\pred\;n)))
   \]
-  is a recursive equation at the meta-level not a $\lambda$-term.\footnote{%
+  is a recursive equation at the meta-level, not a $\lambda$-term.\footnote{%
   N.B. We've used $=$ for the meta-level equality but $=_\beta$ for the object-level equality.
   }
   \medskip
 
-  A term cannot refer to its own name, but we don't have to in $\lambda$-calculus!
+  A term cannot refer to its own name, but self-reference can still be encoded.
 
 %  Note that unfolding $\mathit{sum}$ as many times as required gives
 %  \[
@@ -174,16 +180,7 @@
 %  \]
 \end{frame}
 
-\begin{frame}[allowframebreaks]{General recursion as a fixpoint}
-  We want to encode the recursive definition
-  \[
-    \mathit{sum}(n) =
-      \begin{cases}
-        0 & \text{if } n = 0, \\
-        n + \mathit{sum}(n - 1) & \text{otherwise}.
-      \end{cases}
-  \]
-
+\begin{frame}{General recursion as a fixed point}
   Instead of referring to $\mathit{sum}$ by name, define a functional $G$.
   The argument $f$ of $G\;f$ is the recursive call that the body is allowed
   to use:
@@ -195,18 +192,17 @@
           (\add\;n\;(f\;(\pred\;n))).
   \]
 
-  Thus $G\;f$ computes one step of summation, assuming that $f$ already knows
-  how to compute the smaller recursive calls.  A genuine recursive summation
-  function should therefore satisfy
+  Thus $G\;f$ computes one step of summation, assuming that $f$ computes the smaller recursive calls.
+  A recursive summation function should then satisfy
   \[
-    \mathtt{sum} =_\beta G(\mathtt{sum}).
+    \mathtt{sum} =_\beta G\;\mathtt{sum}.
   \]
 
-  If we have a fixed-point combinator $\mathbf{Y}$ computing a fixpoint of $G$, then we will have 
+  If we have a fixed-point combinator $\mathbf{Y}$ producing a fixed point of $G$, then
   \[
     \mathtt{sum} \defeq \mathbf{Y}G,
     \qquad
-    \mathbf{Y}G =_\beta G(\mathbf{Y}G).
+    \mathbf{Y}G =_\beta G\;(\mathbf{Y}G).
   \]
 
   Therefore, in the body of $G$, the variable $f$ is instantiated by
@@ -242,21 +238,17 @@
 \end{frame}
 
 \begin{frame}{Summation via $\mathbf{Y}$}
-  We encode the recursion
+  Using the functional $G$ from the previous slide, define
   \[
-    \mathit{sum}(n) =
-      \begin{cases}
-        0 & \text{if } n = 0, \\
-        n + \mathit{sum}(n - 1) & \text{otherwise}
-      \end{cases}
+    \mathtt{sum} \defeq \mathbf{Y}G.
   \]
-  by defining one iteration $G$ and $\mathtt{sum} \defeq \mathbf{Y}G$.
-  Define
+  \medskip
+  Also let
   \[
-    G \defeq \lambda f\,n.\,
-      \ifz\;n\;\bc_0\;(\add\;n\;(f\;(\pred\;n))).
+    G' \defeq
+    (\lambda x.\,G\;(x\;x))\;(\lambda x.\,G\;(x\;x)).
   \]
-  Then
+  Then $\mathbf{Y}G \onereduce G'$, and hence
   \begin{align*}
     \mathtt{sum}\;\bc_1
       &\onereduce G'\;\bc_1 \\
@@ -269,7 +261,22 @@
         (\add\;\bc_1\;(G'\;(\pred\;\bc_1))) \\
       &\onereduce \cdots
   \end{align*}
-  where $G' \defeq (\lambda x.\,G\;(x\;x))\;(\lambda x.\,G\;(x\;x))$.
+\end{frame}
+
+\begin{frame}{Exercise: Identifying the Recursive Call}
+  Consider
+  \[
+    G \defeq
+    \lambda f\,n.\,
+      \ifz\;n\;\bc_0\;
+        (\add\;n\;(f\;(\pred\;n))).
+  \]
+
+  \begin{enumerate}
+    \item What role does the variable $f$ play in $G$?
+    \item Write out $G\;(\mathbf{Y}G)$.
+    \item Explain why $\mathbf{Y}G$ behaves like the summation function.
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}{Exercise}
@@ -287,25 +294,10 @@
   You do not need to expand the definitions of $\add$ or $\pred$.
 \end{frame}
 
-\begin{frame}{Exercise: Identifying the Recursive Call}
-  Consider
-  \[
-    G \defeq
-    \lambda f\,n.\,
-      \ifz\;n\;\bc_0\;
-        (\add\;n\;(f\;(\pred\;n))).
-  \]
 
-  \begin{enumerate}
-    \item What role does the variable $f$ play in $G$?
-    \item Write out $G(\mathbf{Y}G)$.
-    \item Explain why $\mathbf{Y}G$ behaves like the summation function.
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Yet Another Fixed-Point Combinator}
-  Recall that $\mathbf{Y}G =_\beta G(\mathbf{Y}\;G)$ but $\mathbf{Y}G \reduce
-  G(\mathbf{Y}\;G)$ does not hold.  Here is a fixed-point operator such that
+\begin{frame}{Turing's Fixed-Point Combinator}
+  The combinator $\Theta$ below gives a fixed point by actual reduction, not only up to
+$\beta$-equality.
   $\Theta F \reduce F(\Theta F)$.
 \begin{proposition}
   Turing's fixed-point combinator $\Theta$ is defined as
@@ -323,13 +315,13 @@
 \end{frame}
 
 \begin{frame}{Exercise: factorial}
-  Define factorial using a fixed-point combinator.
-
-  That is, find a functional $G_{\mathit{fact}}$ such that
+  Define factorial using a fixed-point combinator, for example
   \[
-    \mathtt{fact} \defeq \Theta\,G_{\mathit{fact}}
+    \mathtt{fact} \defeq \mathbf{Y}G_{\mathit{fact}}
+    \quad\text{or}\quad
+    \mathtt{fact} \defeq \Theta G_{\mathit{fact}}.
   \]
-  satisfies
+  That is, find a functional $G_{\mathit{fact}}$ such that
   \[
     \mathtt{fact}\;\bc_0 \reduce \bc_1,
     \qquad
@@ -355,6 +347,7 @@
         \onereduce
         (\mathbf{Y}G)\;\bc_1.
       \]
+      where $G$ is the summation functional defined above.
     \item Reduce the fixed point first:
       \[
         (\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1)
@@ -380,7 +373,7 @@
   \begin{enumerate}
     \item Show that $\mathbf{Y}G =_\beta G(\mathbf{Y}G)$.
     \item Reduce $G(\mathbf{Y}G)$.
-    \item Does this term have a normal form?
+    \item Does this term terminate?
   \end{enumerate}
 \end{frame}
 \begin{frame}{Exercise: a bad reduction choice}
@@ -411,23 +404,23 @@
         \onereduce
         (\lambda x.\,G_0(x\,x))\;(\lambda x.\,G_0(x\,x)).
       \]
-      What happens if we keep trying to evaluate the self-application
-      $x\,x$ before using the body of $G_0$?
+      What happens if we keep reducing the self-application before exposing the body
+of $G_0$?
   \end{enumerate}
 \end{frame}
 
 \begin{frame}{From programming to reduction theory}
-  Fixed-point combinators make recursion possible in the pure
-  $\lambda$-calculus, but they also expose two fundamental issues.
+  Fixed-point combinators make recursion possible in the pure $\lambda$-calculus,
+but they also expose two fundamental issues with unrestricted reduction.
 
   \begin{description}
     \item[Non-determinacy]
       A term may contain several $\beta$-redexes.  Reducing different redexes
       first may produce different intermediate terms:
       \[
-        M \reduce M_1,
+        t \reduce t_1,
         \qquad
-        M \reduce M_2.
+        t \reduce t_2.
       \]
 
     \item[Divergence]
@@ -452,8 +445,11 @@
 \section{Evaluation strategy}
 
 \begin{frame}[allowframebreaks]{Evaluation strategies}
-  An evaluation strategy is a procedure for selecting which $\beta$-redex to
-  reduce. Formally, it is a subrelation
+  An evaluation strategy is a procedure for selecting which $\beta$-redex to reduce and potentially produce a value.
+
+  \vfill
+
+  Formally, an evaluation strategy is a subrelation
   $\longrightarrow_{\mathrm{ev}}$ of the full one-step $\beta$-reduction
   relation $\onereduce$.
 
@@ -507,9 +503,13 @@
 \end{frame}
 
 \begin{frame}{CBV versus CBN}
+  Take values $\mathbf{Val} \subseteq \Lambda(V)$ to be variables and abstractions:
+  \[
+    \mathbf{Val} ::= x \mid \lambda x.\,t.
+  \]
   \begin{description}
     \item[Call-by-value strategy]
-      Reduce a redex $(\lambda x.\,M)\,V$ only after its argument has been
+      Reduce a redex $(\lambda x.\,t)\,u$ only after its argument $u$ has been
       evaluated to a value $V$; do not reduce under abstractions.
 
     \item[Call-by-name strategy]
@@ -524,6 +524,21 @@
     $M \longrightarrow_{\mathrm{ev}} N_1$ and
     $M \longrightarrow_{\mathrm{ev}} N_2$, then $N_1 = N_2$.
   \end{proposition}
+\end{frame}
+
+\begin{frame}{Exercise}
+  Let
+  \[
+    \Omega \defeq (\lambda x.\,x\,x)\,(\lambda x.\,x\,x),
+    \qquad
+    \mathbf{K}_1 \defeq \lambda x\,y.\,x.
+  \]
+
+  Compare the behaviour of
+  \[
+    \mathbf{K}_1\;z\;\Omega
+  \]
+  under call-by-name and call-by-value.
 \end{frame}
 
 \begin{frame}{Normalisation}
@@ -578,6 +593,30 @@
         & v
       }
     \]
+\end{frame}
+
+\begin{frame}{Example: joining genuinely different reducts}
+  Let $T \defeq (\lambda x.\,x\,x)\;((\lambda y.\,y)\;z)$.
+  Then we can choose two different $\beta$-reductions:
+  \[
+    \xymatrix@C=5em@R=4em{
+      & T
+        \ar[dl]_{\text{outer}}
+        \ar[dr]^{\text{inner}}
+      & \\
+      {((\lambda y.\,y)\;z)\;((\lambda y.\,y)\;z)}
+        \ar[dr]_{\beta^*}
+      &&
+      {(\lambda x.\,x\,x)\;z}
+        \ar[dl]^{\beta} \\
+      &
+      {z\;z}
+      &
+    }
+  \]
+
+  The first two reducts are different, but confluence says that
+  further reduction can join them.
 \end{frame}
 
 \begin{frame}{Confluence}
