@@ -48,7 +48,7 @@ E.g., the above examples can be expressed as
 \]
 \end{frame}
 
-\begin{frame}{An example of $\lambda$-notation}
+\begin{frame}{An Example of $\lambda$-notation}
   The idea of function application in $\lambda$-notation is straightforward.
 
   For example, in high school we may say a function $f(x) \defeq x^2$ with the variable $x$ and write
@@ -67,7 +67,7 @@ E.g., the above examples can be expressed as
   $\lambda$-calculus is a \emph{language of functions in $\lambda$-notation} consisting of three constructs:
 \begin{description}
   \item[abstraction]
-    functions can be introduced $\lam{x} t$
+    functions are introduced as $\lam{x} t$
 
   \item[application]
     functions can be applied to an argument $t\;u$
@@ -86,7 +86,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   $\lambda$-calculus itself is a fruitful subject but it is also useful: 
   \begin{itemize}
     \item it serves as a prototype of programming languages which can be reasoned about \alert{mathematically} and \alert{rigorously};
-    \item the methodology we develop to understand $\lambda$-calculus can be used to study and design other programming languages.
+    \item the methodology we develop to understand $\lambda$-calculus are used to study and design other programming languages.
   \end{itemize}
   \vfill
   The common practice in PL research is to start with a variant of typed $\lambda$-calculus and a \emph{language feature} in question and investigate properties of this prototype language.
@@ -96,13 +96,13 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \end{frame}
 
 \begin{frame}{What to expect next?}
-  For $\lambda$-calculus, we will consider following topics in programming language in a style of mathematical formalism.
+  For $\lambda$-calculus, we will consider following topics in programming languages in a style of mathematical formalism.
   \begin{enumerate}
-    \item How programs can be identified \emph{up to variable renaming}?
+    \item How programs are identified \emph{up to variable renaming}?
       E.g., $\lambda x.\, x$ should be `equal' to $\lambda y.\, y$.
     \item How do programs \emph{compute}?
       E.g., the application $(\lambda x.\, x)\;3$ of the identity to $3$ should compute to $3$.
-    \item How programs can be identified \emph{computationally}?
+    \item How programs are identified \emph{computationally}?
       E.g.,
       \[
         (\lambda x.\, x)\;3 \quad\text{and}\quad (\lambda y.\, 3)\;10
@@ -126,7 +126,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \end{description}
 
   \vfill
-  Each construct can be represented as a node in a tree, i.e.\ 
+  Each construct is represented as a node in a tree, i.e.\ 
   \begin{center}
     \begin{minipage}[t]{.32\textwidth}
       \centering
@@ -167,7 +167,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
 
 \begin{frame}{Representing a term as an abstract syntax tree}
-  The expression $\lam{x}(\lam{y}((x@y)@z))$ can be represented as
+  The expression $\lam{x}(\lam{y}((x@y)@z))$ is represented as
   \begin{center}
     \begin{tikzpicture}[
           level distance=1cm,
@@ -194,7 +194,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \end{frame}
 
 \begin{frame}{Term Formation, an Example}
-  The validity of the expression can be justified by its very definition:
+  The validity of the expression is justified by its very definition:
   \[
     \lam{x}(\lam{y}((x@y)@z))
   \]
@@ -306,7 +306,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   where
   \begin{enumerate}
     \item multiple abstractions means a function with multiple arguments;
-    \item applying a function to multiple arguments can be achieved by applying a function to an argument to get another function for the next argument;
+    \item applying a function to multiple arguments is achieved by applying a function to an argument to get another function for the next argument;
     \item applications occur more often than abstractions in a body.
   \end{enumerate}
 \end{frame}
@@ -365,7 +365,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \end{frame}
 
 \begin{frame}{Binding structure in an abstract syntax tree}
-  The binding structure can be visualised in an abstract syntax tree:
+  The binding structure is visualised in an abstract syntax tree:
   \begin{center}
     \begin{tikzpicture}[
           level distance=1.3cm,
@@ -391,7 +391,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
     \end{tikzpicture}
   \end{center}
-  The variable $x$ at the leaf is bound by its nearest abstraction by $x$ in the AST.
+  The variable $x$ at the leaf is bound by its nearest enclosing abstraction by $x$ in the AST.
   Similarly for $y$.
 \end{frame}
 
@@ -406,11 +406,11 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     \item $\lam{a}(\lam{b}(a\,@\,(\lam{a}(a\,@\,b))))$
   \end{enumerate}
   \vfill
-  They the same terms used previously, so you may just reuse your previous answers.
+  They are the same terms used previously, so you may just reuse your previous answers.
 \end{frame}
 
 \begin{frame}{$\alpha$-equivalence: renaming of bound variables}
-  The point of having a name for a variable to look for where it applies to, so
+  The point of naming a variable is to determine where it applies, so
   renaming variables should not alter its meaning.
 
   For example, $f(x, y) = x^2 + y$ and $f(a, b) = a^2 + b$ represent the same function.
@@ -422,14 +422,14 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \]
   if $t$ and $u$ have the same binding structure in their abstract syntax trees, \emph{regardless of their variable names}.
   \vfill
-  \begin{alertblock}{Quest}
+  \begin{alertblock}{Question}
     How to define $\alpha$-equivalence formally?
   \end{alertblock}
 \end{frame}
 
 \begin{frame}{First Idea: Naive Renaming}
   \begin{idea}
-    Using the named representation, define $t =_\alpha u$ if variables in $t$ and $u$ can be renamed `suitably' to exactly the same term.
+    Using the named representation, define $t =_\alpha u$ if variables in $t$ and $u$ are renamed `suitably' to exactly the same term.
   \end{idea}
   After a naive renaming, a renamed variable might be \alert{captured} by some
   $\lambda$ accidentally breaking the original binding structure.
@@ -542,7 +542,8 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
       \end{tikzpicture}
     \end{minipage}
   \end{center}
-  This representation is invented by a Dutch mathematician, N. G. de Bruijn, while implementing a system for formalising mathematics.
+
+  Free variables are left named in this informal presentation.
 \end{frame}
 
 \begin{frame}{Pros and cons of De Bruijn representation}
@@ -557,11 +558,11 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
         \item Machine-readable.
         \item No variable renaming is involved.
       \end{enumerate}
-    \item[Bad] Human-\emph{un}readable.
+    \item[Bad] Hard for humans to read.
   \end{description}
 
   \vfill
-  It is a solution that defeats its own purpose: named variables are used to look up variables easily for human!
+  It is a solution that defeats its own purpose: named variables are used to look up variables easily for humans!
 \end{frame}
 
 \begin{frame}{Third Idea: Capture-Avoiding Renaming}
@@ -579,7 +580,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     \Var(\lam{x} t) & = \{x\} \cup \Var(t) 
   \end{align*}
   \vfill
-  We say $x$ \alert{occurs} in $t$ if $x \in \Var(t)$, i.e.\ $x$ appear in $t$ somewhere.
+  We say $x$ \alert{occurs} in $t$ if $x \in \Var(t)$, i.e.\ $x$ appears in $t$ somewhere.
 \end{frame}
 
 \begin{frame}[t]
@@ -690,7 +691,8 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     \UIC{$\lam{x}t \mathrel{=_\alpha} \lam{y}u $}
   \end{prooftree}
   \end{definition}
-  The third case is the interesting one: $\lam{x}t$ and $\lam{y}u$ are equal up to renaming bound variables if the variables $x$ and $y$ can be swapped with a variable $z$ that does not exist in $t$ and $u$.
+  The third case is the interesting one:
+  the fresh variable \(z\) serves as a common temporary name for the two binders.
 \end{frame}
 
 \begin{frame}{An example of $\alpha$-equivalent terms}
@@ -703,13 +705,13 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     By definition
     \begin{prooftree}
       \AXC{}
-      \UIC{$(y\;y)\cdot y \mathrel{=_\alpha} (y\; x)\cdot x$}
+      \UIC{$(w\;y)\cdot y \mathrel{=_\alpha} (w\;x)\cdot x$}
       \UIC{$\lambda y.\, y \mathrel{=_\alpha} \lambda x.\, x$}
       \AXC{}
       \UIC{$z \mathrel{=_\alpha} z$}
       \BIC{$(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$}
     \end{prooftree}
-  where $(y\;y)\cdot y = () \cdot y = y$ and $(y\;x)\cdot x = y$, so it follows that $(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$.
+  where $(w\;y)\cdot y$ and $(w\;x)\cdot x = w$, so it follows that $(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$.
   \end{proof}
 \end{frame}
 
@@ -741,7 +743,7 @@ Can you come up with a strategy to prove your conjecture?
     That is, $=_\alpha$ is an equivalence relation.
   \end{exercise*}
   \vfill
-  We are mainly in interested in \alert{terms up to $\alpha$-equivalence}, as the name of a bound variable does not matter. 
+  We are mainly interested in \alert{terms up to $\alpha$-equivalence}, as the name of a bound variable does not matter. 
   Hence, we consider $\lambda$-terms \emph{modulo} $\alpha$-equivalence, i.e.\
   \[
     [t]_{\alpha} = \{\, u \in \Lambda(V) \mid t =_\alpha u \,\}
@@ -844,11 +846,11 @@ Can you come up with a strategy to prove your conjecture?
                 \begin{cases}
                   \lambda y.\,u & \text{if $x = y$} \\
                   \lambda y.\,(u\subst{t}{x}) & \text{if $x \neq y$ and $y \notin \FV(t)$} \\
-                  \lambda z.\,((z\,y)\cdot u)\subst{t}{x} & \text{if $x \neq y$, $y \in \FV(t)$, and $z$ is fresh.}
+                  \lambda z.\,((z\,y)\cdot u)\subst{t}{x} & \text{if $x \neq y$, $y \in \FV(t)$, and $z \notin \Var(u) \cup \FV(t) \cup \{x\}$.}
                 \end{cases}
   \end{align*}
 
-  If the last clause is reached, then \emph{rename} the bound variable $y$ to some variable \alert{fresh} for $x$ and $t$, i.e.\ some $z$ such that $z \neq y$ and $z \notin \FV(t)$, before proceeding.
+  The last clause means that we \emph{rename} the bound variable $y$ to some variable \alert{fresh} for $x$, $t$, and $u$  before proceeding.
   
 \end{frame}
 
@@ -889,7 +891,7 @@ Can you come up with a strategy to prove your conjecture?
 
 \begin{frame}{Single-step $\beta$-reduction}
 
-  A \alert{$\beta$-redex} is a term of the form $(\lam{x}t)\;u$ where computation can be performed upon and the application can be reduced to $t\subst{u}{x}$.
+  A \alert{$\beta$-redex} is a term of the form $(\lam{x}t)\;u$ where computation is performed upon and the application is reduced to $t\subst{u}{x}$.
 
 \begin{definition}
   The \emph{one-step (full) $\beta$-reduction} is a relation between terms defined inductively by
@@ -934,7 +936,7 @@ For example,
 
 
 \begin{frame}{Multi-step full $\beta$-reduction}
-  It is convenient to represents a sequence
+  It is convenient to represent a sequence
   of $\beta$-reductions
   \[
     t \onereduce t_1 \onereduce \dots \onereduce u
@@ -960,7 +962,7 @@ For example,
 
 \begin{frame}{$t \reduce u$ is transitive}
   \begin{lemma}
-    For every derivations of $t \reduce u$ and $u \reduce v$, there
+    For every pair of derivations of $t \reduce u$ and $u \reduce v$, there
     is a derivation of $t \reduce v$. 
   \end{lemma}
   We often say ``if $t \reduce u$ and $u \reduce v$ then $t \reduce v$'' instead.
