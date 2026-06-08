@@ -2,7 +2,7 @@
 %! TEX root = lecture1_slide.tex
 
 \title{\texorpdfstring{$\lambda$}{λ}-Calculus}
-\subtitle{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus}
+\subtitle{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus, Part I}
 \begin{document}
 
 \bgroup
@@ -86,7 +86,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   $\lambda$-calculus itself is a fruitful subject but it is also useful: 
   \begin{itemize}
     \item it serves as a prototype of programming languages which can be reasoned about \alert{mathematically} and \alert{rigorously};
-    \item the methodology we develop to understand $\lambda$-calculus are used to study and design other programming languages.
+    \item the methodology we develop to understand $\lambda$-calculus can be used to study and design other programming languages.
   \end{itemize}
   \vfill
   The common practice in PL research is to start with a variant of typed $\lambda$-calculus and a \emph{language feature} in question and investigate properties of this prototype language.
@@ -96,7 +96,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \end{frame}
 
 \begin{frame}{What to expect next?}
-  For $\lambda$-calculus, we will consider following topics in programming languages in a style of mathematical formalism.
+  For $\lambda$-calculus, we will consider the following topics in programming languages in a style of mathematical formalism.
   \begin{enumerate}
     \item How programs are identified \emph{up to variable renaming}?
       E.g., $\lambda x.\, x$ should be `equal' to $\lambda y.\, y$.
@@ -391,7 +391,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
     \end{tikzpicture}
   \end{center}
-  The variable $x$ at the leaf is bound by its nearest enclosing abstraction by $x$ in the AST.
+  The variable $x$ at the leaf is bound by its nearest enclosing abstraction over $x$ in the AST.
   Similarly for $y$.
 \end{frame}
 
@@ -711,7 +711,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
       \UIC{$z \mathrel{=_\alpha} z$}
       \BIC{$(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$}
     \end{prooftree}
-  where $(w\;y)\cdot y$ and $(w\;x)\cdot x = w$, so it follows that $(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$.
+  where $(w\;y)\cdot y = w$ and $(w\;x)\cdot x = w$, so it follows that $(\lambda y.\, y)\;z \mathrel{=_\alpha} (\lambda x.\, x)\;z$.
   \end{proof}
 \end{frame}
 
@@ -761,7 +761,7 @@ Can you come up with a strategy to prove your conjecture?
   The \alert{evaluation} of $\lambda$-calculus is of this form 
   \[
     \fbox{$\cdots\underbrace{(\lam{x}t)\,u}_{\beta\text{-redex}} \cdots$} \longrightarrow_{\beta 1}
-    \fbox{$\cdots \underbrace{t\;\subst{u}{x}}_{\text{substitution of $N$ for $x$ in $M$}} \cdots$}
+    \fbox{$\cdots \underbrace{t\;\subst{u}{x}}_{\text{substitution of $u$ for $x$ in $t$}} \cdots$}
   \]
 
   \mode<presentation>{\vfill}
@@ -846,7 +846,7 @@ Can you come up with a strategy to prove your conjecture?
                 \begin{cases}
                   \lambda y.\,u & \text{if $x = y$} \\
                   \lambda y.\,(u\subst{t}{x}) & \text{if $x \neq y$ and $y \notin \FV(t)$} \\
-                  \lambda z.\,((z\,y)\cdot u)\subst{t}{x} & \text{if $x \neq y$, $y \in \FV(t)$, and $z \notin \Var(u) \cup \FV(t) \cup \{x\}$.}
+                  \lambda z.\,(((z\,y)\cdot u)\subst{t}{x}) & \text{if $x \neq y$, $y \in \FV(t)$, and $z \notin \Var(u) \cup \FV(t) \cup \{x\}$.}
                 \end{cases}
   \end{align*}
 
