@@ -17,11 +17,11 @@
   \begin{itemize}
     \item Terms: variables, abstractions, and applications.
     \item $\alpha$-equivalence avoids dependence on bound-variable names.
-    \item $\beta$-reduction: $(\lambda x.\,M)\;N \onereduce M\subst{N}{x}$.
+    \item $\beta$-reduction: $(\lambda x.\,t)\;u \onereduce t\subst{u}{x}$.
   \end{itemize}
 
   Today, we will use $\lambda$-calculus as a programming language, then study
-two properties of reduction: evaluation strategy and confluence.
+  two aspects of reduction: evaluation strategies and confluence.
 \end{frame}
 
 \section{Defining data in \texorpdfstring{$\lambda$}{λ}-Calculus}
@@ -95,7 +95,8 @@ two properties of reduction: evaluation strategy and confluence.
       $f^{n+1}(x) \defeq f\;(f^n(x))$.
   \end{description}
 
-  A Church numeral receives a function $f$ and an initial value $x$; the numeral $\bc_n$ applies $f$ to $x$ exactly $n$ times.
+  A Church numeral receives a function $f$ and an initial value $x$.
+  The numeral $\bc_n$ applies $f$ to $x$ exactly $n$ times.
 \end{frame}
 
 
@@ -162,8 +163,8 @@ two properties of reduction: evaluation strategy and confluence.
     \mathit{sum} = \lambda n.\,\ifz\;n\;\bc_0\;(\add\;n\;(\mathit{sum}\;(\pred\;n)))
   \]
   is a recursive equation at the meta-level, not a $\lambda$-term.\footnote{%
-  N.B. We've used $=$ for the meta-level equality but $=_\beta$ for the object-level equality.
-  }
+    Here $=$ denotes meta-level equality, whereas $=_\beta$ denotes object-level
+equality of $\lambda$-terms.}
   \medskip
 
   A term cannot refer to its own name, but self-reference can still be encoded.
@@ -225,10 +226,10 @@ two properties of reduction: evaluation strategy and confluence.
       \mathbf{Y} \defeq \lambda f.\,
         (\lambda x.\, f\,(x\,x))\,(\lambda x.\,f\,(x\,x)).
     \]
-    is a fixed-point operator, that is for every
+    is a fixed-point operator; that is, for every
     $\lambda$-term $F$, $\mathbf{Y}F =_\beta F(\mathbf{Y}F)$.
   \end{proposition}
-  Intuitively, $\mathbf{Y}F$ defines recursion, while $F$ describes \emph{one step} unfolding of
+  Intuitively, $\mathbf{Y}F$ defines recursion, while $F$ describes \emph{one-step} unfolding of
   the recursive definition.
   \vfil
 
@@ -294,24 +295,31 @@ two properties of reduction: evaluation strategy and confluence.
   You do not need to expand the definitions of $\add$ or $\pred$.
 \end{frame}
 
-
-\begin{frame}{Turing's Fixed-Point Combinator}
-  The combinator $\Theta$ below gives a fixed point by actual reduction, not only up to
-$\beta$-equality.
-  $\Theta F \reduce F(\Theta F)$.
-\begin{proposition}
-  Turing's fixed-point combinator $\Theta$ is defined as
+\begin{frame}{Turing's fixed-point combinator}
+  Curry's combinator satisfies
   \[
-    \Theta \defeq 
-    (\lambda x\,f.\,f\,(x\,x\,f))\;
-    (\lambda x\,f.\,f\,(x\,x\,f))
+    \mathbf{Y}F =_\beta F(\mathbf{Y}F),
   \]
-  which satisfies $\Theta F \reduce F (\Theta F)$.
-\end{proposition}
+  but the term $\mathbf{Y}F$ does not reduce literally to $F(\mathbf{Y}F)$.
 
-\begin{exercise*}
-  Show that $\Theta F \reduce F (\Theta F)$.
-\end{exercise*}
+  Turing's fixed-point combinator has the stronger reduction behaviour:
+  \[
+    \Theta F \reduce F(\Theta F).
+  \]
+
+  \begin{proposition}
+    Define
+    \[
+      \Theta \defeq
+      (\lambda x\,f.\,f\,(x\,x\,f))\;
+      (\lambda x\,f.\,f\,(x\,x\,f)).
+    \]
+    Then $\Theta F \reduce F(\Theta F)$.
+  \end{proposition}
+
+  \begin{exercise*}
+    Show that $\Theta F \reduce F(\Theta F)$.
+  \end{exercise*}
 \end{frame}
 
 \begin{frame}{Exercise: factorial}
@@ -333,27 +341,29 @@ $\beta$-equality.
   Assume that $\ifz$, $\pred$, and $\mul$ have already been defined.
 \end{frame}
 
-\begin{frame}{Exercise: different reduction choices}
-  Let
+\begin{frame}{Exercise: Different Reduction Choices}
+  Let $G$ be the summation functional defined above, and let
   \[
-    T \defeq (\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1).
+    T \defeq (\Theta G)\;((\lambda x.\,x)\;\bc_1).
   \]
 
   \begin{enumerate}
     \item Identify two different $\beta$-redexes in $T$.
+
     \item Reduce the argument first:
       \[
-        (\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1)
+        (\Theta G)\;((\lambda x.\,x)\;\bc_1)
         \onereduce
-        (\mathbf{Y}G)\;\bc_1.
+        (\Theta G)\;\bc_1.
       \]
-      where $G$ is the summation functional defined above.
-    \item Reduce the fixed point first:
+
+    \item Unfold the fixed point first:
       \[
-        (\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1)
+        (\Theta G)\;((\lambda x.\,x)\;\bc_1)
         \reduce
-        G(\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1).
+        G(\Theta G)\;((\lambda x.\,x)\;\bc_1).
       \]
+
     \item Continue both paths far enough to see that they are computing the
       same recursive call.
   \end{enumerate}
@@ -404,8 +414,8 @@ $\beta$-equality.
         \onereduce
         (\lambda x.\,G_0(x\,x))\;(\lambda x.\,G_0(x\,x)).
       \]
-      What happens if we keep reducing the self-application before exposing the body
-of $G_0$?
+      What happens under a call-by-value-like strategy that tries to evaluate the
+      argument of $G_0$ before reducing the redex $G_0(\cdots)$?
   \end{enumerate}
 \end{frame}
 
@@ -445,7 +455,8 @@ but they also expose two fundamental issues with unrestricted reduction.
 \section{Evaluation strategy}
 
 \begin{frame}[allowframebreaks]{Evaluation strategies}
-  An evaluation strategy is a procedure for selecting which $\beta$-redex to reduce and potentially produce a value.
+  An evaluation strategy is a procedure for selecting which $\beta$-redex to
+reduce at each step of computation.
 
   \vfill
 
@@ -503,17 +514,18 @@ but they also expose two fundamental issues with unrestricted reduction.
 \end{frame}
 
 \begin{frame}{CBV versus CBN}
-  Take values $\mathbf{Val} \subseteq \Lambda(V)$ to be variables and abstractions:
+  For terms with free variables, take values to be variables and abstractions:
   \[
-    \mathbf{Val} ::= x \mid \lambda x.\,t.
+    V ::= x \mid \lambda x.\,t.
   \]
-  \begin{description}
-    \item[Call-by-value strategy]
-      Reduce a redex $(\lambda x.\,t)\,u$ only after its argument $u$ has been
-      evaluated to a value $V$; do not reduce under abstractions.
 
-    \item[Call-by-name strategy]
-      Reduce the leftmost outermost redex, without first evaluating its
+  \begin{description}
+    \item[Call-by-value]
+      Reduce a redex $(\lambda x.\,t)\,V$ only when the argument is already
+      a value $V$; do not reduce under abstractions.
+
+    \item[Call-by-name]
+      Reduce the leftmost outermost redex without first evaluating its
       argument; do not reduce under abstractions.
   \end{description}
 
@@ -521,8 +533,8 @@ but they also expose two fundamental issues with unrestricted reduction.
 
   \begin{proposition}[Determinacy]
     Each fixed evaluation strategy is deterministic. That is, if
-    $M \longrightarrow_{\mathrm{ev}} N_1$ and
-    $M \longrightarrow_{\mathrm{ev}} N_2$, then $N_1 = N_2$.
+    $t \longrightarrow_{\mathrm{ev}} u_1$ and
+    $t \longrightarrow_{\mathrm{ev}} u_2$, then $u_1 = u_2$.
   \end{proposition}
 \end{frame}
 
@@ -583,9 +595,9 @@ but they also expose two fundamental issues with unrestricted reduction.
       }
     \]
 
-  Confluence says that this nondeterminism is harmless: whenever two reduction
-  paths start from the same term, they can be joined again by further
-  reductions.
+  Confluence does not say that every strategy terminates.
+  It says that different successful reduction paths are compatible: if two
+  reducts are reached, they can be joined by further reductions.
   \[
       \xymatrix{
         u_1 \ar@{->>}[rd]^(.8){*}_(.8){\beta}
@@ -597,7 +609,7 @@ but they also expose two fundamental issues with unrestricted reduction.
 
 \begin{frame}{Example: joining genuinely different reducts}
   Let $T \defeq (\lambda x.\,x\,x)\;((\lambda y.\,y)\;z)$.
-  Then we can choose two different $\beta$-reductions:
+  There are two different first reduction steps:
   \[
     \xymatrix@C=5em@R=4em{
       & T
