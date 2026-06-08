@@ -122,7 +122,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \begin{description}
     \item[variable] $x \in \Lambda(V)$ if $x$ is in $V$
     \item[application] $t@u \in \Lambda(V)$ if $t, u \in \Lambda(V)$
-    \item[abstraction] $\lam{x}t$ if $x \in V$ and $t \in \Lambda(V)$
+    \item[abstraction] $\lam{x}t \in \Lambda(V)$ if $x \in V$ and $t \in \Lambda(V)$
   \end{description}
 
   \vfill
@@ -236,10 +236,9 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     \end{prooftree}
     \qquad
     \begin{prooftree}
-      \AxiomC{$x \in V$}
       \AxiomC{$t \in \Lambda(V)$}
-      \RightLabel{\textsc{Abs}}
-      \BinaryInfC{$\lambda x.\, t \in \Lambda(V)$}
+      \RightLabel{\textsc{Abs}, $x \in V$}
+      \UnaryInfC{$\lambda x.\, t \in \Lambda(V)$}
     \end{prooftree}
 \end{frame}
 
@@ -277,8 +276,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \end{frame}
 
 \begin{frame}{Exercises}
-    Assuming, $a$, $b$, $x$, $y$, and $z$ are all in $V$, derive the following
-    terms using its formation rules.  That is, show that the following are
+    Assume that all variables appearing below are in $V$. Derive the following terms using their formation rules. That is, show that the following are
     valid $\lambda$-terms.
     \begin{enumerate}
       \item $x\,@\,(y\,@\,z)$
@@ -296,7 +294,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 \begin{frame}{The need for some conventions}
   For arithmetic expressions, we typically write
   \[
-    3 * 4 + 7 *2 \qquad\text{to mean}\qquad (3 * 4) + (7 + 2)
+    3 * 4 + 7 *2 \qquad\text{to mean}\qquad (3 * 4) + (7 * 2)
   \]
   by the precedence convention.
   \vfill
@@ -321,7 +319,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
       \]
     \item[Consecutive applications]
       \[
-        M_1\;M_2\; M_3\; \dots\;M_n \equiv (\dots((M_1\;M_2)\;M_3) \dots )\; M_n
+        M_1\;M_2\; M_3\; \dots\;M_n \equiv (\dots((M_1\,@\,M_2)\,@\,M_3)\,@ \dots )\,@\, M_n
       \]
     \item[Function body extends as far right as possible]
       \[
@@ -534,7 +532,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
                 child {node (x) {$1$}}
                 child {node (y) {$0$}}
               }
-              child {node {$3$}}
+              child {node {$z$}}
             }
           };
 
@@ -647,7 +645,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
 \begin{frame}{Variable permutation}
   \begin{alertblock}{Idea}
-    We rename a variable $x$ in $t$ with a fresh variable $z$ to $x$, i.e.\ $z \not\in \Var(t)$.
+    To rename a binder safely, we swap it with a fresh variable $z \notin \Var(t)$.
   \end{alertblock}
   
   A \emph{transposition} $(x\, y)$ is a function that swaps $x$ and $y$ but fixes everything else, i.e.\
@@ -659,7 +657,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
       z & \text{otherwise}
     \end{cases}
   \]
-   The \emph{variable permutation} by a transportation $\pi = (y\,z)$ is defined by
+   The \emph{variable permutation} by a transposition $\pi = (y\,z)$ is defined by
    \begin{align*}
      \pi\cdot x     & = \pi\;x \\
      \pi\cdot(t\;u) & = (\pi\cdot t)\; (\pi\cdot u) \\
@@ -688,7 +686,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \end{multicols}
   \begin{prooftree}
     \AXC{$(z\;x)\cdot t \mathrel{=_\alpha} (z\;y)\cdot u$}
-    \RightLabel{if $z \not\in \Var(t, u)$}
+    \RightLabel{if $z \not\in \Var(t) \cup \Var(u)$}
     \UIC{$\lam{x}t \mathrel{=_\alpha} \lam{y}u $}
   \end{prooftree}
   \end{definition}
@@ -836,19 +834,21 @@ Can you come up with a strategy to prove your conjecture?
   \]
   of $t$ for $x$ is defined on terms by
   \begin{align*}
-    y\subst{t}{x}           & =
-                                \begin{cases*}
-                                  t & \text{if $x = y$} \\
-                                  y & \text{otherwise}
-                                \end{cases*} \\
-    (t_1\;t_2) \subst{t}{x} & = (t_1\subst{t}{x})\;(t_2\subst{t}{x}) \\
-    (\lam{y}u) \subst{t}{x} & =
-                                \begin{cases*}
-                                  \lam{y}(u\subst{t}{x}) & \text{if $x \neq y$ and $y \notin \FV(t)$} \\
-                                  ?                      & \text{otherwise}
-                                \end{cases*}
+    y \subst{t}{x} & =
+      \begin{cases*}
+        t & \text{if $x = y$}\\
+        y & \text{otherwise.}
+      \end{cases*} \\
+    (u\; v) \subst{t}{x} & = (u \subst{t}{x})\;(v \subst{t}{x}) \\
+    (\lambda y.\,u)\subst{t}{x} & =
+                \begin{cases}
+                  \lambda y.\,u & \text{if $x = y$} \\
+                  \lambda y.\,(u\subst{t}{x}) & \text{if $x \neq y$ and $y \notin \FV(t)$} \\
+                  \lambda z.\,((z\,y)\cdot u)\subst{t}{x} & \text{if $x \neq y$, $y \in \FV(t)$, and $z$ is fresh.}
+                \end{cases}
   \end{align*}
-  If the clause $?$ is reached, then \emph{rename} the bound variable $y$ to some variable \alert{fresh} for $x$ and $t$, i.e.\ some $z$ such that $z \neq y$ and $z \notin \FV(t)$, before proceeding.
+
+  If the last clause is reached, then \emph{rename} the bound variable $y$ to some variable \alert{fresh} for $x$ and $t$, i.e.\ some $z$ such that $z \neq y$ and $z \notin \FV(t)$, before proceeding.
   
 \end{frame}
 
@@ -914,7 +914,12 @@ Can you come up with a strategy to prove your conjecture?
   \end{multicols}
 \end{definition}
 For example, 
-  $(\boxed{(\lam{x y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}$.
+  \[
+    (\boxed{(\lam{x\,y}x)\; t})\;u
+    \onereduce (\lam{y}t)\;u
+    \onereduce t
+    \qquad\text{assuming } y \notin \FV(t).
+  \]
 \end{frame}
 
 \begin{frame}{Exercise}
@@ -962,7 +967,7 @@ For example,
   \begin{proof}
     By induction on the derivation $d$ of $t \reduce u$:
     \begin{enumerate}
-      \item If $d$ is given by (0-step), then $t =_\alpha u$.
+      \item If $d$ is given by (0-step), then $u = t$, so the given derivation of $u \reduce v$ is already a derivation of $t \reduce v$.
       \item If $d$ is given by (n+1-step), i.e.\ there is $u'$ s.t.\ 
         $t \onereduce u'$ and $u' \reduce u$.
 
@@ -989,7 +994,44 @@ For example,
 \end{frame}
 
 \begin{frame}{Summary}
-  SUMMARISE HERE ALL THE RELATIONS WE HAVE SEEN SO FAR.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{@{}ll@{}}
+      \toprule
+      \textbf{Notation} & \textbf{Meaning} \\
+      \midrule
+      $x \in \Lambda(V)$
+        & $x$ is a variable term over $V$ \\
+
+      $t @ u \in \Lambda(V)$
+        & application of $t$ to $u$ \\
+
+      $\lambda x.\,t \in \Lambda(V)$
+        & abstraction, with $x \in V$ \\
+
+      $t =_\alpha u$
+        & $t$ and $u$ have the same binding structure \\
+
+      $\Var(t)$
+        & variables occurring in $t$ \\
+
+      $\FV(t)$
+        & free variables of $t$ \\
+
+      $t\subst{u}{x}$
+        & capture-avoiding substitution of $u$ for $x$ in $t$ \\
+
+      $t \onereduce u$
+        & one full $\beta$-reduction step \\
+
+      $t \reduce u$
+        & zero or more full $\beta$-reduction steps \\
+
+      $t =_\beta u$
+        & symmetric, reflexive, transitive closure of $\onereduce$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
 \end{frame}
 
 \end{document}
