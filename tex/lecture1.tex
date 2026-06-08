@@ -14,27 +14,11 @@
 
 \begin{frame}[fragile]{評分標準}
   \begin{description}
-    \item[期限] 七月十號 下午 4 點 20
     \item[分數比例] 
       \begin{description}
-        \item[作業] (22.5\%)
         \item[考試] (100\%)
       \end{description}
-    \item[Email] \url{liang.ting.chen.tw@gmail.com}
   \end{description}
-
-  \textbf{作業繳交請遵循以下規定}
-
-  \begin{enumerate}
-    \item 請用 A4 紙（其餘規格尺寸不收），寫上姓名與學號
-    \item 請清楚標示作業次、題號並且力求字跡清楚
-    \item 作業可現場親交給我，或用 PDF 檔案（如翻拍請用掃描軟體後製）後寄到我 email 信箱，格式如下：
-      \begin{description}
-        \item[主旨] \texttt{[FLOLAC] Lambda HW\%x\%}
-        \item[附件] \texttt{Lambda-HW\{1, 2, 3\} - 學號 - 姓名.pdf}
-        \item[內文] （可空白）
-      \end{description}
-  \end{enumerate}
 \end{frame}
 
 \section{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus: Introduction}
@@ -45,6 +29,8 @@ Anonymous functions can be defined in many languages, e.g.,
     \verb|\x f -> f x|
   \item[\OCaml]
     \verb|fun x f -> f x|
+  \item[\Python]
+    \verb|lambda x: M|
 \end{description}
 
 This type of expression is inspired by the \alert{$\lambda$-notation} introduced by Alan Turing's supervisor, Alonzo Church, who was seeking a foundation for mathematics.
@@ -126,7 +112,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \end{enumerate}
 \end{frame}
 
-\section{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus: Statics}
+\section{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus: Static}
 
 \begin{frame}{Syntax of $\lambda$-calculus}
   To define the language of $\lambda$-calculus, we need a primitive notion of \emph{variables} first.
@@ -207,7 +193,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{Formal justification}
+\begin{frame}{Term Formation, an Example}
   The validity of the expression can be justified by its very definition:
   \[
     \lam{x}(\lam{y}((x@y)@z))
@@ -220,15 +206,91 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     \item {\small $\lam{y}((x@y)@z)$ is a term since $(x@y)@z$ is a term and $y$ is a variable;}
     \item {\footnotesize $\lam{y}((x@y)@z)$ is a term and $x$ is a variable, so $\lam{x}(\lam{y}((x@y)@z))$ is a term.}
   \end{enumerate}
+\end{frame}
 
-  \begin{convention*}
-    $@$ is omitted if a term is written as a sequence of symbols, so we write
-    \[
-      t\;u
-      \qquad\text{instead of}\qquad
-      t@u
-    \]
-  \end{convention*}
+\begin{frame}{Exercises}
+    Draw the corresponding abstract syntax tree for each of the following terms:
+    \begin{enumerate}
+      \item $x\,@\,(y\,@\,z)$
+      \item $(x\,@\,y)\,@\,z$
+      \item $\lam{s}(\lam{z}(s\,@\,z))$
+      \item $(\lambda x.\, x)\,@\,(\lambda y.\, y)$
+      \item $\lam{a}(\lam{b}(a\,@\,(\lam{c}(a\,@\,b))))$
+    \end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Term Formation Rules}
+  The set $\Lambda(V)$ of $\lambda$-terms over $V$ can also be given as inference rules:
+    \begin{prooftree}
+      \AxiomC{$x \in V$}
+      \RightLabel{\textsc{Var}}
+      \UnaryInfC{$x \in \Lambda(V)$}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \AxiomC{$t \in \Lambda(V)$}
+      \AxiomC{$u \in \Lambda(V)$}
+      \RightLabel{\textsc{App}}
+      \BinaryInfC{$t @ u \in \Lambda(V)$}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \AxiomC{$x \in V$}
+      \AxiomC{$t \in \Lambda(V)$}
+      \RightLabel{\textsc{Abs}}
+      \BinaryInfC{$\lambda x.\, t \in \Lambda(V)$}
+    \end{prooftree}
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{Term Formation Rules, an example}
+   Assuming $x,y,z \in V$, the following derivation shows that $\lambda
+   x.\,(\lambda y.\,((x @ y) @ z))$ is a well-formed lambda term over $V$.
+
+  \begin{prooftree}
+  \AxiomC{$x \in V$}
+  \RightLabel{\textsc{Var}}
+  \UnaryInfC{$x \in \Lambda(V)$}
+
+  \AxiomC{$y \in V$}
+  \RightLabel{\textsc{Var}}
+  \UnaryInfC{$y \in \Lambda(V)$}
+
+  \RightLabel{\textsc{App}}
+  \BinaryInfC{$x @ y \in \Lambda(V)$}
+
+  \AxiomC{$z \in V$}
+  \RightLabel{\textsc{Var}}
+  \UnaryInfC{$z \in \Lambda(V)$}
+
+  \RightLabel{\textsc{App}}
+  \BinaryInfC{$(x @ y) @ z \in \Lambda(V)$}
+
+  \RightLabel{\textsc{Abs}}
+  \UnaryInfC{$\lambda y.\,((x @ y) @ z) \in \Lambda(V)$}
+
+  \RightLabel{\textsc{Abs}}
+  \UnaryInfC{$\lambda x.\,(\lambda y.\,((x @ y) @ z)) \in \Lambda(V)$}
+\end{prooftree}
+  
+\end{frame}
+
+\begin{frame}{Exercises}
+    Assuming, $a$, $b$, $x$, $y$, and $z$ are all in $V$, derive the following
+    terms using its formation rules.  That is, show that the following are
+    valid $\lambda$-terms.
+    \begin{enumerate}
+      \item $x\,@\,(y\,@\,z)$
+      \item $(x\,@\,y)\,@\,z$
+      \item $\lam{s}(\lam{z}(s\,@\,z))$
+      \item $(\lambda x.\, x)\,@\,(\lambda y.\, y)$
+      \item $\lam{a}(\lam{b}(a\,@\,(\lam{a}(a\,@\,b))))$
+    \end{enumerate}
+    \qquad
+    \begin{alertblock}{Question}
+      What's the difference between the AST representation and derivations? Identify the similarity between these two.
+    \end{alertblock}
 \end{frame}
 
 \begin{frame}{The need for some conventions}
@@ -237,13 +299,13 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     3 * 4 + 7 *2 \qquad\text{to mean}\qquad (3 * 4) + (7 + 2)
   \]
   by the precedence convention.
-
+  \vfill
   We'd also like to have some conventions to omit brackets without any ambiguity.
-  E.g., one should be able to write
+  The convention allows us to write
   \[
-    \lam{x y}x\;y\;z \qquad\text{to mean}\qquad \lam{x}(\lam{y}((x\;y)\;z))
+    \lam{x y}x\;y\;z \qquad\text{to mean}\qquad \lam{x}(\lam{y}((x\,@\,y)\,@\,z))
   \]
-  because
+  where
   \begin{enumerate}
     \item multiple abstractions means a function with multiple arguments;
     \item applying a function to multiple arguments can be achieved by applying a function to an argument to get another function for the next argument;
@@ -262,8 +324,11 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
         M_1\;M_2\; M_3\; \dots\;M_n \equiv (\dots((M_1\;M_2)\;M_3) \dots )\; M_n
       \]
     \item[Function body extends as far right as possible]
-        $\lam{x}M\;N \quad\text{means}\quad \lambda x.\,(M\; N)$ instead of $(\lambda x.\,M)\; N$.
+      \[
+        \lam{x}M\;N \quad\text{means}\quad \lambda x.\,(M\; N) \;\text{instead of}\; (\lambda x.\,M)\; N.
+      \]
   \end{description}
+  For example,
   \begin{enumerate}
     \item $(x\;y)\;z \equiv x\;y\;z$
     \item $\lambda s.\,(\lambda z.\, (s \;z)) \equiv \lambda s\,z.\, s\;z$
@@ -271,21 +336,19 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
     \item $(\lambda x.\, x)\;(\lambda y.\, y) \equiv (\lambda x.\, x)\;\lambda y.\, y$
   \end{enumerate}
 \end{frame}
-\begin{frame}{More Example}
 
-  \begin{exercise*}
-    Draw the corresponding abstract syntax tree for each of the following terms:
-    \begin{enumerate}
-      \item $x\;(y\;z)$
-      \item $x\;y\;z$
-      \item $\lam{sz}s\;z$
-      \item $(\lambda x.\, x)\;(\lambda y.\, y)$
-      \item $\lam{a b}a\;(\lam{c}a\;b)$
-    \end{enumerate}
-  \end{exercise*}
+\begin{frame}[t]
+  \frametitle{Exercise}
+  Apply the convention to rewrite the following terms:
+  \begin{enumerate}
+    \item $x\,@\,(y\,@\,z)$
+    \item $(x\,@\,y)\,@\,z$
+    \item $\lam{s}(\lam{z}(s\,@\,z))$
+    \item $(\lambda x.\, x)\,@\,(\lambda y.\, y)$
+    \item $\lam{a}(\lam{b}(a\,@\,(\lam{a}(a\,@\,b))))$
+  \end{enumerate}
+  
 \end{frame}
-
-
 
 \begin{frame}{Variable binding}
   Let's discuss an important notion of syntax: \emph{variable binding}.
@@ -330,29 +393,108 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 
     \end{tikzpicture}
   \end{center}
+  The variable $x$ at the leaf is bound by its nearest abstraction by $x$ in the AST.
+  Similarly for $y$.
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{Exercise}
+  Draw the binding for each variable in the AST of the following terms:
+  \begin{enumerate}
+    \item $x\,@\,(y\,@\,z)$
+    \item $(x\,@\,y)\,@\,z$
+    \item $\lam{s}(\lam{z}(s\,@\,z))$
+    \item $(\lambda x.\, x)\,@\,(\lambda y.\, y)$
+    \item $\lam{a}(\lam{b}(a\,@\,(\lam{a}(a\,@\,b))))$
+  \end{enumerate}
+  \vfill
+  They the same terms used previously, so you may just reuse your previous answers.
 \end{frame}
 
 \begin{frame}{$\alpha$-equivalence: renaming of bound variables}
-  It is common sense that renaming variables of a program should not alter its meaning: the point of having a name for a variable to look for where it applies to.
+  The point of having a name for a variable to look for where it applies to, so
+  renaming variables should not alter its meaning.
+
+  For example, $f(x, y) = x^2 + y$ and $f(a, b) = a^2 + b$ represent the same function.
 
   \vfill
   Intuitively, two terms $t$ and $u$ are \alert{$\alpha$-equivalent}, written as
   \[
     t =_\alpha u
   \]
-  if $t$ and $u$ have the same binding structure, \emph{regardless of their variable names}, in their abstract syntax trees.
+  if $t$ and $u$ have the same binding structure in their abstract syntax trees, \emph{regardless of their variable names}.
   \vfill
   \begin{alertblock}{Quest}
     How to define $\alpha$-equivalence formally?
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{First solution: de Bruijn representation}
+\begin{frame}{First Idea: Naive Renaming}
   \begin{idea}
-    We discard names completely and use indices $i'$ to represent variable bindings.
+    Using the named representation, define $t =_\alpha u$ if variables in $t$ and $u$ can be renamed `suitably' to exactly the same term.
+  \end{idea}
+  After a naive renaming, a renamed variable might be \alert{captured} by some
+  $\lambda$ accidentally breaking the original binding structure.
+
+  \begin{center}
+    \begin{minipage}{.4\textwidth}
+      \begin{tikzpicture}[
+            level distance=0.75cm,
+          level 1/.style={sibling distance=6cm},
+          level 2/.style={sibling distance=4cm},
+          level 3/.style={sibling distance=2cm}
+        ]
+        \node (root) {$\lambda x$}
+          child {node (lamy) {$\lambda y$}
+            child {node {$@$}
+              child {node {$@$}
+                child {node (x) {$x$}}
+                child {node (y) {$y$}}
+              }
+              child {node {$z$}}
+            }
+          };
+
+        % Draw the arc from x to root
+        \draw[red, ->, thick, dashed, bend left=60] (x) to (root);
+        \draw[red, ->, thick, dashed, bend left=40] (y) to (lamy);
+      \end{tikzpicture}
+    \end{minipage}
+    becomes\hfil
+    \begin{minipage}{.4\textwidth}
+      \begin{tikzpicture}[
+            level distance=0.75cm,
+          level 1/.style={sibling distance=6cm},
+          level 2/.style={sibling distance=4cm},
+          level 3/.style={sibling distance=2cm}
+        ]
+        \node (root) {$\lambda\,y$}
+          child {node (lamy) {$\lambda\,y$}
+            child {node {$@$}
+              child {node {$@$}
+                child {node (x) {$y$}}
+                child {node (y) {$y$}}
+              }
+              child {node {$z$}}
+            }
+          };
+
+        % Draw the arc from x to root
+        \draw[red, ->, thick, dashed, bend left=60] (x) to (lamy);
+        \draw[gray, ->, thick, dashed, bend left=60] (x) to (root);
+        \draw[red, ->, thick, dashed, bend left=40] (y) to (lamy);
+      \end{tikzpicture}
+    \end{minipage}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{Second Idea: de Bruijn Representation}
+  \begin{idea}
+    We discard names completely and use indices $i$ to represent variable bindings.
   \end{idea}
 
-  The index $i'$ points to the $i$-th innermost $\lambda$-node from the variable: 
+  The index $i'$ points to the $i$-th nearest $\lambda$-node from the variable (going upward): 
   \begin{center}
     \begin{minipage}{.4\textwidth}
       \begin{tikzpicture}[
@@ -389,10 +531,10 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
           child {node (lamy) {$\lambda$}
             child {node {$@$}
               child {node {$@$}
-                child {node (x) {$1'$}}
-                child {node (y) {$0'$}}
+                child {node (x) {$1$}}
+                child {node (y) {$0$}}
               }
-              child {node {$3'$}}
+              child {node {$3$}}
             }
           };
 
@@ -417,43 +559,59 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
         \item Machine-readable.
         \item No variable renaming is involved.
       \end{enumerate}
-    \item[Bad] `Don't throw the baby out with the bathwater'.
+    \item[Bad] Human-\emph{un}readable.
   \end{description}
+
+  \vfill
+  It is a solution that defeats its own purpose: named variables are used to look up variables easily for human!
 \end{frame}
 
-\begin{frame}{Second solution: Capture-avoidance renaming}
-  \begin{idea}
-    Using the nominal representation, we define $t =_\alpha u$ if variables $t$ and $u$ can be renamed `suitably' to exactly the same term.
-  \end{idea}
-  With naive renaming, a renamed variable might be \alert{captured} by some $\lambda$, breaking the binding structure.
-  For example, $y$ can be renamed to anything but $x$ in 
-  \[
-    \lambda x.\,(\lambda y.\, x \; y)
-  \]
-  to preserve the same binding structure.
+\begin{frame}{Third Idea: Capture-Avoiding Renaming}
+  Variable renaming has to be constrained to variables that do not
+  \alert{occur} in the term to avoid changing the binding structure.
 
-  Hence, variable renaming has to be constrained to variables that do not \alert{occur} in the term to avoid changing the binding structure.
   \begin{alertblock}{Quest}
     How to define the \alert{occurrence} of a variable and variable \alert{renaming}?
   \end{alertblock}
+
+  Define a function $\Var$ from $\Lambda(V)$ to $\mathcal{P}V$ such that 
+  \begin{align*}
+    \Var(x) & = \{x\} \\
+    \Var(t\;u) & = \Var(t) \cup \Var(u) \\
+    \Var(\lam{x} t) & = \{x\} \cup \Var(t) 
+  \end{align*}
+  \vfill
+  We say $x$ \alert{occurs} in $t$ if $x \in \Var(t)$, i.e.\ $x$ appear in $t$ somewhere.
 \end{frame}
 
-\begin{frame}{Structural recursion over $\lambda$-terms}
-  To define a function from $\lambda$-terms, we may use the '\alert{fold}':
-
-  \begin{theorem*}
-    Given a target set $X$ and functions
-    \begin{align*}
-      f_1 & \colon V \to X \\
-      f_2 & \colon X \times X \to X \\
-      f_3 & \colon V \times X \to X
-    \end{align*}
-    there exists a unique $\hat{f}\colon \Lambda(V)  \to X$ such that
-    \begin{align*}
-      \hat{f}\,x    & = f_1\,x & \hat{f}(t\;u) & = f_2(\hat{f}\,t, \hat{f}\,u) & \hat{f}(\lambda x.\, t) & = f_3(x, \hat{f}\,t)
-    \end{align*}
-  \end{theorem*}
+\begin{frame}[t]
+  \frametitle{Exercise}
+  Compute $\Var(t)$ for the following terms $t$ by definition step by step. 
+  \begin{enumerate}
+    \item $x\,(y\,z)$
+    \item $x\,y\,z$
+    \item $\lam{s}(\lam{z}s\,z)$
+    \item $(\lambda x.\, x)\,(\lambda y.\, y)$
+    \item $\lam{a b}a\,(\lam{a}a\,b)$
+  \end{enumerate}
 \end{frame}
+
+% \begin{frame}{Structural recursion over $\lambda$-terms}
+%   To define a function from $\lambda$-terms, we may use the '\alert{fold}':
+% 
+%   \begin{theorem*}
+%     Given a target set $X$ and functions
+%     \begin{align*}
+%       f_1 & \colon V \to X \\
+%       f_2 & \colon X \times X \to X \\
+%       f_3 & \colon V \times X \to X
+%     \end{align*}
+%     there exists a unique $\hat{f}\colon \Lambda(V)  \to X$ such that
+%     \begin{align*}
+%       \hat{f}\,x    & = f_1\,x & \hat{f}(t\;u) & = f_2(\hat{f}\,t, \hat{f}\,u) & \hat{f}(\lambda x.\, t) & = f_3(x, \hat{f}\,t)
+%     \end{align*}
+%   \end{theorem*}
+% \end{frame}
 
 %\begin{frame}{Exercise: Height}
 %
@@ -469,25 +627,29 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
 %\end{exercise*}
 %\end{frame}
 
-\begin{frame}{Variable occurrences}
-  We define the set $\Var(t)$ of variables in a term $t$ by structural recursion with the target set $\mathcal{P}V$ and
-\begin{align*}
-  \Var_1(x) & = \{x\} \\
-  \Var_2(S_1, S_2) & = S_1 \cup S_2 \\
-  \Var_3(x, S) & =  \{x\} \cup S
-\end{align*}
-  That is, $\Var$ is a function from $\Lambda(V)$ to $\mathcal{P}V$ such that 
-  \begin{align*}
-    \Var(x) & = \{x\} \\
-    \Var(t\;u) & = \Var(t) \cup \Var(u) \\
-    \Var(\lam{x} t) & = \{x\} \cup \Var(t) 
-  \end{align*}
-  \vfill
-  We say $x$ occurs in $t$ if $x \in \Var(t)$, i.e.\ $x$ appear in $t$ somewhere.
-\end{frame}
+% \begin{frame}{Variable occurrences}
+%   We define the set $\Var(t)$ of variables in a term $t$ by structural recursion with the target set $\mathcal{P}V$ and
+% \begin{align*}
+%   \Var_1(x) & = \{x\} \\
+%   \Var_2(S_1, S_2) & = S_1 \cup S_2 \\
+%   \Var_3(x, S) & =  \{x\} \cup S
+% \end{align*}
+%   That is, $\Var$ is a function from $\Lambda(V)$ to $\mathcal{P}V$ such that 
+%   \begin{align*}
+%     \Var(x) & = \{x\} \\
+%     \Var(t\;u) & = \Var(t) \cup \Var(u) \\
+%     \Var(\lam{x} t) & = \{x\} \cup \Var(t) 
+%   \end{align*}
+%   \vfill
+%   We say $x$ occurs in $t$ if $x \in \Var(t)$, i.e.\ $x$ appear in $t$ somewhere.
+% \end{frame}
 
 
 \begin{frame}{Variable permutation}
+  \begin{alertblock}{Idea}
+    We rename a variable $x$ in $t$ with a fresh variable $z$ to $x$, i.e.\ $z \not\in \Var(t)$.
+  \end{alertblock}
+  
   A \emph{transposition} $(x\, y)$ is a function that swaps $x$ and $y$ but fixes everything else, i.e.\
   \[
     (x\, y)\;z = 
@@ -497,7 +659,6 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
       z & \text{otherwise}
     \end{cases}
   \]
-   \vfill
    The \emph{variable permutation} by a transportation $\pi = (y\,z)$ is defined by
    \begin{align*}
      \pi\cdot x     & = \pi\;x \\
@@ -505,10 +666,7 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
      \pi\cdot(\lambda x.\, t) & = \lambda (\pi\;x).\, (\pi\cdot t)
    \end{align*}
    \vfill
-   E.g.,
-  \[
-    (z\,y) \cdot \lambda x.\,(\lambda y.\, y \; y) = \lambda x.\,(\lambda z.\, z \; z)
-  \]
+   E.g., $(z\,y) \cdot \lambda x.\,\lambda y.\, y \; y = \lambda x.\,\lambda z.\, z \; z$.
 \end{frame}
 
 \begin{frame}{Renaming of bound variables}
@@ -557,27 +715,6 @@ $\lambda$-calculus can be understood as a programming language \emph{without} an
   \end{proof}
 \end{frame}
 
-
-\begin{frame}{$\alpha$-equivalence is an equivalence}
-  $\alpha$-equivalence satisfies the following properties
-  \begin{description}
-    \item[reflexivity] $t =_\alpha t$ for any term $t$;
-    \item[symmetry] $u =_\alpha t$ if $t =_\alpha u$;
-    \item[transitivity] $t =_\alpha v$ if $t =_\alpha u$ and $u =_\alpha v$. 
-  \end{description}
-  Easy to prove reflexivity and symmetry (try it!) but tricky to prove transitivity.
-  \vfill
-  We are mainly in interested in \alert{terms up to $\alpha$-equivalence}, as the name of a bound variable does not matter. 
-  Hence, we consider $\lambda$-terms \emph{modulo} $\alpha$-equivalence, i.e.\
-  \[
-    [t]_{\alpha} = \{\, u \in \Lambda(V) \mid t =_\alpha u \,\}
-  \]
-  as well as the (quotient) set:
-  \[
-    \Lambda(V)/{=_\alpha} \defeq \{\, [t]_{\alpha} \mid t \in \Lambda(V) \,\}.
-  \]
-\end{frame}
-
 \begin{frame}{Exercise}
 Which of the following pairs are $\alpha$-equivalent? If so, prove it.
 \begin{enumerate}
@@ -595,6 +732,27 @@ Can you come up with a strategy to prove your conjecture?
 
 \end{frame}
 
+\begin{frame}{$\alpha$-equivalence is an equivalence}
+  \begin{exercise*}
+    Show that $\alpha$-equivalence satisfies the following properties
+    \begin{description}
+      \item[reflexivity] $t =_\alpha t$ for any term $t$;
+      \item[symmetry] $u =_\alpha t$ if $t =_\alpha u$;
+      \item[transitivity] $t =_\alpha v$ if $t =_\alpha u$ and $u =_\alpha v$. 
+    \end{description}
+    That is, $=_\alpha$ is an equivalence relation.
+  \end{exercise*}
+  \vfill
+  We are mainly in interested in \alert{terms up to $\alpha$-equivalence}, as the name of a bound variable does not matter. 
+  Hence, we consider $\lambda$-terms \emph{modulo} $\alpha$-equivalence, i.e.\
+  \[
+    [t]_{\alpha} = \{\, u \in \Lambda(V) \mid t =_\alpha u \,\}
+  \]
+  as well as the (quotient) set:
+  \[
+    \Lambda(V)/{=_\alpha} \defeq \{\, [t]_{\alpha} \mid t \in \Lambda(V) \,\}.
+  \]
+\end{frame}
 
 
 \section{Untyped \texorpdfstring{$\lambda$}{λ}-Calculus: Dynamics}
@@ -694,6 +852,17 @@ Can you come up with a strategy to prove your conjecture?
   
 \end{frame}
 
+\begin{frame}[t]
+  \frametitle{Exercise}
+  Compute the following by definition step by step.
+  \begin{itemize}
+    \item $(\lam{y}x)\subst{t}{x}$ if $x \neq y$ and $y \notin \FV(t)$.
+    \item $\left(\lam{x\,y}n\;(\lam{z}y)\;x\right)\subst{\lam{f\,x}x}{n}$, assuming all variables are distinct.
+  \end{itemize}
+  
+  
+\end{frame}
+
 %\begin{frame}{$\alpha$-Structural recursion}
 %\end{frame}
 %
@@ -747,6 +916,7 @@ Can you come up with a strategy to prove your conjecture?
 For example, 
   $(\boxed{(\lam{x y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}$.
 \end{frame}
+
 \begin{frame}{Exercise}
   Write down a sequence of $\beta$-reductions and \emph{circle} all $\beta$-redexes while reducing a term:
   \begin{enumerate}
@@ -821,426 +991,5 @@ For example,
 \begin{frame}{Summary}
   SUMMARISE HERE ALL THE RELATIONS WE HAVE SEEN SO FAR.
 \end{frame}
-
-\section{Programming in \texorpdfstring{$\lambda$}{λ}-Calculus}
-\begin{frame}{Church encoding of boolean values}
-  
-Boolean and conditional can be encoded as combinators.
-  
-\begin{description}
-  \item[Boolean]
-    \begin{align*}
-      & \mathtt{True}  && \defeq && \lambda x\,y.\, x \\
-      & \mathtt{False} && \defeq && \lambda x\,y.\, y
-    \end{align*}
-
-  \item[Conditional]
-    \begin{align*}
-      \mathtt{if} & \defeq \lambda b\;x\;y.\;b\,x\,y  \\
-      \mathtt{if} \;\mathtt{True} \;M\;N &\reduce M \\
-      \mathtt{if} \;\mathtt{False}\;M\;N &\reduce N
-    \end{align*}
-    for any two $\lambda$-terms $M$ and~$N$.
-\end{description}
-
-\end{frame}
-\begin{frame}[allowframebreaks]{Church Encoding of natural numbers}
-
-  Natural numbers as well as arithmetic operations can be encoded in untyped
-  lambda calculus.
-  \begin{description}
-    \item[Church numerals] 
-      \begin{align*}
-        &\bc_0 &&\defeq\;&& \lambda f\,x.\, x \\
-        &\bc_{1} &&\defeq\;&& \lambda f\,x.\, f\,x \\
-        &\bc_{2} &&\defeq\;&& \lambda f\,x.\, f\,(f\,x) \\
-        &\bc_{n+1} &&\defeq\;&& \lambda f\,x.\, f^{n+1}\,(x)
-      \end{align*}
-      where $f^1(x) \defeq f\;x$ and $f^{n+1}(x)  \defeq f\;(f^n(x))$.
-    \item[Successor]
-      \begin{align*}
-        & \mathtt{succ} && \defeq\; && \lambda n.\,\lambda f\,x.\, f\,(n\,f\,x) \\
-        & \mathtt{succ}\;\bc_n && \reduce\; && \bc_{n+1}
-      \end{align*}
-      for any natural number~$n \in \mathbb{N}$.
-    \item[Addition]
-      \begin{align*}
-        & \mathtt{add} && \defeq\; && \lambda n\,m.\,\lambda f\,x.\;
-        n\;f\;(m\;f\;x)  \\ & \mathtt{add}\;\bc_{n}\;\bc_{m}\;
-                            && \reduce\; && \bc_{n + m}
-      \end{align*}
-
-    \item[Conditional]
-      \begin{align*}
-        & \mathtt{ifz} && \defeq \; \lambda n\;x\;y.\;n\;(\lambda z.\;y)\;x 
-        \\
-        & \mathtt{ifz}\;\bc_0\;M\;N && \reduce \; M \\
-        & \mathtt{ifz}\;\bc_{n+1}\;M\;N && \reduce \; N
-      \end{align*}
-  \end{description}
-\end{frame}
-
-\begin{frame}{Exercise}
-  \begin{enumerate}
-    \item Define Boolean operations $\mathtt{not}$, $\mathtt{and}$, and $\mathtt{or}$.
-    \item Evaluate $\mathtt{succ}\;\bc_0$ and $\mathtt{add}\;\bc_{1}\;\bc_{2}$. 
-    \item Define the multiplication $\mathtt{mult}$ over Church numerals.
-
-  \end{enumerate}
-\end{frame}
-\begin{frame}{General Recursion via self-reference}
-
-  The summation $\sum_{i = 0}^{n} i$ for $n \in \mathbb{N}$ is typically
-  described by self-reference as
-\[
-  \mathit{sum}(n) =
-    \begin{cases} 
-     0 & \text{if } n = 0 \\
-     n + \mathit{sum}(n - 1)  & \text{otherwise}.
-    \end{cases}
-\]
-This \alert{cannot} be done in $\lambda$-calculus directly. (Why?)
-
-Note that unfolding $\mathit{sum}$ as many times as it requires gives
-\[
-  \mathit{sum}(n) =
-    \begin{cases} 
-     0 & \text{if } n = 0 \\
-     1 + \mathit{sum}(0) & n = 1 \\
-     \cdots \\
-     n + \mathit{sum}(n - 1)  & \text{otherwise}.
-    \end{cases}
-\]
-
-
-%We can avoid self-reference by considering a functional
-%$G\colon (\mathbb{N} \to \mathbb{N}) \to (\mathbb{N} \to \mathbb{N})$
-%defined by
-%\begin{equation} \label{eq:summation}
-%  (G(f))(n) \defeq
-%  \begin{cases}
-%     0 & \text{if } n = 0 \\
-%     n + f(n - 1)  & \text{otherwise}.
-%  \end{cases}
-%\end{equation}
-%Then, we can show that if there exists $s\colon \mathbb{N} \to \mathbb{N}$ such that $G(s) = s$ then $s = \mathit{sum}$ by induction.
-\end{frame}
-
-\begin{frame}{Curry's paradoxical combinator}
-  The \emph{Y combinator} is defined as a term 
-  \[
-    \mathbf{Y} \defeq \lambda f.\, (\lambda x.\, f\,(x\,x))\,(\lambda
-    x.\,f\,(x\,x)).
-  \]
-\begin{proposition}
-  $\mathbf{Y}$ is a fixed-point operator, i.e.\ 
-  \begin{align*}
-    \mathbf{Y}F
-    & \onereduce {\color{red} (\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))} \\
-    & \onereduce F\,({\color{red}(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))}) \\
-  \end{align*}
-  for every $\lambda$-term~$F$. In particular, $\mathbf{Y}F =_\beta F(\mathbf{Y}F)$.
-\end{proposition}
-Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration. 
-\end{frame}
-
-
-\begin{frame}{Summation via $\mathtt{Y}$}
-  We encode the following recursion
-  \[
-    \mathit{sum}(n) =
-      \begin{cases} 
-       0 & \text{if } n = 0 \\
-       n + \mathit{sum}(n - 1)  & \text{otherwise}.
-      \end{cases}
-  \]
-  by defining each iteration $G$ with an additional function $f$ so that $\mathtt{sum} \defeq \mathbf{Y}G$:
-  \[
-    G \defeq \lambda f\,n.\, \mathtt{ifz}\;n\;\bc_0\; (\add\;n\;(f\;(\mathtt{pred}\;n)))
-  \]
-  For example, letting $G' \defeq ((\lambda x.\, G\;(x\;x))\;(\lambda x.\,G\;(x\;x)))$, we have
-  \begin{align*}
-    \mathtt{sum}\;\bc_1
-      &\onereduce G'\;\bc_1 \\
-      &\onereduce G\;G'\;\bc_1 \\
-      &\onereduce (\lambda n.\, \mathtt{ifz}\;n\;\bc_0\;
-      (\add\;n\;(G'\;(\mathtt{pred}\;n))))\;\bc_1 \\
-      &\onereduce \mathtt{ifz}\;\bc_1\;\bc_0\;
-      (\add\;\bc_1\;(G'\;(\mathtt{pred}\;\bc_1))) \\
-      &\onereduce \dots
-  \end{align*}
-\end{frame}
-  
-%\begin{frame}{Turing's fixed-point combinator}
-%  Recall that $\mathbf{Y}G =_\beta G(\mathbf{Y}\;G)$ but $\mathbf{Y}G \reduce
-%  G(\mathbf{Y}\;G)$ does not hold.  Here is a fixed-point operator such that
-%  $\Theta F \reduce F(\Theta F)$.
-%\begin{proposition}
-%  Define 
-%  \[
-%    \Theta \defeq 
-%    (\lambda x\,f.\,f\,(x\,x\,f))\;
-%    (\lambda x\,f.\,f\,(x\,x\,f))
-%  \]
-%  Then, 
-%  \[
-%    \Theta F \reduce F (\Theta F)
-%  \]
-%\end{proposition}
-%Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
-%\begin{align*}
-%  G \defeq{} &
-%  \lambda f\,n.\,
-%  \mathtt{ifz}\;n\;\bc_0\;
-%  (\add\;n\;(f\,(\mathtt{pred}\;n))) \\
-%  \mathtt{sum} \defeq\; & \Theta\,G 
-%\end{align*}
-%\end{frame}
-
-\begin{frame}{Exercise}
-  \begin{enumerate}
-    \item Evaluate $\mathtt{sum}\;\bc_1$ to its normal form in detail.
-    \item Define the factorial $n!$ with Church numerals.
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Homework}
-  \begin{theorem}[Church-Rosser]
-    Given $u_1$ and $u_2$ with $t \reduce u_1$ and $t\reduce u_2$, there is $v$
-    such that $u_1 \reduce v$ and $u_2 \reduce v$. 
-    \[
-      \xymatrix@-4.8pt{
-        & t \ar@{->>}[rd]^{\beta} \ar@{->>}[ld]_{\beta} \\
-        u_1 \ar@{->>}[rd]_{\beta} & & u_2 \ar@{->>}[ld]^{\beta} \\
-        & v
-      }
-    \]
-  \end{theorem}
-  \begin{enumerate}
-    \item (2.5\%) Show that $t \reduce u$ implies $t =_\beta u$. 
-    \item (2.5\%) Show that if $t =_\beta u$ then there is a \emph{confluent} term $v$ of $t$ and $u$, i.e.\ $t \reduce v$ and $u \reduce v$.
-  \end{enumerate}
-\end{frame}
-
-\appendix 
-\section{Appendix: Evaluation strategy}
-\begin{frame}[allowframebreaks]{Evaluation strategies}
-An evaluation strategy is a procedure of selecting $\beta$-redexes
-to reduce. It is a subset $\longrightarrow_{\mathrm{ev}}$ of the full
-$\beta$-reduction $\onereduce$.
-
-\begin{description}
-  \item[Innermost $\beta$-redex] does not contain any $\beta$-redex.
-  \item[Outermost $\beta$-redex] is not contained in any other $\beta$-redex.
-\end{description}
-
-\begin{description}
-  \item[the leftmost-outermost (\emph{normal order}) strategy] reduces the leftmost outermost
-    $\beta$-redex in a term first. For example, 
-    \begin{align*}
-      & 
-      \underline{(\lambda x.\, (\lambda y.\, y)\,x)}\quad
-      \underline{(\lambda x.\, (\lambda y.\, y\,y)\,x)}
-      \\
-      \onereduce &
-      \underline{(\lambda y.\, y)}\quad
-      \underline{(\lambda x.\, (\lambda y.\, y\,y)\, x)} \\
-      \onereduce &
-      \lambda x.\, \underline{(\lambda y.\, y\,y)}\quad
-      \underline{\vphantom{(\lambda}x} \\
-      \onereduce & (\lambda x.\, x\,x) \\
-      \notonereduce
-    \end{align*}
-  \item[the leftmost-innermost strategy] reduces the leftmost innermost
-    $\beta$-redex in a term first. For example, 
-    \begin{align*}
-      & (\lambda x.\, \underline{(\lambda y.\,
-        y)}\;\;\underline{\vphantom{(\lambda} x})\,
-      (\lambda x.\, (\lambda y.\, y\, y)\,x) \\
-      \onereduce & (\lambda x.\,x)\;
-      (\lambda x.\, \underline{(\lambda y.\, y\,
-        y)}\;\;\underline{\vphantom{(\lambda}x}) \\
-      \onereduce & \underline{(\lambda x.\,x)}\;\;\underline{(\lambda x.\, x\,x)} \\
-      \onereduce & (\lambda x.\, x\, x) \\
-      \notonereduce
-    \end{align*}
-  \item[the rightmost-innermost/outermost strategy]
-    are defined similarly where terms are reduced from right to left
-    instead.
-\end{description}
-\end{frame}
-
-\begin{frame}{CBV versus CBN}
-\begin{description}
-  \item[Call-by-value strategy]
-    rightmost-outermost but not under any abstraction
-  \item[Call-by-name strategy]
-    leftmost-outermost but not under any abstraction
-\end{description}
-
-  \mode<presentation>{\vfill}
-\begin{proposition}[Determinacy]
-  Each of evaluation strategies is deterministic, i.e.\ 
-  if $M \onereduce N_1$ and $M \onereduce N_2$ then $N_1 = N_2$.
-\end{proposition}
-\end{frame}
-
-%\begin{frame}{Exercise}
-%  Define following terms
-%\begin{align*}
-%  \Omega &\defeq (\lambda x.\, x\,x)\;(\lambda x.\,x\,x) \\
-%  \mathbf{K}_1 & \defeq \lambda x\,y.\;x
-%\end{align*}
-%Evaluate 
-%\[
-%  \mathbf{K}_1\;z\;\Omega
-%\]
-%using the call-by-value and the call-by-name strategy respectively.
-%\end{frame}
-
-\begin{frame}{Normalisation}
-\begin{definition}
-  \begin{enumerate}
-    \item $M$ is in \emph{normal form} if $M \notonereduce N$ for any $N$. 
-    \item $M$ is \emph{weakly normalising} if $M \reduce N$ for some $N$ in
-      normal form.
-  \end{enumerate}
-\end{definition}
-%
-  \begin{enumerate}
-    \item $\Omega$ is not weakly normalising.
-    \item $\mathbf{K}_1$ is normal and thus weakly normalising.
-    \item $\mathbf{K}_1\;z\; \Omega$ is weakly normalising.
-  \end{enumerate}
-
-\begin{theorem}
-  The normal order strategy reduces every weakly
-  normalising term to a normal form.
-\end{theorem}
-
-\end{frame}
-%\begin{frame}{Remark}
-% The definition of capture-avoiding substation is widely adopted, it is still
-% ill-defined.  Recursion is always a total function. Advanced
-% mathematics~\cite{Pitts2013} is needed to resolve this issue.
-%
-%  \mode<presentation>{\vfill}
-% Issues with named variables may be lifted by using nameless representation of
-% terms. For example, in de Bruijin's representation every term 
-% has a canonical form, see \cite[Chapter 6]{Pierce2002}.
-%
-%  \mode<presentation>{\vfill}
-%  In fact, every computable function on natural numbers is definable in terms of
-%  terms. For interested readers, see~\cite[Chapter 3]{Barendregt1984}
-%  for further detail. Therefore, $\lambda$-calculus is Turing-complete. 
-%\end{frame}
-
-
-
-\section{Appendix: Takahashi's Proof of Confluence}
-
-\begin{frame}{Takahashi's Proof of Confluence}
-  Proving the Church-Rosser property (or \alert{confluence}) can be quite tricky.
-  This section presents a straightforward strategy based on a notion of complete development, which unfolds as many $\beta$-redexes as possible \emph{statically}.
-
-  The \emph{complete development} $M^*$ of a $\lambda$-term $M$ is defined by
-  \begin{align*}
-    x^*      & = x \\
-    (\lambda x.\, M)^* & = \lambda x.\, M^* \\
-    \left((\lambda x.\, M)\;N\right)^* & = M^*\subst{N^*}{x} \\
-    (M\;N)^* & = M^*\;N^* && \text{ if $M \not\equiv \lambda x.\,M'$ } 
-  \end{align*}
-\end{frame}
-\begin{frame}{Confluence: Parallel reduction}
-  Let $M \parreduce N$ denote the \emph{parallel reduction} defined by
-  \begin{multicols}{2}
-    \begin{prooftree}
-      \AXC{$\vphantom{M\reduce M}$}
-      \UIC{$x \parreduce x$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \parreduce N$}
-      \UIC{$\lambda x.\, M \parreduce \lambda x.\, N$}
-    \end{prooftree}
-    \columnbreak
-    \begin{prooftree}
-      \AXC{$M \parreduce M'$}
-      \AXC{$N \parreduce N'$}
-      \BIC{$M\;N \parreduce M'\;N'$}
-    \end{prooftree}
-    \begin{prooftree}
-      \AXC{$M \parreduce M'$}
-      \AXC{$N \parreduce N'$}
-      \BIC{$(\lambda x.\, M)\;N \parreduce M'\subst{N'}{x}$}
-    \end{prooftree}
-  \end{multicols}
-  For example, 
-  \[
-    \underline{(\lambda x.\, (\lambda y.\, y)\;x)}\;\underline{((\lambda x.\, x)\;\false)}
-    \parreduce
-    \false
-  \]
-  because $(\lambda y.\,y)\;x \parreduce x$ and $(\lambda x.\,x)\;\false \parreduce \false$.
-\end{frame}
-
-\begin{frame}{Confluence: Properties of parallel reduction}
-  \begin{lemma}
-    \begin{enumerate}
-      \item $M \parreduce M$ holds for any term~$M$, 
-      \item $M \onereduce N$ implies $M \parreduce N$, and
-      \item $M \parreduce N$ implies $M \reduce N$.
-    \end{enumerate}
-    In particular, $M \parreduce^* N$ if and only if $M \reduce N$. 
-  \end{lemma}
-  \begin{lemma}[Substitution respects parallel reduction]
-      $M \parreduce M'$ and $N \parreduce N'$ imply $M\subst{N}{x} \parreduce
-      M'\subst{N'}{x}$. 
-  \end{lemma}
-  \begin{theorem}[Triangle property]
-    If $M \parreduce N$, then $N \parreduce M^*$.
-  \end{theorem}
-  \begin{proof}[Proof sketch]
-    By induction on $M \parreduce N$.
-  \end{proof}
-\end{frame}
-
-\begin{frame}{Strip Lemma}
-  \begin{theorem}
-    If $L \parreduce^* M_1$ and $L \parreduce M_2$, then there exists $N$
-    satisfying that $M_1 \parreduce N$ and $M_2 \parreduce^* N$, i.e.\
-    \[
-      \xymatrix{
-        & L \ar@{=>}[rd] \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
-      }
-    \]
-  \end{theorem}
-  \begin{proof}[Proof sketch]
-    By induction on $L \parreduce^* M_1$. 
-  \end{proof}
-\end{frame}
-
-\begin{frame}{Confluence}
-  \begin{theorem}
-    If $L \parreduce^* M_1$ and $L \parreduce^* M_2$, then there exists $N$ such that $M_1 \parreduce^* N$ and $M_2 \parreduce^* N$.
-    \[
-      \xymatrix{
-        & L \ar@{=>}[rd]^(.8){*}_(.8){\beta} \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd]^(.8){*}_(.8){\beta} & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
-      }
-    \]
-  \end{theorem}
-  \begin{corollary}
-    The confluence of $\reduce$ holds. 
-  \end{corollary}
-  
-\end{frame}
-
-%\begin{frame}[allowframebreaks]{References}
-%  \bibliographystyle{amsalpha}
-%  \bibliography{library} 
-%\end{frame}
 
 \end{document}
