@@ -620,23 +620,69 @@
   Therefore no closed term of type $X \to X$ denotes constant true.
 \end{frame}
 
-\begin{frame}{Parametricity for System F}
-  For System~F, the same idea is extended to universal types.
-
-  \vfill
-
-  A closed term of type
+\begin{frame}{Parametricity: usable form}
+  Let
   \[
-    \forall X.\,A
+    \vdash t : \forall X.\,A(X).
   \]
-  must preserve not just one relation for $X$, but every admissible relation
-  chosen for $X$.
+  For any two type interpretations $B,C$ and any relation
+  \[
+    R \subseteq \Brackets{B} \times \Brackets{C},
+  \]
+  the two instances $t\;B$ and $t\;C$ preserve $R$:
+  \[
+    (\Brackets{t\;B},\Brackets{t\;C})
+    \in \mathcal{R}^{A}_{X \mapsto R}.
+  \]
 
   \vfill
 
-  This is the source of \alert{parametricity}: a polymorphic term cannot branch
-  on the identity of the type argument. It can only use operations supplied by
-  its type.
+  Read this as: a polymorphic program sends related inputs to related outputs,
+  for every relation chosen for the type variable.
+\end{frame}
+
+\begin{frame}{How to read $\mathcal{R}^{A}_{X \mapsto R}$}
+  The relation $\mathcal{R}^{A}_{X \mapsto R}$ is computed from the type $A$.
+
+  \[
+  \begin{array}{rcl}
+    \mathcal{R}^{X}_{X \mapsto R}
+      &=& R \\[4pt]
+
+    \mathcal{R}^{A \to B}_{X \mapsto R}(f,g)
+      &\Longleftrightarrow&
+      \forall a\,b.\,
+      \mathcal{R}^{A}_{X \mapsto R}(a,b)
+      \Rightarrow
+      \mathcal{R}^{B}_{X \mapsto R}(f\,a,g\,b)
+  \end{array}
+  \]
+
+  \vfill
+
+  For today, this is the useful fragment: variables use the chosen relation;
+  function types preserve relatedness.
+\end{frame}
+
+\begin{frame}{Graph relations}
+  Given a function $f : B \to C$, its graph relation is
+  \[
+    \mathrm{graph}(f)
+    =
+    \{(b,f(b)) \mid b \in \Brackets{B}\}.
+  \]
+
+  \vfill
+
+  To extract equations from a polymorphic type, choose
+  \[
+    R = \mathrm{graph}(f).
+  \]
+
+  \vfill
+
+  Then parametricity says that the polymorphic term commutes with $f$ in the
+  shape prescribed by its type.
 \end{frame}
 
 \begin{frame}{No closed term of $\forall X.\,X$}
@@ -645,41 +691,35 @@
     \vdash t : \forall X.\,X.
   \]
 
-  For every type interpretation $A$, the term $t\;A$ denotes an element
+  Parametricity gives, for every relation
+  $R \subseteq \Brackets{B} \times \Brackets{C}$,
   \[
-    \Brackets{t}_A \in \Brackets{A}.
+    (\Brackets{t\;B},\Brackets{t\;C}) \in R.
   \]
 
-  Parametricity says more: for any two interpretations $A,B$ and any relation
+  \vfill
+
+  Choose
   \[
-    R \subseteq \Brackets{A} \times \Brackets{B},
-  \]
-  the two instances must be related:
-  \[
-    R(\Brackets{t}_A,\Brackets{t}_B).
+    \Brackets{B}=\Brackets{C}=\{*\}
+    \qquad\text{and}\qquad
+    R = \emptyset.
   \]
 \end{frame}
 
 \begin{frame}{No closed term of $\forall X.\,X$, continued}
-  Now choose a simple case:
+  Since both interpretations are singletons,
   \[
-    \Brackets{A}=\Brackets{B}=\{*\}
+    \Brackets{t\;B}=*
     \qquad\text{and}\qquad
-    R = \emptyset.
+    \Brackets{t\;C}=*.
   \]
 
-  If $t : \forall X.\,X$ existed, then
+  But parametricity requires
   \[
-    \Brackets{t}_A = *
-    \qquad\text{and}\qquad
-    \Brackets{t}_B = *.
+    (*,*) \in \emptyset,
   \]
-
-  But parametricity would require
-  \[
-    R(*,*),
-  \]
-  i.e. $(*,*) \in \emptyset$, contradiction.
+  contradiction.
 
   \vfill
 
@@ -705,24 +745,22 @@
 \begin{frame}{A free theorem}
   Let
   \[
-    t : \forall X.\,\List(X) \to \List(X).
+    t : \forall X.\,\List(X) \to \List(X)
+  \]
+  and choose a function $f : A \to B$.
+
+  \vfill
+
+  Taking $R=\mathrm{graph}(f)$, parametricity says that related lists are sent
+  to related lists.  In this case, that means
+  \[
+    \mathtt{map}\;f\;(t\;A\;xs)
+    =
+    t\;B\;(\mathtt{map}\;f\;xs).
   \]
 
-  Parametricity says that for every function $f : A \to B$, the following
-  diagram commutes:
-  \[
-    \xymatrix{
-      \List(A) \ar[r]^{t_A} \ar[d]_{\mathtt{map}\;f}
-        & \List(A) \ar[d]^{\mathtt{map}\;f} \\
-      \List(B) \ar[r]_{t_B}
-        & \List(B)
-    }
-  \]
-
-  Equivalently,
-  \[
-    \mathtt{map}\;f\;(t_A\;xs) = t_B\;(\mathtt{map}\;f\;xs).
-  \]
+  So $t$ cannot inspect the elements of the list; it must commute with every
+  map.
 \end{frame}
 
 \begin{frame}{Summary}
