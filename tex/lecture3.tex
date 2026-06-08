@@ -292,28 +292,28 @@
   the unsolvable type equation that would be required.
 \end{frame}
 
-\begin{frame}{Type inference and checking}
-  Can we answer the following questions algorithmically?
-
-  \begin{description}
-    \item[Type inference]
-      Given a context $\Gamma$ and a term $t$, does there exist a type $A$ such
-      that $\Gamma \vdash_i t : A$ is derivable?
-
-    \item[Type checking]
-      Given a context $\Gamma$, a type $A$, and a term $t$, is
-      $\Gamma \vdash_i t : A$ derivable?
-  \end{description}
-
-  \vfill
-
-  \begin{theorem}
-    Type checking is \emph{decidable} in simply typed $\lambda$-calculus.
-  \end{theorem}
-
-  Because the rules are syntax-directed, checking follows the structure of the
-  term.  Inference additionally requires generating and solving type equations.
-\end{frame}
+%\begin{frame}{Type inference and checking}
+%  Can we answer the following questions algorithmically?
+%
+%  \begin{description}
+%    \item[Type inference]
+%      Given a context $\Gamma$ and a term $t$, does there exist a type $A$ such
+%      that $\Gamma \vdash_i t : A$ is derivable?
+%
+%    \item[Type checking]
+%      Given a context $\Gamma$, a type $A$, and a term $t$, is
+%      $\Gamma \vdash_i t : A$ derivable?
+%  \end{description}
+%
+%  \vfill
+%
+%  \begin{theorem}
+%    Type checking is \emph{decidable} in simply typed $\lambda$-calculus.
+%  \end{theorem}
+%
+%  Because the rules are syntax-directed, checking follows the structure of the
+%  term.  Inference additionally requires generating and solving type equations.
+%\end{frame}
 
 \section{Programming in Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus}
 
@@ -648,34 +648,34 @@
   abstraction.
 \end{frame}
 
-\begin{frame}{Weak normalisation}
-  \begin{definition}
-    A term $t$ is \emph{weakly normalising}, written $t \downarrow$, if the
-    following judgement is derivable.
-    \begin{multicols}{2}
-      \begin{prooftree}
-        \AXC{$\normal\;t$}
-        \UIC{$t \downarrow$}
-      \end{prooftree}
-      \columnbreak
-      \begin{prooftree}
-        \AXC{$t \onereduce u$}
-        \AXC{$u \downarrow$}
-        \BIC{$t \downarrow$}
-      \end{prooftree}
-    \end{multicols}
-  \end{definition}
-
-  Thus $t$ is weakly normalising if there is a sequence
-  \[
-    t \onereduce t_1 \onereduce t_2 \onereduce \cdots \onereduce u
-  \]
-  where $u$ is in normal form.
-
-  \begin{theorem}[Weak normalisation]
-    Every typable term $t$ with $\Gamma \vdash_i t : A$ is weakly normalising.
-  \end{theorem}
-\end{frame}
+%\begin{frame}{Weak normalisation}
+%  \begin{definition}
+%    A term $t$ is \emph{weakly normalising}, written $t \downarrow$, if the
+%    following judgement is derivable.
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$\normal\;t$}
+%        \UIC{$t \downarrow$}
+%      \end{prooftree}
+%      \columnbreak
+%      \begin{prooftree}
+%        \AXC{$t \onereduce u$}
+%        \AXC{$u \downarrow$}
+%        \BIC{$t \downarrow$}
+%      \end{prooftree}
+%    \end{multicols}
+%  \end{definition}
+%
+%  Thus $t$ is weakly normalising if there is a sequence
+%  \[
+%    t \onereduce t_1 \onereduce t_2 \onereduce \cdots \onereduce u
+%  \]
+%  where $u$ is in normal form.
+%
+%  \begin{theorem}[Weak normalisation]
+%    Every typable term $t$ with $\Gamma \vdash_i t : A$ is weakly normalising.
+%  \end{theorem}
+%\end{frame}
 
 \begin{frame}{Strong normalisation}
   \begin{definition}
@@ -846,7 +846,7 @@
 \end{frame}
 
 \begin{frame}{In-class review exercises}
-  These exercises are intended for discussion rather than homework.
+  These exercises are for peer discussion.
 
   \begin{enumerate}
     \item Prove the application case of the Progress Theorem.
