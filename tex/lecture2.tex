@@ -12,224 +12,607 @@
   \end{frame}
 \egroup
 
+\begin{frame}{Recap}
+  We have covered so far
+  \begin{itemize}
+    \item Terms: variables, abstractions, and applications.
+    \item $\beta$-reduction: $(\lambda x.\,M)\;N \onereduce M\subst{N}{x}$.
+    \item $\alpha$-equivalence avoids dependence on bound-variable names.
+  \end{itemize}
 
-\section{Programming in \texorpdfstring{$\lambda$}{λ}-Calculus}
-\begin{frame}{Church encoding of boolean values}
-  
-Boolean and conditional can be encoded as combinators.
-  
-\begin{description}
-  \item[Boolean]
-    \begin{align*}
-      & \mathtt{True}  && \defeq && \lambda x\,y.\, x \\
-      & \mathtt{False} && \defeq && \lambda x\,y.\, y
-    \end{align*}
-
-  \item[Conditional]
-    \begin{align*}
-      \mathtt{if} & \defeq \lambda b\;x\;y.\;b\,x\,y  \\
-      \mathtt{if} \;\mathtt{True} \;M\;N &\reduce M \\
-      \mathtt{if} \;\mathtt{False}\;M\;N &\reduce N
-    \end{align*}
-    for any two $\lambda$-terms $M$ and~$N$.
-\end{description}
-
+  Today, we will use $\lambda$-calculus for programming, recursion, confluence, and evaluation strategy.
 \end{frame}
-\begin{frame}[allowframebreaks]{Church Encoding of natural numbers}
 
-  Natural numbers as well as arithmetic operations can be encoded in untyped
-  lambda calculus.
+\section{Defining data in \texorpdfstring{$\lambda$}{λ}-Calculus}
+
+\begin{frame}{Church encoding: data by behaviour}
+  A Church-encoded value is represented by what it does to its eliminators.
+
+  \begin{center}
+    \begin{tabular}{ll}
+      Boolean & chooses between two branches \\
+      Natural number & iterates a function a fixed number of times
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Church encoding of Boolean values}
+  Boolean values and conditional expressions can be encoded as combinators.
+
   \begin{description}
-    \item[Church numerals] 
+    \item[Boolean values]
       \begin{align*}
-        &\bc_0 &&\defeq\;&& \lambda f\,x.\, x \\
-        &\bc_{1} &&\defeq\;&& \lambda f\,x.\, f\,x \\
-        &\bc_{2} &&\defeq\;&& \lambda f\,x.\, f\,(f\,x) \\
-        &\bc_{n+1} &&\defeq\;&& \lambda f\,x.\, f^{n+1}\,(x)
+        \mathtt{True}  &\defeq \lambda x\,y.\,x \\
+        \mathtt{False} &\defeq \lambda x\,y.\,y
       \end{align*}
-      where $f^1(x) \defeq f\;x$ and $f^{n+1}(x)  \defeq f\;(f^n(x))$.
-    \item[Successor]
-      \begin{align*}
-        & \mathtt{succ} && \defeq\; && \lambda n.\,\lambda f\,x.\, f\,(n\,f\,x) \\
-        & \mathtt{succ}\;\bc_n && \reduce\; && \bc_{n+1}
-      \end{align*}
-      for any natural number~$n \in \mathbb{N}$.
-    \item[Addition]
-      \begin{align*}
-        & \mathtt{add} && \defeq\; && \lambda n\,m.\,\lambda f\,x.\;
-        n\;f\;(m\;f\;x)  \\ & \mathtt{add}\;\bc_{n}\;\bc_{m}\;
-                            && \reduce\; && \bc_{n + m}
-      \end{align*}
-
     \item[Conditional]
       \begin{align*}
-        & \mathtt{ifz} && \defeq \; \lambda n\;x\;y.\;n\;(\lambda z.\;y)\;x 
-        \\
-        & \mathtt{ifz}\;\bc_0\;M\;N && \reduce \; M \\
-        & \mathtt{ifz}\;\bc_{n+1}\;M\;N && \reduce \; N
+        \mathtt{if} &\defeq \lambda b\;x\;y.\; b\,x\,y \\
+        \mathtt{if}\;\mathtt{True}\;t\;u &\reduce t \\
+        \mathtt{if}\;\mathtt{False}\;t\;u &\reduce u
+      \end{align*}
+      for any two $\lambda$-terms $M$ and~$N$.
+  \end{description}
+  where variables $x$ and $y$ of $\lambda\,x\,y$ are `used' as $\mathtt{true}$ and $\mathtt{false}$ and a Bool value is itself a conditional expression.
+\end{frame}
+
+\begin{frame}{Example}
+  \begin{align*}
+    \mathtt{if}\;\mathtt{True}\;t\;u
+    &= (\lambda b\,x\,y.\,b\,x\,y)\;(\lambda x\,y.\,x)\;t\;u \\
+    &\onereduce (\lambda x\,y.\,x)\;t\;u \\
+    &\reduce t
+\end{align*}
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{Exercise}
+  Define the following terms directly without using $\mathtt{if}$.
+  \begin{itemize}
+    \item Negation: $\mathtt{not}$ such that $\mathtt{not}\;\mathtt{True} \reduce \mathtt{False}$ and $\mathtt{not}\;\mathtt{False} \reduce \mathtt{True}$.
+    \item Conjunction $\mathtt{and}$.
+    \item Disjunction $\mathtt{or}$.
+  \end{itemize}
+  
+  
+\end{frame}
+
+
+\begin{frame}{Church encoding of natural numbers, I}
+  Natural numbers and arithmetic operations can also be encoded.
+
+  \begin{description}
+    \item[Church numerals]
+      \begin{align*}
+        \bc_0     &\defeq \lambda f\,x.\,x \\
+        \bc_1     &\defeq \lambda f\,x.\,f\,x \\
+        \bc_2     &\defeq \lambda f\,x.\,f\,(f\,x) \\
+        \bc_{n+1} &\defeq \lambda f\,x.\,f^{n+1}(x)
+      \end{align*}
+      where $f^1(x) \defeq f\;x$ and
+      $f^{n+1}(x) \defeq f\;(f^n(x))$.
+  \end{description}
+  where variables $f$ and $x$ in $\bc_0$ and $\bc_{n+1}$ are used as the successor and zero under the lambda abstraction.
+\end{frame}
+
+\begin{frame}{Church encoding of natural numbers, II}
+  \begin{description}
+    \item[Successor]
+      \begin{align*}
+        \mathtt{succ} &\defeq \lambda n.\,\lambda f\,x.\, f\,(n\,f\,x) \\
+        \mathtt{succ}\;\bc_n &\reduce \bc_{n+1}
+      \end{align*}
+
+    \item[Addition]
+      \begin{align*}
+        \add &\defeq \lambda n\,m.\,\lambda f\,x.\;
+          n\;f\;(m\;f\;x) \\
+        \add\;\bc_n\;\bc_m &\reduce \bc_{n+m}
+      \end{align*}
+
+    \item[Zero test]
+      \begin{align*}
+        \ifz &\defeq \lambda n\;x\;y.\; n\;(\lambda z.\;y)\;x \\
+        \ifz\;\bc_0\;t\;u &\reduce t \\
+        \ifz\;\bc_{n+1}\;t\;u &\reduce u
       \end{align*}
   \end{description}
 \end{frame}
 
+\begin{frame}{Example}
+  \begin{align*}
+    \mathtt{succ}\;\bc_1
+    &= (\lambda n.\,\lambda f\,x.\,f\,(n\,f\,x))\;\bc_1 \\
+    &\onereduce \lambda f\,x.\,f\,(\bc_1\,f\,x) \\
+    &\reduce \lambda f\,x.\,f\,(f\,x) \\
+    &= \bc_2.
+  \end{align*}
+\end{frame}
+
+
 \begin{frame}{Exercise}
   \begin{enumerate}
-    \item Define Boolean operations $\mathtt{not}$, $\mathtt{and}$, and $\mathtt{or}$.
-    \item Evaluate $\mathtt{succ}\;\bc_0$ and $\mathtt{add}\;\bc_{1}\;\bc_{2}$. 
-    \item Define the multiplication $\mathtt{mult}$ over Church numerals.
-
+    \item Evaluate $\mathtt{succ}\;\bc_0$ and $\add\;\bc_1\;\bc_2$.
+    \item Define the multiplication $\mul$ over Church numerals.
+    \item (Hard) Define the predecessor $\mathtt{pred}$, i.e.\ $\mathtt{pred}\;\bc_{1+n} =_\beta \bc_n$.
   \end{enumerate}
 \end{frame}
-\begin{frame}{General Recursion via self-reference}
 
-  The summation $\sum_{i = 0}^{n} i$ for $n \in \mathbb{N}$ is typically
+\section{Recursion in \texorpdfstring{$\lambda$}{λ}-Calculus}
+
+\begin{frame}{Why direct self-reference is not a term}
+  The summation $\sum_{i=0}^{n} i$, for $n \in \mathbb{N}$, is typically
   described by self-reference as
-\[
-  \mathit{sum}(n) =
-    \begin{cases} 
-     0 & \text{if } n = 0 \\
-     n + \mathit{sum}(n - 1)  & \text{otherwise}.
-    \end{cases}
-\]
-This \alert{cannot} be done in $\lambda$-calculus directly. (Why?)
+  \[
+    \mathit{sum}(n) =
+      \begin{cases}
+        0 & \text{if } n = 0, \\
+        n + \mathit{sum}(n - 1) & \text{otherwise}.
+      \end{cases}
+  \]
+  In the pure $\lambda$-calculus, this cannot be expressed by directly naming
+  $\mathit{sum}$ inside its own definition. That is, the equation
+  \[
+    \mathit{sum} = \lambda n.\,\ifz\;n\;\bc_0\;(\add\;n\;(\mathit{sum}\;(\pred\;n)))
+  \]
+  is a recursive equation at the meta-level not a $\lambda$-term.\footnote{%
+  N.B. We've used $=$ for the meta-level equality but $=_\beta$ for the object-level equality.
+  }
+  \medskip
 
-Note that unfolding $\mathit{sum}$ as many times as it requires gives
-\[
-  \mathit{sum}(n) =
-    \begin{cases} 
-     0 & \text{if } n = 0 \\
-     1 + \mathit{sum}(0) & n = 1 \\
-     \cdots \\
-     n + \mathit{sum}(n - 1)  & \text{otherwise}.
-    \end{cases}
-\]
+  A term cannot refer to its own name, but we don't have to in $\lambda$-calculus!
 
+%  Note that unfolding $\mathit{sum}$ as many times as required gives
+%  \[
+%    \mathit{sum}(n) =
+%      \begin{cases}
+%        0 & \text{if } n = 0, \\
+%        1 + \mathit{sum}(0) & \text{if } n = 1, \\
+%        \cdots \\
+%        n + \mathit{sum}(n - 1) & \text{otherwise}.
+%      \end{cases}
+%  \]
+\end{frame}
 
-%We can avoid self-reference by considering a functional
-%$G\colon (\mathbb{N} \to \mathbb{N}) \to (\mathbb{N} \to \mathbb{N})$
-%defined by
-%\begin{equation} \label{eq:summation}
-%  (G(f))(n) \defeq
-%  \begin{cases}
-%     0 & \text{if } n = 0 \\
-%     n + f(n - 1)  & \text{otherwise}.
-%  \end{cases}
-%\end{equation}
-%Then, we can show that if there exists $s\colon \mathbb{N} \to \mathbb{N}$ such that $G(s) = s$ then $s = \mathit{sum}$ by induction.
+\begin{frame}[allowframebreaks]{General recursion as a fixpoint}
+  We want to encode the recursive definition
+  \[
+    \mathit{sum}(n) =
+      \begin{cases}
+        0 & \text{if } n = 0, \\
+        n + \mathit{sum}(n - 1) & \text{otherwise}.
+      \end{cases}
+  \]
+
+  Instead of referring to $\mathit{sum}$ by name, define a functional $G$.
+  The argument $f$ of $G\;f$ is the recursive call that the body is allowed
+  to use:
+  \[
+    G \defeq
+    \lambda f.\,
+      \lambda n.\,
+        \ifz\;n\;\bc_0\;
+          (\add\;n\;(f\;(\pred\;n))).
+  \]
+
+  Thus $G\;f$ computes one step of summation, assuming that $f$ already knows
+  how to compute the smaller recursive calls.  A genuine recursive summation
+  function should therefore satisfy
+  \[
+    \mathtt{sum} =_\beta G(\mathtt{sum}).
+  \]
+
+  If we have a fixed-point combinator $\mathbf{Y}$ computing a fixpoint of $G$, then we will have 
+  \[
+    \mathtt{sum} \defeq \mathbf{Y}G,
+    \qquad
+    \mathbf{Y}G =_\beta G(\mathbf{Y}G).
+  \]
+
+  Therefore, in the body of $G$, the variable $f$ is instantiated by
+  $\mathbf{Y}G$ itself:
+  \[
+    \mathbf{Y}G
+    =_\beta
+    \lambda n.\,
+      \ifz\;n\;\bc_0\;
+        (\add\;n\;((\mathbf{Y}G)\;(\pred\;n))).
+  \]
 \end{frame}
 
 \begin{frame}{Curry's paradoxical combinator}
-  The \emph{Y combinator} is defined as a term 
-  \[
-    \mathbf{Y} \defeq \lambda f.\, (\lambda x.\, f\,(x\,x))\,(\lambda
-    x.\,f\,(x\,x)).
-  \]
-\begin{proposition}
-  $\mathbf{Y}$ is a fixed-point operator, i.e.\ 
-  \begin{align*}
-    \mathbf{Y}F
-    & \onereduce {\color{red} (\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))} \\
-    & \onereduce F\,({\color{red}(\lambda x.\,F\,(x\,x))\,(\lambda x.\, F\,(x\,x))}) \\
-  \end{align*}
-  for every $\lambda$-term~$F$. In particular, $\mathbf{Y}F =_\beta F(\mathbf{Y}F)$.
-\end{proposition}
-Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration. 
+
+  \begin{proposition}
+
+    The \emph{Y combinator} defined as
+    \[
+      \mathbf{Y} \defeq \lambda f.\,
+        (\lambda x.\, f\,(x\,x))\,(\lambda x.\,f\,(x\,x)).
+    \]
+    is a fixed-point operator, that is for every
+    $\lambda$-term $F$, $\mathbf{Y}F =_\beta F(\mathbf{Y}F)$.
+  \end{proposition}
+  Intuitively, $\mathbf{Y}F$ defines recursion, while $F$ describes \emph{one step} unfolding of
+  the recursive definition.
+  \vfil
+
+  \begin{exercise*}
+    Verify that $\mathbf{Y}F =_\beta F(\mathbf{Y}F)$ for any term $F$.
+  \end{exercise*}
 \end{frame}
 
-
-\begin{frame}{Summation via $\mathtt{Y}$}
-  We encode the following recursion
+\begin{frame}{Summation via $\mathbf{Y}$}
+  We encode the recursion
   \[
     \mathit{sum}(n) =
-      \begin{cases} 
-       0 & \text{if } n = 0 \\
-       n + \mathit{sum}(n - 1)  & \text{otherwise}.
+      \begin{cases}
+        0 & \text{if } n = 0, \\
+        n + \mathit{sum}(n - 1) & \text{otherwise}
       \end{cases}
   \]
-  by defining each iteration $G$ with an additional function $f$ so that $\mathtt{sum} \defeq \mathbf{Y}G$:
+  by defining one iteration $G$ and $\mathtt{sum} \defeq \mathbf{Y}G$.
+  Define
   \[
-    G \defeq \lambda f\,n.\, \mathtt{ifz}\;n\;\bc_0\; (\add\;n\;(f\;(\mathtt{pred}\;n)))
+    G \defeq \lambda f\,n.\,
+      \ifz\;n\;\bc_0\;(\add\;n\;(f\;(\pred\;n))).
   \]
-  For example, letting $G' \defeq ((\lambda x.\, G\;(x\;x))\;(\lambda x.\,G\;(x\;x)))$, we have
+  Then
   \begin{align*}
     \mathtt{sum}\;\bc_1
       &\onereduce G'\;\bc_1 \\
-      &\onereduce G\;G'\;\bc_1 \\
-      &\onereduce (\lambda n.\, \mathtt{ifz}\;n\;\bc_0\;
-      (\add\;n\;(G'\;(\mathtt{pred}\;n))))\;\bc_1 \\
-      &\onereduce \mathtt{ifz}\;\bc_1\;\bc_0\;
-      (\add\;\bc_1\;(G'\;(\mathtt{pred}\;\bc_1))) \\
-      &\onereduce \dots
+      &\onereduce (G\;G')\;\bc_1 \\
+      &\onereduce
+        (\lambda n.\,\ifz\;n\;\bc_0\;
+        (\add\;n\;(G'\;(\pred\;n))))\;\bc_1 \\
+      &\onereduce
+        \ifz\;\bc_1\;\bc_0\;
+        (\add\;\bc_1\;(G'\;(\pred\;\bc_1))) \\
+      &\onereduce \cdots
   \end{align*}
+  where $G' \defeq (\lambda x.\,G\;(x\;x))\;(\lambda x.\,G\;(x\;x))$.
 \end{frame}
-  
-%\begin{frame}{Turing's fixed-point combinator}
-%  Recall that $\mathbf{Y}G =_\beta G(\mathbf{Y}\;G)$ but $\mathbf{Y}G \reduce
-%  G(\mathbf{Y}\;G)$ does not hold.  Here is a fixed-point operator such that
-%  $\Theta F \reduce F(\Theta F)$.
-%\begin{proposition}
-%  Define 
-%  \[
-%    \Theta \defeq 
-%    (\lambda x\,f.\,f\,(x\,x\,f))\;
-%    (\lambda x\,f.\,f\,(x\,x\,f))
-%  \]
-%  Then, 
-%  \[
-%    \Theta F \reduce F (\Theta F)
-%  \]
-%\end{proposition}
-%Try Turing's fixed-point combinator with $G$ to define $\sum_{i=0}^n i$.
-%\begin{align*}
-%  G \defeq{} &
-%  \lambda f\,n.\,
-%  \mathtt{ifz}\;n\;\bc_0\;
-%  (\add\;n\;(f\,(\mathtt{pred}\;n))) \\
-%  \mathtt{sum} \defeq\; & \Theta\,G 
-%\end{align*}
-%\end{frame}
 
 \begin{frame}{Exercise}
+      Reduce
+  \[
+    \mathtt{sum}\;\bc_2
+  \]
+  far enough to see the recursive calls
+  \[
+    \add\;\bc_2\;(\mathtt{sum}\;\bc_1),
+    \qquad
+    \add\;\bc_1\;(\mathtt{sum}\;\bc_0).
+  \]
+
+  You do not need to expand the definitions of $\add$ or $\pred$.
+\end{frame}
+
+\begin{frame}{Exercise: Identifying the Recursive Call}
+  Consider
+  \[
+    G \defeq
+    \lambda f\,n.\,
+      \ifz\;n\;\bc_0\;
+        (\add\;n\;(f\;(\pred\;n))).
+  \]
+
   \begin{enumerate}
-    \item Evaluate $\mathtt{sum}\;\bc_1$ to its normal form in detail.
-    \item Define the factorial $n!$ with Church numerals.
+    \item What role does the variable $f$ play in $G$?
+    \item Write out $G(\mathbf{Y}G)$.
+    \item Explain why $\mathbf{Y}G$ behaves like the summation function.
   \end{enumerate}
+\end{frame}
+
+\begin{frame}{Yet Another Fixed-Point Combinator}
+  Recall that $\mathbf{Y}G =_\beta G(\mathbf{Y}\;G)$ but $\mathbf{Y}G \reduce
+  G(\mathbf{Y}\;G)$ does not hold.  Here is a fixed-point operator such that
+  $\Theta F \reduce F(\Theta F)$.
+\begin{proposition}
+  Turing's fixed-point combinator $\Theta$ is defined as
+  \[
+    \Theta \defeq 
+    (\lambda x\,f.\,f\,(x\,x\,f))\;
+    (\lambda x\,f.\,f\,(x\,x\,f))
+  \]
+  which satisfies $\Theta F \reduce F (\Theta F)$.
+\end{proposition}
+
+\begin{exercise*}
+  Show that $\Theta F \reduce F (\Theta F)$.
+\end{exercise*}
+\end{frame}
+
+\begin{frame}{Exercise: factorial}
+  Define factorial using a fixed-point combinator.
+
+  That is, find a functional $G_{\mathit{fact}}$ such that
+  \[
+    \mathtt{fact} \defeq \Theta\,G_{\mathit{fact}}
+  \]
+  satisfies
+  \[
+    \mathtt{fact}\;\bc_0 \reduce \bc_1,
+    \qquad
+    \mathtt{fact}\;\bc_{n+1}
+      \reduce
+      \mul\;\bc_{n+1}\;(\mathtt{fact}\;\bc_n).
+  \]
+
+  Assume that $\ifz$, $\pred$, and $\mul$ have already been defined.
+\end{frame}
+
+\begin{frame}{Exercise: different reduction choices}
+  Let
+  \[
+    T \defeq (\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1).
+  \]
+
+  \begin{enumerate}
+    \item Identify two different $\beta$-redexes in $T$.
+    \item Reduce the argument first:
+      \[
+        (\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1)
+        \onereduce
+        (\mathbf{Y}G)\;\bc_1.
+      \]
+    \item Reduce the fixed point first:
+      \[
+        (\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1)
+        \reduce
+        G(\mathbf{Y}G)\;((\lambda x.\,x)\;\bc_1).
+      \]
+    \item Continue both paths far enough to see that they are computing the
+      same recursive call.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Exercise: divergence from fixed points}
+  Let
+  \[
+    G \defeq \lambda f.\,f.
+  \]
+
+  Study the behaviour of
+  \[
+    \mathbf{Y}G.
+  \]
+
+  \begin{enumerate}
+    \item Show that $\mathbf{Y}G =_\beta G(\mathbf{Y}G)$.
+    \item Reduce $G(\mathbf{Y}G)$.
+    \item Does this term have a normal form?
+  \end{enumerate}
+\end{frame}
+\begin{frame}{Exercise: a bad reduction choice}
+  Let
+  \[
+    G_0 \defeq \lambda f\,n.\,\bc_0
+  \]
+  and define
+  \[
+    \mathtt{zero} \defeq \mathbf{Y}G_0.
+  \]
+
+  Intuitively, $\mathtt{zero}$ should ignore its argument and return $\bc_0$.
+
+  \begin{enumerate}
+    \item Show that, by unfolding the fixed point once,
+      \[
+        \mathtt{zero}\;\bc_3
+        =_\beta
+        G_0(\mathbf{Y}G_0)\;\bc_3
+        \reduce
+        \bc_0.
+      \]
+
+    \item Now expand $\mathbf{Y}G_0$:
+      \[
+        \mathbf{Y}G_0
+        \onereduce
+        (\lambda x.\,G_0(x\,x))\;(\lambda x.\,G_0(x\,x)).
+      \]
+      What happens if we keep trying to evaluate the self-application
+      $x\,x$ before using the body of $G_0$?
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{From programming to reduction theory}
+  Fixed-point combinators make recursion possible in the pure
+  $\lambda$-calculus, but they also expose two fundamental issues.
+
+  \begin{description}
+    \item[Non-determinacy]
+      A term may contain several $\beta$-redexes.  Reducing different redexes
+      first may produce different intermediate terms:
+      \[
+        M \reduce M_1,
+        \qquad
+        M \reduce M_2.
+      \]
+
+    \item[Divergence]
+      Some reduction choices may unfold a recursive call forever, even when
+      another choice would quickly reach a result.
+  \end{description}
+
+  \vfill
+
+  The next two topics address these issues.
+
+  \begin{description}
+    \item[Evaluation strategies]
+      How should a programming language choose which redex to reduce?
+
+    \item[Confluence]
+      If two reduction paths start from the same term, can they be joined again?
+  \end{description}
+\end{frame}
+
+
+\section{Evaluation strategy}
+
+\begin{frame}[allowframebreaks]{Evaluation strategies}
+  An evaluation strategy is a procedure for selecting which $\beta$-redex to
+  reduce. Formally, it is a subrelation
+  $\longrightarrow_{\mathrm{ev}}$ of the full one-step $\beta$-reduction
+  relation $\onereduce$.
+
+  \begin{description}
+    \item[Innermost $\beta$-redex] A $\beta$-redex that contains no other
+      $\beta$-redex.
+    \item[Outermost $\beta$-redex] A $\beta$-redex that is not contained in any
+      other $\beta$-redex.
+  \end{description}
+
+  \begin{description}
+    \item[Leftmost-outermost strategy (normal order)]
+      Reduce the leftmost outermost $\beta$-redex first. For example,
+      \begin{align*}
+        &
+        \underline{(\lambda x.\,(\lambda y.\,y)\,x)}\quad
+        \underline{(\lambda x.\,(\lambda y.\,y\,y)\,x)} \\
+        \onereduce{}
+        &\underline{(\lambda y.\,y)}\quad
+        \underline{(\lambda x.\,(\lambda y.\,y\,y)\,x)} \\
+        \onereduce{}
+        &\lambda x.\,\underline{(\lambda y.\,y\,y)}\quad
+        \underline{\vphantom{(\lambda}x} \\
+        \onereduce{}
+        &(\lambda x.\,x\,x) \\
+        &\notonereduce
+      \end{align*}
+
+    \item[Leftmost-innermost strategy]
+      Reduce the leftmost innermost $\beta$-redex first. For example,
+      \begin{align*}
+        &(\lambda x.\,\underline{(\lambda y.\,y)}\;
+          \underline{\vphantom{(\lambda}x})\,
+          (\lambda x.\,(\lambda y.\,y\,y)\,x) \\
+        \onereduce{}
+        &(\lambda x.\,x)\;
+          (\lambda x.\,\underline{(\lambda y.\,y\,y)}\;
+          \underline{\vphantom{(\lambda}x}) \\
+        \onereduce{}
+        &\underline{(\lambda x.\,x)}\;
+          \underline{(\lambda x.\,x\,x)} \\
+        \onereduce{}
+        &(\lambda x.\,x\,x) \\
+        &\notonereduce
+      \end{align*}
+
+    \item[Rightmost-innermost and rightmost-outermost strategies]
+      These are defined similarly, but choose the rightmost candidate redex
+      instead.
+  \end{description}
+\end{frame}
+
+\begin{frame}{CBV versus CBN}
+  \begin{description}
+    \item[Call-by-value strategy]
+      Reduce a redex $(\lambda x.\,M)\,V$ only after its argument has been
+      evaluated to a value $V$; do not reduce under abstractions.
+
+    \item[Call-by-name strategy]
+      Reduce the leftmost outermost redex, without first evaluating its
+      argument; do not reduce under abstractions.
+  \end{description}
+
+  \mode<presentation>{\vfill}
+
+  \begin{proposition}[Determinacy]
+    Each fixed evaluation strategy is deterministic. That is, if
+    $M \longrightarrow_{\mathrm{ev}} N_1$ and
+    $M \longrightarrow_{\mathrm{ev}} N_2$, then $N_1 = N_2$.
+  \end{proposition}
+\end{frame}
+
+\begin{frame}{Normalisation}
+  \begin{definition}
+    \begin{enumerate}
+      \item $M$ is in \emph{normal form} if $M \notonereduce N$ for every
+        term $N$.
+      \item $M$ is \emph{weakly normalising} if $M \reduce N$ for some term
+        $N$ in normal form.
+    \end{enumerate}
+  \end{definition}
+
+  \[
+    \Omega \defeq (\lambda x.\,x\,x)\,(\lambda x.\,x\,x),
+    \qquad
+    \mathbf{K}_1 \defeq \lambda x\,y.\,x.
+  \]
+
+  \begin{enumerate}
+    \item $\Omega$ is not weakly normalising.
+    \item $\mathbf{K}_1$ is normal, and hence weakly normalising.
+    \item $\mathbf{K}_1\;z\;\Omega$ is weakly normalising.
+  \end{enumerate}
+
+  \begin{theorem}
+    The normal-order strategy reduces every weakly normalising term to a normal
+    form.
+  \end{theorem}
 \end{frame}
 
 \section{Confluence}
 
-\begin{frame}
-  The (multi-step) $\beta$-reduction is non-deterministic
-  
-\end{frame}
-
-
-\begin{frame}
-  \begin{theorem}[Confluence]
-    If $t \reduce u_1$ and $t \reduce u_2$, then there exists $v$ such that $u_1 \reduce v$ and $u_2 \reduce v$.
+\begin{frame}{Nondeterminism of $\beta$-reduction}
+  Multi-step $\beta$-reduction is nondeterministic: a term may contain several
+  $\beta$-redexes, and reducing different redexes first may produce different
+  intermediate terms.
     \[
       \xymatrix{
-        & t \ar@{->>}[rd]^(.8){*}_(.8){\beta} \ar@{->>}[ld]^(.8){*}_(.8){\beta} \\
-        u_1 \ar@{->>}[rd]^(.8){*}_(.8){\beta} & & u_2 \ar@{->>}[ld]^(.8){*}_(.8){\beta} \\
-            & v
+        & t \ar@{->>}[rd]^(.8){*}_(.8){\beta}
+            \ar@{->>}[ld]^(.8){*}_(.8){\beta} \\
+        u_1 & & u_2
       }
     \]
-    where $v$ is called the \emph{confluent} term of $u_1$ and $u_2$.
+
+  Confluence says that this nondeterminism is harmless: whenever two reduction
+  paths start from the same term, they can be joined again by further
+  reductions.
+  \[
+      \xymatrix{
+        u_1 \ar@{->>}[rd]^(.8){*}_(.8){\beta}
+          & & u_2 \ar@{->>}[ld]^(.8){*}_(.8){\beta} \\
+        & v
+      }
+    \]
+\end{frame}
+
+\begin{frame}{Confluence}
+  \begin{theorem}[Confluence]
+    If $t \reduce u_1$ and $t \reduce u_2$, then there exists a term $v$ such
+    that $u_1 \reduce v$ and $u_2 \reduce v$.
+    \[
+      \xymatrix{
+        & t \ar@{->>}[rd]^(.8){*}_(.8){\beta}
+            \ar@{->>}[ld]^(.8){*}_(.8){\beta} \\
+        u_1 \ar@{->>}[rd]^(.8){*}_(.8){\beta}
+          & & u_2 \ar@{->>}[ld]^(.8){*}_(.8){\beta} \\
+        & v
+      }
+    \]
+    The term $v$ is called a \emph{common reduct} of $u_1$ and $u_2$.
   \end{theorem}
-  \vfil
-  Confluence lets us reason about computational equality by reducing both
-  sides to a common reduct $v$.
+
+  \vfill
+
+  Confluence lets us reason about computational equality by reducing both sides
+  to a common reduct.
+  Its proof is a bit involved, so we ignore it for now.
 \end{frame}
 
 \begin{frame}{Using confluence}
   \begin{proposition}
-    If $t =_\beta u$, then there exists $v$ such that
+    If $t =_\beta u$, then there exists a term $v$ such that
     $t \reduce v$ and $u \reduce v$.
   \end{proposition}
 
   \begin{proof}[Idea]
-    The relation $=_\beta$ is generated by $\onereduce$, reflexivity,
-    symmetry, and transitivity.  Confluence handles the case where reduction
-    paths go in different directions.
+    The relation $=_\beta$ is generated by $\onereduce$, reflexivity, symmetry,
+    and transitivity. Confluence handles the cases where reduction paths go in
+    different directions.
   \end{proof}
 
   \vfill
@@ -241,217 +624,136 @@ Intuitively, $\mathbf{Y}F$ defines recursion where $F$ describes each iteration.
 \end{frame}
 
 \begin{frame}{Exercise}
-  Show that if $t =_\beta u$ then there is a \emph{confluent} term $v$ of $t$ and $u$, i.e.\ $t \reduce v$ and $u \reduce v$.
+  Show that if $t =_\beta u$, then there is a common reduct $v$ of $t$ and $u$;
+  that is, $t \reduce v$ and $u \reduce v$ by induction on the derivation of $t =_\beta u$.
 \end{frame}
-
-
-\section{Evaluation strategy}
-\begin{frame}[allowframebreaks]{Evaluation strategies}
-An evaluation strategy is a procedure of selecting $\beta$-redexes
-to reduce. It is a subset $\longrightarrow_{\mathrm{ev}}$ of the full
-$\beta$-reduction $\onereduce$.
-
-\begin{description}
-  \item[Innermost $\beta$-redex] does not contain any $\beta$-redex.
-  \item[Outermost $\beta$-redex] is not contained in any other $\beta$-redex.
-\end{description}
-
-\begin{description}
-  \item[the leftmost-outermost (\emph{normal order}) strategy] reduces the leftmost outermost
-    $\beta$-redex in a term first. For example, 
-    \begin{align*}
-      & 
-      \underline{(\lambda x.\, (\lambda y.\, y)\,x)}\quad
-      \underline{(\lambda x.\, (\lambda y.\, y\,y)\,x)}
-      \\
-      \onereduce &
-      \underline{(\lambda y.\, y)}\quad
-      \underline{(\lambda x.\, (\lambda y.\, y\,y)\, x)} \\
-      \onereduce &
-      \lambda x.\, \underline{(\lambda y.\, y\,y)}\quad
-      \underline{\vphantom{(\lambda}x} \\
-      \onereduce & (\lambda x.\, x\,x) \\
-      \notonereduce
-    \end{align*}
-  \item[the leftmost-innermost strategy] reduces the leftmost innermost
-    $\beta$-redex in a term first. For example, 
-    \begin{align*}
-      & (\lambda x.\, \underline{(\lambda y.\,
-        y)}\;\;\underline{\vphantom{(\lambda} x})\,
-      (\lambda x.\, (\lambda y.\, y\, y)\,x) \\
-      \onereduce & (\lambda x.\,x)\;
-      (\lambda x.\, \underline{(\lambda y.\, y\,
-        y)}\;\;\underline{\vphantom{(\lambda}x}) \\
-      \onereduce & \underline{(\lambda x.\,x)}\;\;\underline{(\lambda x.\, x\,x)} \\
-      \onereduce & (\lambda x.\, x\, x) \\
-      \notonereduce
-    \end{align*}
-  \item[the rightmost-innermost/outermost strategy]
-    are defined similarly where terms are reduced from right to left
-    instead.
-\end{description}
-\end{frame}
-
-\begin{frame}{CBV versus CBN}
-\begin{description}
-  \item[Call-by-value strategy]
-    leftmost-outermost but not under any abstraction
-  \item[Call-by-name strategy]
-    leftmost-outermost but not under any abstraction
-\end{description}
-
-  \mode<presentation>{\vfill}
-\begin{proposition}[Determinacy]
-  Each of evaluation strategies is deterministic, i.e.\ 
-  if $M \onereduce N_1$ and $M \onereduce N_2$ then $N_1 = N_2$.
-\end{proposition}
-\end{frame}
-
-%\begin{frame}{Exercise}
-%  Define following terms
-%\begin{align*}
-%  \Omega &\defeq (\lambda x.\, x\,x)\;(\lambda x.\,x\,x) \\
-%  \mathbf{K}_1 & \defeq \lambda x\,y.\;x
-%\end{align*}
-%Evaluate 
-%\[
-%  \mathbf{K}_1\;z\;\Omega
-%\]
-%using the call-by-value and the call-by-name strategy respectively.
-%\end{frame}
-
-\begin{frame}{Normalisation}
-\begin{definition}
-  \begin{enumerate}
-    \item $M$ is in \emph{normal form} if $M \notonereduce N$ for any $N$. 
-    \item $M$ is \emph{weakly normalising} if $M \reduce N$ for some $N$ in
-      normal form.
-  \end{enumerate}
-\end{definition}
-%
-  \begin{enumerate}
-    \item $\Omega$ is not weakly normalising.
-    \item $\mathbf{K}_1$ is normal and thus weakly normalising.
-    \item $\mathbf{K}_1\;z\; \Omega$ is weakly normalising.
-  \end{enumerate}
-
-\begin{theorem}
-  The normal order strategy reduces every weakly
-  normalising term to a normal form.
-\end{theorem}
-
-\end{frame}
-
 
 \appendix
 
 \section{Proof of Confluence}
 
-\begin{frame}{Takahashi's Proof of Confluence}
-  Proving the confluence property can be quite tricky.
-  This section presents a straightforward strategy based on a notion of complete development, which unfolds as many $\beta$-redexes as possible \emph{statically}.
+\begin{frame}{Takahashi's proof of confluence}
+  Proving confluence can be tricky. This section presents a direct strategy
+  based on the notion of complete development, which contracts as many
+  $\beta$-redexes as possible \emph{statically}.
 
   The \emph{complete development} $M^*$ of a $\lambda$-term $M$ is defined by
   \begin{align*}
-    x^*      & = x \\
-    (\lambda x.\, M)^* & = \lambda x.\, M^* \\
-    \left((\lambda x.\, M)\;N\right)^* & = M^*\subst{N^*}{x} \\
-    (M\;N)^* & = M^*\;N^* && \text{ if $M \not\equiv \lambda x.\,M'$ } 
+    x^* &= x \\
+    (\lambda x.\,M)^* &= \lambda x.\,M^* \\
+    ((\lambda x.\,M)\;N)^* &= M^*\subst{N^*}{x} \\
+    (M\;N)^* &= M^*\;N^* && \text{if $M \not\equiv \lambda x.\,M'$}.
   \end{align*}
 \end{frame}
-\begin{frame}{Confluence: Parallel reduction}
-  Let $M \parreduce N$ denote the \emph{parallel reduction} defined by
+
+\begin{frame}{Confluence: parallel reduction}
+  Let $M \parreduce N$ denote the \emph{parallel reduction} relation defined by
+  the following rules.
+
   \begin{multicols}{2}
     \begin{prooftree}
       \AXC{$\vphantom{M\reduce M}$}
       \UIC{$x \parreduce x$}
     \end{prooftree}
+
     \begin{prooftree}
       \AXC{$M \parreduce N$}
-      \UIC{$\lambda x.\, M \parreduce \lambda x.\, N$}
+      \UIC{$\lambda x.\,M \parreduce \lambda x.\,N$}
     \end{prooftree}
+
     \columnbreak
+
     \begin{prooftree}
       \AXC{$M \parreduce M'$}
       \AXC{$N \parreduce N'$}
       \BIC{$M\;N \parreduce M'\;N'$}
     \end{prooftree}
+
     \begin{prooftree}
       \AXC{$M \parreduce M'$}
       \AXC{$N \parreduce N'$}
-      \BIC{$(\lambda x.\, M)\;N \parreduce M'\subst{N'}{x}$}
+      \BIC{$(\lambda x.\,M)\;N \parreduce M'\subst{N'}{x}$}
     \end{prooftree}
   \end{multicols}
-  For example, 
+
+  For example,
   \[
-    \underline{(\lambda x.\, (\lambda y.\, y)\;x)}\;\underline{((\lambda x.\, x)\;\false)}
+    \underline{(\lambda x.\,(\lambda y.\,y)\;x)}\;
+    \underline{((\lambda x.\,x)\;\false)}
     \parreduce
-    \false
+    \false,
   \]
-  because $(\lambda y.\,y)\;x \parreduce x$ and $(\lambda x.\,x)\;\false \parreduce \false$.
+  because $(\lambda y.\,y)\;x \parreduce x$ and
+  $(\lambda x.\,x)\;\false \parreduce \false$.
 \end{frame}
 
-\begin{frame}{Confluence: Properties of parallel reduction}
+\begin{frame}{Confluence: properties of parallel reduction}
   \begin{lemma}
     \begin{enumerate}
-      \item $M \parreduce M$ holds for any term~$M$, 
+      \item $M \parreduce M$ holds for every term $M$,
       \item $M \onereduce N$ implies $M \parreduce N$, and
       \item $M \parreduce N$ implies $M \reduce N$.
     \end{enumerate}
-    In particular, $M \parreduce^* N$ if and only if $M \reduce N$. 
+    In particular, $M \parreduce^* N$ if and only if $M \reduce N$.
   \end{lemma}
+
   \begin{lemma}[Substitution respects parallel reduction]
-      $M \parreduce M'$ and $N \parreduce N'$ imply $M\subst{N}{x} \parreduce
-      M'\subst{N'}{x}$. 
+    If $M \parreduce M'$ and $N \parreduce N'$, then
+    $M\subst{N}{x} \parreduce M'\subst{N'}{x}$.
   \end{lemma}
+
   \begin{theorem}[Triangle property]
     If $M \parreduce N$, then $N \parreduce M^*$.
   \end{theorem}
+
   \begin{proof}[Proof sketch]
-    By induction on $M \parreduce N$.
+    By induction on the derivation of $M \parreduce N$.
   \end{proof}
 \end{frame}
 
-\begin{frame}{Strip Lemma}
-  \begin{lemma}[Strip Lemma]
-    If $L \parreduce^* M_1$ and $L \parreduce M_2$, then there exists $N$
-    satisfying that $M_1 \parreduce N$ and $M_2 \parreduce^* N$, i.e.\
+\begin{frame}{Strip lemma}
+  \begin{lemma}[Strip lemma]
+    If $L \parreduce^* M_1$ and $L \parreduce M_2$, then there exists a term
+    $N$ such that $M_1 \parreduce N$ and $M_2 \parreduce^* N$; that is,
     \[
       \xymatrix{
         & L \ar@{=>}[rd] \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
         M_1 \ar@{=>}[rd] & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
+        & N
       }
     \]
   \end{lemma}
+
   \begin{proof}[Proof sketch]
-    By induction on $L \parreduce^* M_1$. 
+    By induction on the derivation of $L \parreduce^* M_1$.
   \end{proof}
 \end{frame}
+
 \begin{frame}{Confluence}
   \begin{theorem}
-    If $L \parreduce^* M_1$ and $L \parreduce^* M_2$, then there exists $N$ such that $M_1 \parreduce^* N$ and $M_2 \parreduce^* N$.
+    If $L \parreduce^* M_1$ and $L \parreduce^* M_2$, then there exists a term
+    $N$ such that $M_1 \parreduce^* N$ and $M_2 \parreduce^* N$.
     \[
       \xymatrix{
-        & L \ar@{=>}[rd]^(.8){*}_(.8){\beta} \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-        M_1 \ar@{=>}[rd]^(.8){*}_(.8){\beta} & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
-            & N
+        & L \ar@{=>}[rd]^(.8){*}_(.8){\beta}
+            \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+        M_1 \ar@{=>}[rd]^(.8){*}_(.8){\beta}
+          & & M_2 \ar@{=>}[ld]^(.8){*}_(.8){\beta} \\
+        & N
       }
     \]
   \end{theorem}
+
   \begin{corollary}
-    The confluence of $\reduce$ holds.
+    The relation $\reduce$ is confluent.
   \end{corollary}
-  
-  It follows from the above theorem and that $M \parreduce^* N$ is equivalent to $M \reduce N$.
-  
+
+  This follows because $M \parreduce^* N$ is equivalent to $M \reduce N$.
 \end{frame}
-
-
 
 %\begin{frame}[allowframebreaks]{References}
 %  \bibliographystyle{amsalpha}
-%  \bibliography{library} 
+%  \bibliography{library}
 %\end{frame}
 
 \end{document}

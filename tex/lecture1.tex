@@ -894,8 +894,7 @@ Can you come up with a strategy to prove your conjecture?
   A \alert{$\beta$-redex} is a term of the form $(\lam{x}t)\;u$ where computation is performed upon and the application is reduced to $t\subst{u}{x}$.
 
 \begin{definition}
-  The \emph{one-step (full) $\beta$-reduction} is a relation between terms defined inductively by
-  following rules:
+  The \emph{one-step (full) $\beta$-reduction} is a relation defined inductively by 
   \begin{multicols}{2}
     \begin{prooftree}
       \AXC{\vphantom{$M\subst{N}{x}$ is defined}}
@@ -915,13 +914,9 @@ Can you come up with a strategy to prove your conjecture?
     \end{prooftree}
   \end{multicols}
 \end{definition}
-For example, 
-  \[
-    (\boxed{(\lam{x\,y}x)\; t})\;u
-    \onereduce (\lam{y}t)\;u
-    \onereduce t
-    \qquad\text{assuming } y \notin \FV(t).
-  \]
+For example, $(\boxed{(\lam{x\,y}x)\; t})\;u \onereduce (\lam{y}t)\;u \onereduce t \qquad\text{assuming } y \notin \FV(t)$.
+
+A term $t$ is in \alert{normal form} if $t \not \onereduce u$ for any $u$.
 \end{frame}
 
 \begin{frame}{Exercise}
@@ -956,7 +951,6 @@ For example,
       \RightLabel{($n+1$-step)}
       \BIC{$t \reduce v$}
     \end{prooftree}
-    
   \end{definition}
 \end{frame}
 
