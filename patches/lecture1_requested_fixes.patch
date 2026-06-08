@@ -2,17 +2,15 @@ diff --git a/tex/lecture1.tex b/tex/lecture1.tex
 index 26560fb..0000000 100644
 --- a/tex/lecture1.tex
 +++ b/tex/lecture1.tex
-@@ -122,7 +122,7 @@
+@@ -121,6 +121,6 @@
+   The set $\Lambda(V)$ of $\lambda$-terms over $V$ is defined \emph{inductively} as
    \begin{description}
      \item[variable] $x \in \Lambda(V)$ if $x$ is in $V$
      \item[application] $t@u \in \Lambda(V)$ if $t, u \in \Lambda(V)$
 -    \item[abstraction] $\lam{x}t$ if $x \in V$ and $t \in \Lambda(V)$
 +    \item[abstraction] $\lam{x}t \in \Lambda(V)$ if $x \in V$ and $t \in \Lambda(V)$
    \end{description}
- 
-   \vfill
-@@ -236,10 +236,9 @@
-     \end{prooftree}
+@@ -237,8 +237,7 @@
      \qquad
      \begin{prooftree}
 -      \AxiomC{$x \in V$}
@@ -23,17 +21,12 @@ index 26560fb..0000000 100644
 +      \UnaryInfC{$\lambda x.\, t \in \Lambda(V)$}
      \end{prooftree}
  \end{frame}
- 
-@@ -277,8 +276,7 @@
- \end{frame}
- 
+@@ -279,4 +278,3 @@
  \begin{frame}{Exercises}
 -    Assuming, $a$, $b$, $x$, $y$, and $z$ are all in $V$, derive the following
 -    terms using its formation rules.  That is, show that the following are
 +    Assume that all variables appearing below are in $V$. Derive the following terms using their formation rules. That is, show that the following are
      valid $\lambda$-terms.
-     \begin{enumerate}
-       \item $x\,@\,(y\,@\,z)$
 @@ -298,7 +296,7 @@
  \begin{frame}{The need for some conventions}
    For arithmetic expressions, we typically write
@@ -43,7 +36,7 @@ index 26560fb..0000000 100644
    \]
    by the precedence convention.
    \vfill
-@@ -536,7 +534,7 @@
+@@ -534,7 +532,7 @@
                child {node {$@$}
                  child {node (x) {$1$}}
                  child {node (y) {$0$}}
@@ -52,16 +45,13 @@ index 26560fb..0000000 100644
 +              child {node {$z$}}
              }
            };
- 
-@@ -649,7 +647,7 @@
+@@ -649,5 +647,5 @@
  
  \begin{frame}{Variable permutation}
    \begin{alertblock}{Idea}
 -    We rename a variable $x$ in $t$ with a fresh variable $z$ to $x$, i.e.\ $z \not\in \Var(t)$.
 +    To rename a binder safely, we swap it with a fresh variable $z \notin \Var(t)$.
    \end{alertblock}
-   
-   A \emph{transposition} $(x\, y)$ is a function that swaps $x$ and $y$ but fixes everything else, i.e.\
 @@ -661,7 +659,7 @@
        z & \text{otherwise}
      \end{cases}
@@ -80,8 +70,7 @@ index 26560fb..0000000 100644
      \UIC{$\lam{x}t \mathrel{=_\alpha} \lam{y}u $}
    \end{prooftree}
    \end{definition}
-@@ -916,7 +914,11 @@
-   \end{multicols}
+@@ -916,4 +914,9 @@
  \end{definition}
  For example, 
 -  $(\boxed{(\lam{x y}x)\; t})\;u \onereduce \boxed{(\lam{y}t)\;u} \onereduce t\subst{u}{y}$.
@@ -92,21 +81,14 @@ index 26560fb..0000000 100644
 +    \qquad\text{assuming } y \notin \FV(t).
 +  \]
  \end{frame}
- 
-@@ -964,12 +966,11 @@
-   We often say ``if $t \reduce u$ and $u \reduce v$ then $t \reduce v$'' instead.
+@@ -964,5 +968,5 @@
    \begin{proof}
      By induction on the derivation $d$ of $t \reduce u$:
      \begin{enumerate}
 -      \item If $d$ is given by (0-step), then $t =_\alpha u$.
 +      \item If $d$ is given by (0-step), then $u = t$, so the given derivation of $u \reduce v$ is already a derivation of $t \reduce v$.
        \item If $d$ is given by (n+1-step), i.e.\ there is $u'$ s.t.\ 
-         $t \onereduce u'$ and $u' \reduce u$.
- 
-         By induction hypothesis,
-         every derivation $u' \reduce u$ gives rise to a derivation of $u' \reduce v$, so by (n+1-step) $t \reduce v$. 
-@@ -990,8 +991,41 @@
-   How about the converse?
+@@ -990,7 +994,46 @@
  \end{frame}
  
  \begin{frame}{Summary}
