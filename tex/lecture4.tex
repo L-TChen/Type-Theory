@@ -13,6 +13,211 @@
   \end{frame}
 \egroup
 
+%\begin{frame}{\textbf{T}: Types and terms}
+%  \begin{definition}[Types]
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$B \in \mathbb{V}$}
+%        \RightLabel{(tvar)}
+%        \UIC{$B : \type$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{B}$}
+%        \RightLabel{(nat)}
+%        \UIC{$\mathbb{N} : \type$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$\sigma : \type$}
+%        \AXC{$\tau   : \type$}
+%        \RightLabel{(fun)}
+%        \BIC{$\sigma \to \tau : \type$}
+%      \end{prooftree}
+%    \end{multicols}
+%  \end{definition}
+%  \begin{definition}[Terms]
+%    Additional term formation rules are added to $\lambda_\to$ as follows.
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{M}$}
+%        \UIC{$\zero : \term_{\textbf{T}}$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$M$}
+%        \UIC{$\suc\;M : \term_{\textbf{T}}$}
+%      \end{prooftree}
+%    \end{multicols}
+%      \begin{prooftree}
+%        \AXC{$L : \term_{\textbf{T}}$}
+%        \AXC{$M : \term_{\textbf{T}}$}
+%        \AXC{$N : \term_{\textbf{T}}$}
+%        \AXC{$x \in V$}
+%        \AXC{$y \in V$}
+%        \QuinaryInfC{$\mathtt{rec}(M; x.\,y.\,N)\; L : \term_{\textbf{T}}$}
+%      \end{prooftree}
+%  \end{definition}
+%\end{frame}
+%
+%\begin{frame}{\textbf{T}: Typing rules}
+%  \begin{definition}
+%    Additional term typing rules are added to $\lambda_\to$ as follows.
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{\Gamma}$}
+%        \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$\Gamma \vdash M : \mathbb{N}$}
+%        \UIC{$\Gamma \vdash \suc\;M : \mathbb{N}$}
+%      \end{prooftree}
+%    \end{multicols}
+%    \begin{prooftree}
+%      \AXC{$\Gamma \vdash L : \mathbb{N}$}
+%      \AXC{$\Gamma \vdash M : \tau$}
+%      \AXC{$\Gamma, x : \mathbb{N}, y : \tau \vdash N : \tau$}
+%      \TrinaryInfC{$\Gamma \vdash \mathtt{rec}(M; x.\,y.\,N)\;L : \tau$}
+%    \end{prooftree}
+%  \end{definition}
+%  \begin{itemize}
+%    \item Substitution for \textbf{T} is defined similarly.
+%    \item Substitution respects typing judgements, i.e.\ 
+%      $\Gamma \vdash N : \tau$ and $\Gamma, x : \tau \vdash M : \sigma$, then 
+%      $\Gamma \vdash M\subst{N}{x} : \sigma$.
+%  \end{itemize}
+%\end{frame}
+%
+%\begin{frame}{\textbf{T}: Dynamics}
+%  $\beta$-conversion for \textbf{T} is extended with two rules
+%  \begin{align*}
+%    \mathtt{rec}(M, x.\,y.\, N)\;\zero & \longrightarrow_\beta M \\
+%    \mathtt{rec}(M, x.\,y.\, N)\;\suc\;L & \longrightarrow_\beta N\subst{L , \mathtt{rec}(M; x.\,y.\,N)\;L}{x, y}
+%  \end{align*}
+%  Similarly, a $\beta$-reduction $\onereduce$ extends $\longrightarrow_\beta$ to all parts of a term and $\reduce$ indicates finitely many $\beta$-reductions.
+%  
+%  \mode<presentation>{\vfill}
+%  \begin{theorem}
+%    \textbf{T} enjoys the strong and weak normalisation properties as well as type safety.
+%  \end{theorem}
+%\end{frame}
+%
+%\begin{frame}{Example: Addition and summation}
+%  $\mathtt{add} : \mathbb{N} \to \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
+%  \[
+%    \lambda n.\,\lambda m.\,\mathtt{rec}\;(m; x.\,y.\, \suc\;y)\;n\;m
+%  \]
+%
+%  $\mathtt{sum} : \mathbb{N} \to \mathbb{N}$ can be defined in \textbf{T} as
+%  \[
+%    \lambda n.\, \mathtt{rec}\;(\zero; x.\,y.\, \add\;(\suc\;x)\;y)\;n
+%  \]
+%\mode<presentation>{\vfill}
+%  \begin{block}{Exercise}
+%    Evaluate $\mathtt{sum}\;(\suc\;\zero)$.
+%  \end{block}
+%\end{frame}
+%
+
+%\section{\PCF --- System of Recursive Functions}
+%
+%\begin{frame}{\textbf{PCF}: $\lambda_\to$ with naturals and general recursion}
+%%  \textbf{T} does not include all computable functions, since all terms terminate eventually. 
+%%  Programming language in reality allows us to do \emph{general recursion}
+%%  including \emph{infinite loops}. 
+%
+%%  \textbf{PCF} has the same class of types as \textbf{T}.
+%
+%  \begin{definition}[Terms]
+%    Additional term formation rules are added to $\lambda_\to$ as follows.
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{M}$}
+%        \UIC{$\zero : \term_{\PCF}$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$M : \term_{\PCF}$}
+%        \UIC{$\suc\;M : \term_{\PCF}$}
+%      \end{prooftree}
+%    \end{multicols}
+%      \begin{prooftree}
+%      \color{red}
+%        \AXC{$L : \term_{\PCF}$}
+%        \AXC{$M : \term_{\PCF}$}
+%        \AXC{$N : \term_{\PCF}$}
+%        \AXC{$x \in V$}
+%        \QuaternaryInfC{$\ifz(M; x.\,N)\; L$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%      \color{red}
+%        \AXC{$M : \term_{\PCF}$}
+%        \AXC{$x \in V$}
+%        \BIC{$\fix\,x.\,M : \term_{\PCF}$}
+%      \end{prooftree}
+%  \end{definition}
+%\end{frame}
+%
+%\begin{frame}{\textbf{PCF}: Typing rules}
+%  \begin{definition}
+%    Additional term typing rules are added to $\lambda_\to$ as follows.
+%    \begin{multicols}{2}
+%      \begin{prooftree}
+%        \AXC{$\vphantom{\Gamma}$}
+%        \UIC{$\Gamma \vdash \zero : \mathbb{N}$}
+%      \end{prooftree}
+%      \begin{prooftree}
+%        \AXC{$\Gamma \vdash M : \mathbb{N}$}
+%        \UIC{$\Gamma \vdash \suc\;M : \mathbb{N}$}
+%      \end{prooftree}
+%    \end{multicols}
+%    \begin{prooftree}
+%      \color{red}
+%      \AXC{$\Gamma \vdash L : \mathbb{N}$}
+%      \AXC{$\Gamma \vdash M : \tau$}
+%      \AXC{$\Gamma, x : \mathbb{N} \vdash N : \tau$}
+%      \TrinaryInfC{$\Gamma \vdash \ifz(M; x.\,N)\;L : \tau$}
+%    \end{prooftree}
+%    \begin{prooftree}
+%      \color{red}
+%      \AXC{$\Gamma, x : \tau \vdash M : \tau$}
+%      \UIC{$\Gamma \vdash \fix\,x.\,M : \tau$}
+%    \end{prooftree}
+%  \end{definition}
+%  \begin{itemize}
+%    \item Substitution for \textbf{PCF} is defined similarly.
+%    \item Substitution respects typing judgements, i.e.\ 
+%      $\Gamma \vdash N : \tau$ and $\Gamma, x : \tau \vdash M : \sigma$, then 
+%      $\Gamma \vdash M\subst{N}{x} : \sigma$.
+%  \end{itemize}
+%\end{frame}
+%
+%\begin{frame}{\textbf{PCF}: Dynamics}
+%  $\beta$-conversion for \textbf{PCF} is extended with three rules
+%  \begin{align*}
+%    \fix\,x.\,M & \longrightarrow_\beta M\subst{\fix\,x.\,M}{x} \\
+%    \ifz(M; x.\, N)\;\zero & \longrightarrow_\beta M \\
+%    \ifz(M; x.\, N)\;(\suc\;L) & \longrightarrow_\beta N\subst{L}{x}
+%  \end{align*}
+%  Similarly, a $\beta$-reduction $\onereduce$ extends $\longrightarrow_\beta$ to all parts of a term and $\reduce$ indicates finitely many $\beta$-reductions.
+%  
+%  \mode<presentation>{\vfill}
+%  \begin{theorem}
+%    \textbf{PCF} enjoys type safety. 
+%  \end{theorem}
+%\end{frame}
+%
+%\begin{frame}{Example: Predecessor and negation}
+%  \begin{align*}
+%    \pred & \defeq \lambda n : \mathbb{N}.\,\ifz(\zero; x.\, x)\;n & : \mathbb{N} \to \mathbb{N} \\
+%               \mathtt{not} & \defeq \lambda n : \mathbb{N}.\, \ifz(\suc\;\zero; x.\, \zero)\; n & : \mathbb{N} \to \mathbb{N}
+%  \end{align*}
+%  \begin{block}{Exercise}
+%    Evaluate the following terms to their normal forms.
+%    \begin{enumerate}
+%      \item $\pred\;\zero$
+%      \item $\pred\;(\suc\;(\suc\;(\suc\;\zero)))$
+%      \item $\mathtt{not}\;(\suc\;(\suc\;\zero))$
+%    \end{enumerate}
+%    
+%  \end{block}
+%\end{frame}
 \begin{frame}{Where we are}
   In the simply typed $\lambda$-calculus, a term receives one type at a time.
   For example,
@@ -115,18 +320,17 @@
 \end{frame}
 
 \begin{frame}{Terms}
-  Terms are extended with explicit type abstraction and type application.
-
   \begin{definition}
-    The terms of System~F are generated by
+    Terms of System~F are extended with explicit type abstraction and type application:
     \begin{description}
-      \item[variable] $x$;
-      \item[term application] $t\;u$;
-      \item[term abstraction] $\lam{x : A}t$;
-      \item[type abstraction] $\lam{X}t$;
-      \item[type application] $t\;A$.
+      \item[variable] $x \in \Lambda_{\forall}(V, \mathbb{V})$ if $x$ is in $V$
+      \item[application] $t@u \in \Lambda_{\forall}(V, \mathbb{V})$ if $t, u \in \Lambda_{\forall}(V, \mathbb{V})$
+      \item[abstraction] $\lam{x:A}t$ if $x \in V$, $A$ is a type, and $t \in \Lambda_{\forall}(V, \mathbb{V})$
+      \item[type abstraction] $\lam{X}t$ is in $\Lambda_{\forall}(V, \mathbb{V})$ if $X$ is in $\mathbb{V}$ and $t$ is in $\Lambda_{\forall}(V, \mathbb{V})$
+      \item[type application] $t\;A$ is in $\Lambda_{\forall}(V, \mathbb{V})$ if $t$ is in $\Lambda_{\forall}(V, \mathbb{V})$ and $A$ is a type.
     \end{description}
   \end{definition}
+  
 
   \vfill
 
@@ -620,7 +824,7 @@
   Therefore no closed term of type $X \to X$ denotes constant true.
 \end{frame}
 
-\begin{frame}{Parametricity: usable form}
+\begin{frame}{Parametricity: One universal quantification case}
   Let
   \[
     \vdash t : \forall X.\,A(X).
@@ -637,8 +841,8 @@
 
   \vfill
 
-  Read this as: a polymorphic program sends related inputs to related outputs,
-  for every relation chosen for the type variable.
+  A polymorphic program sends related inputs to related outputs, for every
+  relation chosen for the type variable.
 \end{frame}
 
 \begin{frame}{How to read $\mathcal{R}^{A}_{X \mapsto R}$}
@@ -660,8 +864,9 @@
 
   \vfill
 
-  For today, this is the useful fragment: variables use the chosen relation;
-  function types preserve relatedness.
+  This is the source of \alert{parametricity}: a polymorphic term cannot inspect
+  specific type argument.
+  It can only use operations supplied by its type.
 \end{frame}
 
 \begin{frame}{Graph relations}
@@ -686,7 +891,7 @@
 \end{frame}
 
 \begin{frame}{No closed term of $\forall X.\,X$}
-  Suppose, for contradiction, that
+  For contradiction, we suppose that there is a closed term
   \[
     \vdash t : \forall X.\,X.
   \]
@@ -723,7 +928,7 @@
 
   \vfill
 
-  Therefore there is no closed System~F term of type $\forall X.\,X$.
+  Hence, there is no closed System~F term of type $\forall X.\,X$.
 \end{frame}
 
 \begin{frame}{Examples of parametric reasoning}
