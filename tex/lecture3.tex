@@ -26,8 +26,8 @@
   \begin{enumerate}
     \item the simply typed $\lambda$-calculus;
     \item typed programming with Church encodings;
-    \item preservation, progress, and normalisation;
-    \item extensions with general recursion and primitive data types.
+    \item type safety: preservation and progress;
+    \item if time permits, extensions with general recursion and primitive data.
   \end{enumerate}
 \end{frame}
 
@@ -261,8 +261,7 @@
     \qquad
     \Gamma \vdash_i u : A.
   \]
-  If $t$ has already been assigned type $C$, then type checking must solve
-  the equation
+  If $t$ has already been assigned type $C$, then we must solve
   \[
     C = A \to B.
   \]
@@ -291,29 +290,6 @@
   For typable terms, give a possible type.  For non-typable terms, identify
   the unsolvable type equation that would be required.
 \end{frame}
-
-%\begin{frame}{Type inference and checking}
-%  Can we answer the following questions algorithmically?
-%
-%  \begin{description}
-%    \item[Type inference]
-%      Given a context $\Gamma$ and a term $t$, does there exist a type $A$ such
-%      that $\Gamma \vdash_i t : A$ is derivable?
-%
-%    \item[Type checking]
-%      Given a context $\Gamma$, a type $A$, and a term $t$, is
-%      $\Gamma \vdash_i t : A$ derivable?
-%  \end{description}
-%
-%  \vfill
-%
-%  \begin{theorem}
-%    Type checking is \emph{decidable} in simply typed $\lambda$-calculus.
-%  \end{theorem}
-%
-%  Because the rules are syntax-directed, checking follows the structure of the
-%  term.  Inference additionally requires generating and solving type equations.
-%\end{frame}
 
 \section{Programming in Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus}
 
@@ -410,7 +386,7 @@
         \mathtt{and},\qquad \mathtt{or},\qquad \mathtt{not}.
       \]
 
-    \item Prove that the following judgements are derivable:
+    \item Check that the following judgements are derivable:
       \[
         \vdash_i \mathtt{and} : \bool_A \to \bool_A \to \bool_A,
       \]
@@ -422,7 +398,7 @@
   \end{enumerate}
 \end{frame}
 
-\section{Properties of Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus}
+\section{Type Safety}
 
 \begin{frame}[c]{Type safety = preservation + progress}
   \begin{quote}
@@ -491,8 +467,8 @@
 
   \begin{proof}[Proof sketch]
     By induction on the derivations of $\Gamma \vdash_i t : A$ and
-    $t \onereduce u$.  The non-trivial case is the $\beta$-redex
-    $(\lambda x.\,t')\;u'$ and uses the substitution lemma.
+    $t \onereduce u$.  The only interesting case is the $\beta$-redex
+    $(\lambda x.\,t')\;u'$, where the substitution lemma is needed.
   \end{proof}
 \end{frame}
 
@@ -507,7 +483,7 @@
   \]
 
   \begin{enumerate}
-    \item Use inversion to obtain types $A$ and $B$ such that
+    \item Use inversion to obtain a type $A$ such that
       \[
         \Gamma \vdash_i \lambda x.\,t : A \to B,
         \qquad
@@ -524,22 +500,9 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Progress: first attempt}
-  \begin{theorem}
-    If $\Gamma \vdash_i t : A$, then $t$ is in normal form or there exists
-    $u$ such that $t \onereduce u$.
-  \end{theorem}
-
-  To prove this by induction on $\Gamma \vdash_i t : A$, we need to know what
-  normal forms look like syntactically.
-
-  \vfill
-
-  Question: if a term is in normal form, what shape can it have?
-\end{frame}
-
 \begin{frame}{Normal and neutral forms}
-  Define the judgements $\neutral\;t$ and $\normal\;t$ mutually as follows.
+  To prove progress constructively, we use a syntactic characterisation of
+  normal forms.
 
   \begin{multicols}{2}
     \begin{prooftree}
@@ -568,7 +531,6 @@
 
   \vfill
 
-  \textbf{Idea.}
   Neutral terms are variables applied to normal arguments.  Normal terms are
   either neutral terms or abstractions whose bodies are normal.
 \end{frame}
@@ -589,30 +551,23 @@
   For each normal term, give a derivation of $\normal\;t$ or $\neutral\;t$.
 \end{frame}
 
-\begin{frame}{Soundness and completeness of normal forms}
-  A term $t$ has no $\beta$-reduction if and only if $t$ is normal.
-
-  \begin{lemma}
-    \begin{description}
-      \item[Soundness]
-        If $\normal\;t$ or $\neutral\;t$ is derivable, then $t$ is in normal form.
-      \item[Completeness]
-        If $t$ is in normal form, then $\normal\;t$ is derivable.
-    \end{description}
+\begin{frame}{Normal-form characterisation}
+  \begin{lemma}[Normal-form characterisation]
+    A term $t$ has no $\beta$-reduction if and only if $\normal\;t$ is derivable.
   \end{lemma}
 
-  \begin{proof}[Proof sketch]
-    \begin{description}
-      \item[Soundness]
-        By mutual induction on the derivations of $\normal\;t$ and
-        $\neutral\;t$.
-      \item[Completeness]
-        By induction on the formation of $t$.
-    \end{description}
-  \end{proof}
+  \vfill
+
+  This lemma says that the inductive judgements $\normal$ and $\neutral$ exactly
+  capture the ordinary notion of having no $\beta$-redex.
+
+  \medskip
+
+  We will use this characterisation in the proof of progress, but we will not
+  prove the lemma here.
 \end{frame}
 
-\begin{frame}{Progress}
+\begin{frame}{Progress theorem}
   \begin{theorem}[Progress]
     If $\Gamma \vdash_i t : A$, then $\normal\;t$ or there exists $u$ such that
     $t \onereduce u$.
@@ -620,13 +575,14 @@
 
   \begin{proof}[Proof sketch]
     By induction on the derivation of $\Gamma \vdash_i t : A$.
+
+    \medskip
+
+    The variable and abstraction cases produce normal forms.  The application
+    case is the main case: if the function part reduces, the whole application
+    reduces; if the function part is an abstraction, there is a $\beta$-redex;
+    otherwise the application is neutral when its argument is normal.
   \end{proof}
-
-  \vfill
-
-  As a mere proposition, this statement follows classically from the law of
-  excluded middle.  The proof by induction is stronger: it gives an algorithm
-  that either recognises a normal form or finds the next reduction step.
 \end{frame}
 
 \begin{frame}{Exercise: progress for applications}
@@ -648,57 +604,46 @@
   abstraction.
 \end{frame}
 
-%\begin{frame}{Weak normalisation}
-%  \begin{definition}
-%    A term $t$ is \emph{weakly normalising}, written $t \downarrow$, if the
-%    following judgement is derivable.
-%    \begin{multicols}{2}
-%      \begin{prooftree}
-%        \AXC{$\normal\;t$}
-%        \UIC{$t \downarrow$}
-%      \end{prooftree}
-%      \columnbreak
-%      \begin{prooftree}
-%        \AXC{$t \onereduce u$}
-%        \AXC{$u \downarrow$}
-%        \BIC{$t \downarrow$}
-%      \end{prooftree}
-%    \end{multicols}
-%  \end{definition}
-%
-%  Thus $t$ is weakly normalising if there is a sequence
-%  \[
-%    t \onereduce t_1 \onereduce t_2 \onereduce \cdots \onereduce u
-%  \]
-%  where $u$ is in normal form.
-%
-%  \begin{theorem}[Weak normalisation]
-%    Every typable term $t$ with $\Gamma \vdash_i t : A$ is weakly normalising.
-%  \end{theorem}
-%\end{frame}
+\begin{frame}{Type safety: summary}
+  Preservation and progress are proved separately, but they work together.
+
+  \begin{description}
+    \item[Preservation]
+      Each reduction step keeps the same type.
+
+    \item[Progress]
+      A well-typed term is either already normal or can take a reduction step.
+  \end{description}
+
+  \vfill
+
+  Hence evaluation of a well-typed term cannot get stuck because of a type
+  error.  It either continues reducing while preserving its type, or it reaches
+  a normal form.
+\end{frame}
 
 \begin{frame}{Strong normalisation}
   \begin{definition}
-    A term $t$ is \emph{strongly normalising}, written $t \Downarrow$, if the
-    following inductive judgement is derivable.
-    \begin{prooftree}
-      \AXC{$\forall u.\,(t \onereduce u \implies u \Downarrow)$}
-      \UIC{$t \Downarrow$}
-    \end{prooftree}
+    A term $t$ is \emph{strongly normalising}, written $t \Downarrow$, if every
+    reduction sequence starting from $t$ terminates.
   \end{definition}
-
-  Intuitively, strong normalisation says that every reduction sequence
-  \[
-    t \onereduce t_1 \onereduce t_2 \onereduce \cdots
-  \]
-  terminates.
 
   \begin{theorem}[Strong normalisation]
     Every typable term $t$ with $\Gamma \vdash_i t : A$ is strongly normalising.
   \end{theorem}
+
+  \vfill
+
+  This theorem is stronger than type safety.  Type safety says that reduction
+  does not get stuck; strong normalisation says that, in the simply typed
+  $\lambda$-calculus, reduction cannot continue forever.
+
+  \medskip
+
+  We state this result without proof.
 \end{frame}
 
-\section{Extensions to Simply Typed \texorpdfstring{$\lambda$}{λ}-Calculus}
+\section{Optional Extensions}
 
 \begin{frame}{General recursion: statics}
   The self-applicative term
@@ -849,11 +794,11 @@
   These exercises are for peer discussion.
 
   \begin{enumerate}
-    \item Prove the application case of the Progress Theorem.
+    \item Complete the application case of the Progress Theorem.
 
     \item Show that if a term is in normal form, then $\normal\;t$ is derivable.
 
-    \item Extend the calculus with product types $A \times B$:
+    \item If time permits, extend the calculus with product types $A \times B$:
       \begin{enumerate}
         \item add terms for pairs;
         \item add a pattern-matching eliminator;
