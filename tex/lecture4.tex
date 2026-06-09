@@ -677,44 +677,58 @@
   Types rule out bad programs, but polymorphic types can also rule out many
   seemingly possible behaviours.
 
-  \vfill
+  In fact, types can be used to tell what functions are \emph{definable} or what equations a term should satisfy with respect to a given type.
+
 
   For example, what can a closed term of each type do?
   \begin{enumerate}
-    \item $\forall X.\,X$
-    \item $\forall X.\,X \to X$
-    \item $\forall X.\,\forall Y.\,X \to Y \to X$
-    \item $\forall X.\,\List(X) \to \List(X)$
+    \item $\forall X. X$
+    \item $\forall X.\, X \to X$
+    \item $\forall X Y.\, X \to Y \to X$
+    \item $\forall X.\, X \to \nat$
   \end{enumerate}
 
   \vfill
 
   The informal answer is: a polymorphic program must act uniformly in the
   unknown type.
+  Let's start with functions definable in simply typed $\lambda$-calculus first.
 \end{frame}
 
-\begin{frame}{Set-theoretic interpretation for simple types}
-  For simply typed $\lambda$-calculus, choose a set $O_X$ for each type
-  variable $X$, and interpret function types by function spaces:
+\begin{frame}[allowframebreaks]{$\lambda$-Definability in simply typed $\lambda$-calculus}
+  \begin{idea}
+    Each term $\Gamma \vdash t : A$ can be interpreted as a \emph{set-theoretic} function $f$ to $\Brackets{A}$, a designated interpretation of $A$, from $\Brackets{\Gamma} = \prod_{x : A \in \Gamma} \Brackets{A}$.
+  \end{idea}
+
+  Assign a set $O_X$ to each $X \in \mathbb{V}$ and then extend the interpretation to all types:
   \begin{align*}
-    \Brackets{X}       & = O_X, \\
-    \Brackets{A \to B} & = \Brackets{A} \to \Brackets{B}.
+    \Brackets{X}       & = O_X     \\
+    \Brackets{A \to B} & = \Brackets{A} \to \Brackets{B}
+  \end{align*}
+  as well as contexts $\Gamma$:
+  \begin{align*}
+    \Brackets{\cdot}         & = \{*\} \\
+    \Brackets{\Gamma, x : A} & = \Brackets{\Gamma} \times \Brackets{A}.
   \end{align*}
 
-  \vfill
-
-  A typing derivation $\Gamma \vdash t : A$ denotes a function
+  Each term $\Gamma \vdash t : A$ is interpreted as a set-theoretic function
   \[
-    \Brackets{t} : \Brackets{\Gamma} \to \Brackets{A}.
+    \Brackets{t}\colon \Brackets{\Gamma} \to \Brackets{A}
   \]
-
-  Thus a closed term of type $A \to B$ defines a set-theoretic function
-  \[
-    \Brackets{A} \to \Brackets{B}.
-  \]
+  defined inductively (modulo $\alpha$-equivalence) by
+  \begin{align*}
+    \Brackets{\Gamma \vdash x_i : A}(\rho) & = \rho(i) \\
+    \Brackets{\Gamma \vdash t\; u : B}(\rho) & = \Brackets{\Gamma \vdash t : A \to B}(\rho)\left(\Brackets{\Gamma \vdash u : A}(\rho)\right) \\
+    \Brackets{\Gamma \vdash \lam{x}t : A \to B}(\rho) & = \left( v \mapsto \Brackets{\Gamma, x : A \vdash t}(\rho , v) \right)
+  \end{align*}
+  where $\rho \in \Brackets{\Gamma}$ is called an \emph{environment}.
+  N.B.\ For $\Brackets{\cdot \vdash t : A}(*)$ we simply write $\Brackets{t}$.
+  \begin{definition}
+    A set-theoretic function $f\colon X \to Y$ is \alert{$\lambda$-definable} w.r.t.\ some interpretation if there is a closed term $t : A \to B$ such that $f = \Brackets{t}$.
+  \end{definition}
 \end{frame}
 
-\begin{frame}{A small definability question}
+\begin{frame}{Definability}
   Let there be one base type variable $X$, interpreted by
   \[
     O_X = \{\btt,\bff\}.
@@ -727,7 +741,6 @@
     \item constant false: $a \mapsto \bff$;
     \item negation: $\btt \mapsto \bff$ and $\bff \mapsto \btt$.
   \end{enumerate}
-
   \vfill
 
   The question is not whether these set-theoretic functions exist.  They do.
@@ -735,237 +748,144 @@
   type $X \to X$.
 \end{frame}
 
-\begin{frame}{Logical relations}
-  A logical relation lifts a relation on base types through function types.
+\begin{frame}{Logical relation}
+  \begin{idea}
+    If $v_1$ and $v_2$ are related, $\Brackets{t}(v_1)$ and $\Brackets{t}(v_2)$ should also be related.
+  \end{idea}
+  A family $\{R^A \subseteq \Brackets{A} \times \Brackets{A} \}_{A : \type}$ of binary relations is \alert{logical} if 
+  \[
+    R^{A \to B}(f_1, f_2) \quad\text{iff}\quad \forall x_1 x_2.\, R^{A}(x_1, x_2) \implies R^{B}(f_1(x_1), f_2(x_2)).
+  \]
 
-  \begin{definition}
-    A family of relations
-    \[
-      R^A \subseteq \Brackets{A} \times \Brackets{A}
-    \]
-    is logical if
-    \[
-      R^{A \to B}(f,g)
-      \quad\text{iff}\quad
-      \forall a\,b.\,R^A(a,b) \Rightarrow R^B(f(a),g(b)).
-    \]
-  \end{definition}
-
-  \vfill
-
-  The relation at a function type says: related inputs are sent to related
-  outputs.
+  N.B.\ A logical relation is determined by $R^X$ for type variables $X$.
+  \begin{exercise*}
+    What is $R^{X \to X}$, if \dots
+    \begin{enumerate}
+      \item $R^X = \emptyset$?
+      \item $R^X = O_X \times O_X$?
+      \item $R^X = \{(\btt, \bff)\}$?
+    \end{enumerate}
+  \end{exercise*}
 \end{frame}
 
-\begin{frame}{Fundamental theorem}
-  The key theorem says that well-typed terms preserve every logical relation.
-
-  \begin{theorem}[Fundamental theorem, simply typed form]
-    Let $\{R^A\}_{A:\type}$ be a logical relation.  If
-    $\Gamma \vdash t : A$, and two environments $\rho_1,\rho_2$ map each
-    variable $x_i : A_i$ in $\Gamma$ to related elements, then
+\begin{frame}{The fundamental theorem of logical relations}
+  \begin{theorem}[Fundamental Theorem of Logical Relations]\label{thm:fundamental_thm}
+    Let $\{R^A\}_{A : \type}$ be a logical relation.
+    Then, 
     \[
-      R^A(\Brackets{t}(\rho_1),\Brackets{t}(\rho_2)).
+      R^A(\Brackets{\Gamma \vdash t : A}(\rho_1), \Brackets{\Gamma \vdash t : A}(\rho_2))
     \]
+    for every $\Gamma \vdash t : A$ and environments $\rho_1, \rho_2 \in \Brackets{\Gamma}$ satisfying $R^{A_i}(\rho_1(i), \rho_2(i))$ for every $x_i : A_i \in \Gamma$.
   \end{theorem}
-
-  \vfill
-
-  In particular, every closed term $t : A$ satisfies
-  \[
-    R^A(\Brackets{t},\Brackets{t})
-  \]
-  for every logical relation $R$.
+  \begin{proof}[Proof sketch]
+    By induction on the typing derivation of $\Gamma \vdash t : A$.
+%    \footnotesize
+%
+%    For example, consider $\Gamma \vdash t\;u : B$.
+%    Then, we have $\Gamma \vdash t : A \to B$ and $\Gamma \vdash u : A$ for some $A$.
+%    By the induction hypothesis,
+%    \[
+%      (\Brackets{\Gamma \vdash u : A}(\rho_1), \Brackets{\Gamma \vdash u : A}(\rho_2))
+%      \;\text{and}\;
+%      (\Brackets{\vdash t : A \to B}(\rho_1), \Brackets{\vdash t : A \to B}(\rho_2))
+%    \]
+%    are related by $R^A$ and $R^{A \to B}$, respectively.
+%    By definition, $\Brackets{\vdash t : A \to B}(\rho_1)(\Brackets{\Gamma \vdash u : A}(\rho_1))$ and $\Brackets{\vdash t : A \to B}(\rho_2)(\Brackets{\Gamma \vdash u : A}(\rho_2))$ are related by $R^B$.
+%    Hence, \eqref{eq:fundamental_thm} holds for $\Gamma \vdash t\;u : B$.
+  \end{proof}
+  In particular, $R^A(\Brackets{t}, \Brackets{t})$ for any closed term $t$ of type $A$. 
 \end{frame}
 
-\begin{frame}{Non-definability: constant true}
-  We prove that the constant true function is not definable by a closed term of
-  type $X \to X$ in pure simply typed $\lambda$-calculus.
+\begin{frame}{Definability, Revisited}
+  Consider $O_X = \{\btt, \bff\}$ and the logical relation $\{R^A\}_{A}$ determined by
+  \[
+    R^{X} = \{(\bff, \btt)\}.
+  \]
 
-  \vfill
-
-  Suppose, for contradiction, that some closed $t : X \to X$ denotes
-  \[
-    c_{\btt}(a) = \btt.
-  \]
-  Choose the relation
-  \[
-    R^X = \{(\bff,\btt)\}.
-  \]
-  Since $t$ is closed and well typed, the fundamental theorem gives
-  \[
-    R^{X \to X}(\Brackets{t},\Brackets{t}).
-  \]
+  \begin{enumerate}
+    \item Suppose that the constant function $f(x) = \btt$ is $\lambda$-definable, then $R^{X \to X}(\Brackets{t}, \Brackets{t})$ by the fundamental theorem.
+      By definition of being logical $R^{X}(\Brackets{t}(\bff), \Brackets{t}(\btt))$, i.e.\ $R^{X}(\btt, \btt)$---a contradiction.
+      That is, $f(x) = \btt$ is not $\lambda$-definable.
+  \end{enumerate}
 \end{frame}
 
-\begin{frame}{Non-definability: constant true, continued}
-  By definition of the relation at a function type,
-  \[
-    R^X(\bff,\btt)
-    \quad\Longrightarrow\quad
-    R^X(\Brackets{t}(\bff),\Brackets{t}(\btt)).
-  \]
-
-  Since $\Brackets{t}$ is assumed to be constant true,
-  \[
-    \Brackets{t}(\bff)=\btt
-    \qquad\text{and}\qquad
-    \Brackets{t}(\btt)=\btt.
-  \]
-
-  Hence the fundamental theorem would force
-  \[
-    R^X(\btt,\btt),
-  \]
-  but $(\btt,\btt) \notin R^X$.
-
-  \vfill
-
-  Therefore no closed term of type $X \to X$ denotes constant true.
+\begin{frame}
+  \begin{exercise*}
+    \begin{enumerate}
+      \item Show that the constant function $f(x) = \bff$ is not $\lambda$-definable.
+      \item Show that the negation function $\neg$ is not $\lambda$-definable.
+    \end{enumerate}
+  \end{exercise*}
+  
 \end{frame}
 
-\begin{frame}{Parametricity: One universal quantification case}
-  Let
-  \[
-    \vdash t : \forall X.\,A(X).
-  \]
-  For any two type interpretations $B,C$ and any relation
-  \[
-    R \subseteq \Brackets{B} \times \Brackets{C},
-  \]
-  the two instances $t\;B$ and $t\;C$ preserve $R$:
-  \[
-    (\Brackets{t\;B},\Brackets{t\;C})
-    \in \mathcal{R}^{A}_{X \mapsto R}.
-  \]
 
-  \vfill
+\begin{frame}{No set-theoretic model for polymorphic $\lambda$-calculus}
+  We would like to apply the same approach of arguing $\lambda$-definability to polymorphic $\lambda$-calculus, but it is apparently circular: 
+  \begin{enumerate}
+    \item the universal quantification  $\forall X. A$ is \alert{impredicative} and
+    \item $\Brackets{\forall X. A}$ should depend on $\Brackets{A \subst{B}{X}}$ for any $B : \type$,
+    \item including $B = \forall X. A$.
+  \end{enumerate}
 
-  A polymorphic program sends related inputs to related outputs, for every
-  relation chosen for the type variable.
+  In fact, there is no set-theoretic interpretation for polymorphic $\lambda$-calculus \cite{Reynolds1984} in classical set theory, due to the \emph{cardinality issue}.
+
+  Thus, we have to consider \emph{other models} rather than sets, some constructive set theory~\cite{Pitts1987}, or a weaker but predicative version of parametric polymorphism~\cite{Leivant1991}.
 \end{frame}
 
-\begin{frame}{How to read $\mathcal{R}^{A}_{X \mapsto R}$}
-  The relation $\mathcal{R}^{A}_{X \mapsto R}$ is computed from the type $A$.
+\begin{frame}{Parametricity in polymorphic $\lambda$-calculus}
+  Following Girard's \emph{reducibility candidate}~\cite{Girard1989}, assume a set $\mathcal{U}$ of \alert{relation candidates} in some model.
+  A family of $\{ R_{\Phi}^{A} \}_{\Delta \vdash A}$ is logical if
+  \begin{align*}
+    R^{X}_{\Phi}(x_1, x_2)        & \quad\text{iff} \quad\Phi(X)(x_1, x_2)  \\
+    R^{A \to B}_{\Phi}(f_1, f_2)  & \quad \text{iff} \quad \forall x_1 x_2.\, R^{A}_{\Phi}(x_1, x_2) \implies R^{B}_{\Phi}(f_1(x_1), f_2(x_2)) \\
+    R^{\forall X.\, A}_{\Phi}(x_1, x_2) & \quad\text{iff}\quad \alert{\forall U \in \mathcal{U}.\, R^{A}_{\Phi; X \mapsto U}(x_1, x_2)}
+  \end{align*}
+  where $\Phi\colon \Delta \to \mathcal{U}$ is a map and $\Phi; X \mapsto U$ means a map s.t.\ $Y$ is mapped to $U$ if $Y = X$ or $\Phi(Y)$ otherwise.
 
-  \[
-  \begin{array}{rcl}
-    \mathcal{R}^{X}_{X \mapsto R}
-      &=& R \\[4pt]
-
-    \mathcal{R}^{A \to B}_{X \mapsto R}(f,g)
-      &\Longleftrightarrow&
-      \forall a\,b.\,
-      \mathcal{R}^{A}_{X \mapsto R}(a,b)
-      \Rightarrow
-      \mathcal{R}^{B}_{X \mapsto R}(f\,a,g\,b)
-  \end{array}
-  \]
-
-  \vfill
-
-  This is the source of \alert{parametricity}: a polymorphic term cannot inspect
-  specific type argument.
-  It can only use operations supplied by its type.
+  If $\Delta$ is empty, then the subscript $\Phi$ in $R^A_{\Phi}$ is omitted, i.e.\ $R^A$ instead.
+  \begin{theorem}
+    The fundamental theorem holds for logical relations i.e.\ $R^A(\Brackets{t}, \Brackets{t})$ holds for any closed term $t$ of type $A$ in polymorphic $\lambda$-calculus. 
+  \end{theorem}
+  
 \end{frame}
 
-\begin{frame}{Graph relations}
-  Given a function $f : B \to C$, its graph relation is
+\begin{frame}{Examples: $\forall X.\, X$}
+  The type $\forall X.\, X$ is not inhabited.
+
+  Suppose that $\vdash t : \forall X.\, X$.
+  Then, by the fundamental theorem,
   \[
-    \mathrm{graph}(f)
-    =
-    \{(b,f(b)) \mid b \in \Brackets{B}\}.
+    R^{\forall X.\, X}(\Brackets{t}, \Brackets{t}).
   \]
-
-  \vfill
-
-  To extract equations from a polymorphic type, choose
+  By definition, $R^{\forall X.\, X}(\Brackets{t}, \Brackets{t})$ if and only if
   \[
-    R = \mathrm{graph}(f).
+    \forall U \in \mathcal{U}.\, R^X_{X \mapsto U}(\Brackets{t}, \Brackets{t})
+    \quad\text{or equivalently,}\quad
+    \forall U \in \mathcal{U}.\, U(\Brackets{t}, \Brackets{t})
   \]
-
-  \vfill
-
-  Then parametricity says that the polymorphic term commutes with $f$ in the
-  shape prescribed by its type.
+  Choosing $U$ to be the empty relation $\emptyset$,
+  \[
+    (\Brackets{t}, \Brackets{t}) \in \emptyset,
+  \]
+  a contradiction.
+  Hence, there is \emph{no} closed term of type $\forall X.\, X$.
 \end{frame}
 
-\begin{frame}{No closed term of $\forall X.\,X$}
-  For contradiction, we suppose that there is a closed term
-  \[
-    \vdash t : \forall X.\,X.
-  \]
+\begin{frame}{Theorems for Free}
+  Consider the case that $R^X$ is instantiated as $\{\,(x, f(x)) \mid x \in A \,\}$ of some $f\colon A \to B$ and apply the fundamental theorem to derive, e.g.,
+  \begin{itemize}
+    \item the following equation for any $t : \forall X.\, \List(X) \to \List(X)$:
+      \[
+        \xymatrix{
+          \Brackets{\List(A)} \ar[r]^{\Brackets{t}_A} \ar[d]_{\mathtt{map}\;f} & \Brackets{\List(A)} \ar[d]^{\mathtt{map}\;f} \\
+          \Brackets{\List(B)} \ar[r]_{\Brackets{t}_B }& \Brackets{\List(B)}
+        }
+      \]
+  \end{itemize}
+  N.B.\ The equation is derived in the working model, not necessarily implying $=_{\beta}$ between $\lambda$-terms.
 
-  Parametricity gives, for every relation
-  $R \subseteq \Brackets{B} \times \Brackets{C}$,
-  \[
-    (\Brackets{t\;B},\Brackets{t\;C}) \in R.
-  \]
-
-  \vfill
-
-  Choose
-  \[
-    \Brackets{B}=\Brackets{C}=\{*\}
-    \qquad\text{and}\qquad
-    R = \emptyset.
-  \]
-\end{frame}
-
-\begin{frame}{No closed term of $\forall X.\,X$, continued}
-  Since both interpretations are singletons,
-  \[
-    \Brackets{t\;B}=*
-    \qquad\text{and}\qquad
-    \Brackets{t\;C}=*.
-  \]
-
-  But parametricity requires
-  \[
-    (*,*) \in \emptyset,
-  \]
-  contradiction.
-
-  \vfill
-
-  Hence, there is no closed System~F term of type $\forall X.\,X$.
-\end{frame}
-
-\begin{frame}{Examples of parametric reasoning}
-  Parametricity explains why some types are very restrictive.
-
-  \begin{description}
-    \item[$\forall X.\,X$]
-      No closed term exists: the empty relation gives a contradiction.
-
-    \item[$\forall X.\,X \to X$]
-      Any closed term behaves like the identity: it cannot manufacture or
-      inspect an arbitrary $X$.
-
-    \item[$\forall X.\,\forall Y.\,X \to Y \to X$]
-      Any closed term behaves like first projection.
-  \end{description}
-\end{frame}
-
-\begin{frame}{A free theorem}
-  Let
-  \[
-    t : \forall X.\,\List(X) \to \List(X)
-  \]
-  and choose a function $f : A \to B$.
-
-  \vfill
-
-  Taking $R=\mathrm{graph}(f)$, parametricity says that related lists are sent
-  to related lists.  In this case, that means
-  \[
-    \mathtt{map}\;f\;(t\;A\;xs)
-    =
-    t\;B\;(\mathtt{map}\;f\;xs).
-  \]
-
-  So $t$ cannot inspect the elements of the list; it must commute with every
-  map.
+  The fundamental theorem is well known for this specialised form, dubbed as \emph{free theorems}~\cite{Wadler1989}. 
 \end{frame}
 
 \begin{frame}{Summary}
@@ -983,6 +903,16 @@
 
   This is the point at which type theory begins to act not only as a discipline
   for programs, but also as a method for reasoning about what programs can be.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+  \setbeamerfont{bibliography item}{size=\footnotesize}
+  \setbeamerfont{bibliography entry author}{size=\footnotesize}
+  \setbeamerfont{bibliography entry title}{size=\footnotesize}
+  \setbeamerfont{bibliography entry location}{size=\footnotesize}
+  \setbeamerfont{bibliography entry note}{size=\footnotesize}
+  \bibliographystyle{apalike}
+  \bibliography{ref} 
 \end{frame}
 
 \end{document}
