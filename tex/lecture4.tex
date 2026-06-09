@@ -270,6 +270,33 @@
   \end{description}
 \end{frame}
 
+\begin{frame}{What changed from simply typed \(\lambda\)-calculus?}
+  System~F adds two new ideas.
+
+  \begin{center}
+    \begin{tabular}{lll}
+      & Introduction & Elimination \\[2pt]
+      term functions
+        & \(\lambda x:A.\,t\)
+        & \(t\,u\) \\[4pt]
+      type functions
+        & \(\lambda X.\,t\)
+        & \(t\,A\)
+    \end{tabular}
+  \end{center}
+
+  \vfill
+
+  A term of type
+  \[
+    \forall X.\,A
+  \]
+  is a program that can be instantiated at any type \(B\):
+  \[
+    t\,B : A\subst{B}{X}.
+  \]
+\end{frame}
+
 \begin{frame}{Types}
   Fix a countably infinite set $\mathbb{V}$ of type variables.  A type context
   $\Delta$ is a finite sequence of distinct type variables.
@@ -427,12 +454,7 @@
 \end{frame}
 
 \begin{frame}{Example: polymorphic identity}
-  The polymorphic identity function is
-  \[
-    \mathtt{id} \defeq \lam{X}\lam{x : X}x.
-  \]
-
-  \vfill
+  The polymorphic identity function is $\mathtt{id} \defeq \lam{X}\lam{x : X}x$.
 
   Its type is derivable as follows.
   \begin{prooftree}
@@ -444,13 +466,19 @@
     \UIC{$\cdot;\cdot \vdash \lam{X}\lam{x : X}x : \forall X.\,X \to X$}
   \end{prooftree}
 
+  Instantiation at a type $A$ gives $\mathtt{id}\;A : A \to A$.
   \vfill
 
-  Instantiation at a type $A$ gives
-  \[
-    \mathtt{id}\;A : A \to A.
-  \]
+  \begin{exercise*}
+    Reduce the following term:
+    \[
+      \mathtt{id}\;(A \to A)\;(\lam{x:A}x).
+    \]
+
+    What is its type?
+  \end{exercise*}
 \end{frame}
+
 
 \begin{frame}{Exercises}
   Derive the following judgements.
@@ -518,6 +546,41 @@
   sequence terminates.  We state this theorem without proof.
 \end{frame}
 
+\begin{frame}{Sum type}
+  A binary sum can be encoded by asking the sum value how to eliminate itself.
+
+  \begin{definition}
+    \[
+      A + B \defeq \forall X.\,(A \to X) \to (B \to X) \to X.
+    \]
+  \end{definition}
+  Read this as:
+
+  \begin{quote}
+    To use an \(A+B\), give a result type \(X\), a case for \(A\), and a case
+    for \(B\).
+  \end{quote}
+
+  \vfill
+
+  The injections are
+  \begin{align*}
+    \mathtt{left}_{A,B}
+      &\defeq
+        \lam{x : A}\lam{X}\lam{f : A \to X}\lam{g : B \to X}f\;x, \\
+    \mathtt{right}_{A,B}
+      &\defeq
+        \lam{y : B}\lam{X}\lam{f : A \to X}\lam{g : B \to X}g\;y.
+  \end{align*}
+
+  \begin{exercise*}
+    Define
+    \[
+      \mathtt{either} : \forall X.\,(A \to X) \to (B \to X) \to A + B \to X.
+    \]
+  \end{exercise*}
+\end{frame}
+
 \begin{frame}{Empty type}
   The polymorphic type
   \[
@@ -542,35 +605,6 @@
   We will return to a parametricity argument for non-existence later.
 \end{frame}
 
-\begin{frame}{Sum type}
-  A binary sum can be encoded by asking the sum value how to eliminate itself.
-
-  \begin{definition}
-    \[
-      A + B \defeq \forall X.\,(A \to X) \to (B \to X) \to X.
-    \]
-  \end{definition}
-
-  \vfill
-
-  The injections are
-  \begin{align*}
-    \mathtt{left}_{A,B}
-      &\defeq
-        \lam{x : A}\lam{X}\lam{f : A \to X}\lam{g : B \to X}f\;x, \\
-    \mathtt{right}_{A,B}
-      &\defeq
-        \lam{y : B}\lam{X}\lam{f : A \to X}\lam{g : B \to X}g\;y.
-  \end{align*}
-
-  \begin{exercise*}
-    Define
-    \[
-      \mathtt{either} : \forall X.\,(A \to X) \to (B \to X) \to A + B \to X.
-    \]
-  \end{exercise*}
-\end{frame}
-
 \begin{frame}{Product type}
   A binary product can be encoded by asking the pair how to eliminate itself.
 
@@ -589,15 +623,24 @@
       \lam{x : A}\lam{y : B}\lam{X}\lam{f : A \to B \to X}f\;x\;y.
   \]
 
-  \begin{exercise*}
-    Define projections
-    \[
-      \mathtt{proj}_1 : A \times B \to A
-      \qquad\text{and}\qquad
-      \mathtt{proj}_2 : A \times B \to B.
-    \]
-  \end{exercise*}
 \end{frame}
+
+\begin{frame}{Exercise}
+  Define
+  \[
+    \mathtt{split}
+    :
+    A \times B \to \forall X.\,(A \to B \to X) \to X.
+  \]
+
+  Then use it to define projections
+  \[
+    \mathtt{proj}_1 : A \times B \to A
+    \qquad\text{and}\qquad
+    \mathtt{proj}_2 : A \times B \to B.
+  \]
+\end{frame}
+
 
 \begin{frame}[allowframebreaks]{Natural numbers}
   Church numerals become a single closed polymorphic type:
@@ -762,6 +805,27 @@
   type $X \to X$.
 \end{frame}
 
+\begin{frame}{Why relations?}
+  The set-theoretic interpretation tells us which functions exist.
+
+  \vfill
+
+  But we want to know which functions are \emph{definable} by programs.
+
+  \vfill
+
+  Logical relations give a test:
+
+  \begin{quote}
+    A definable function must preserve every relation compatible with its type.
+  \end{quote}
+
+  \vfill
+
+  To show that a set-theoretic function is not definable, find a relation that
+  it fails to preserve.
+\end{frame}
+
 \begin{frame}{Logical relation}
   \begin{idea}
     If $v_1$ and $v_2$ are related, then a definable function must send them to
@@ -776,18 +840,32 @@
     \forall x_1\,x_2.\,
       R^{A}(x_1,x_2) \implies R^{B}(f_1(x_1),f_2(x_2)).
   \]
+  \vfil
 
   N.B.\ A logical relation is determined by $R^X$ for type variables $X$.
+\end{frame}
 
-  \begin{exercise*}
+\begin{frame}{Exercise}
+
     What is $R^{X \to X}$ if \dots
     \begin{enumerate}
       \item $R^X = \emptyset$?
       \item $R^X = O_X \times O_X$?
       \item $R^X = \{(\btt,\bff)\}$?
     \end{enumerate}
-  \end{exercise*}
+
+    Let \(O_X=\{\btt,\bff\}\) and $R^X = \{(\bff,\btt)\}$.
+
+    Which of the following functions preserve \(R^X\)?
+
+    \begin{enumerate}
+      \item identity;
+      \item constant true;
+      \item constant false;
+      \item negation.
+    \end{enumerate}
 \end{frame}
+
 
 \begin{frame}{The fundamental theorem of logical relations}
   \begin{theorem}[Fundamental Theorem of Logical Relations]\label{thm:fundamental_thm}
@@ -839,6 +917,27 @@
     \item Show that the constant function $f(x) = \bff$ is not $\lambda$-definable.
     \item Show that the negation function $\neg$ is not $\lambda$-definable.
   \end{enumerate}
+\end{frame}
+
+\begin{frame}{From logical relations to parametricity}
+  For simply typed terms, logical relations tell us:
+
+  \[
+    \text{definable programs preserve relations.}
+  \]
+
+  \vfill
+
+  For polymorphic terms, the relation for a type variable is not fixed.
+
+  \[
+    X \quad\leadsto\quad \text{any relation chosen by the user}
+  \]
+
+  \vfill
+
+  Parametricity says that a polymorphic program must work uniformly for every
+  such choice.
 \end{frame}
 
 \begin{frame}{No set-theoretic model for polymorphic $\lambda$-calculus}
@@ -911,6 +1010,17 @@
     (\Brackets{t}(U),\Brackets{t}(U)) \in \emptyset,
   \]
   a contradiction.  Hence there is no closed term of type $\forall X.\,X$.
+\end{frame}
+
+\begin{frame}{Exercise}
+  Use parametricity to explain why every closed term of type
+  \[
+    \forall X.\,X \to X
+  \]
+  behaves like the identity.
+
+  Hint: choose a relation containing exactly one pair \((a,b)\).
+  
 \end{frame}
 
 \begin{frame}{Theorems for free}
