@@ -228,8 +228,8 @@
 
   \vfill
 
-  This last session asks what happens if a single program may be used uniformly
-  at every type.
+  This lecture asks what happens if a single program may be used uniformly at
+  every type.
 
   \begin{center}
     \begin{tabular}{ll}
@@ -321,16 +321,20 @@
 
 \begin{frame}{Terms}
   \begin{definition}
-    Terms of System~F are extended with explicit type abstraction and type application:
+    The terms of System~F extend simply typed terms with explicit type
+    abstraction and type application:
     \begin{description}
-      \item[variable] $x \in \Lambda_{\forall}(V, \mathbb{V})$ if $x$ is in $V$
-      \item[application] $t@u \in \Lambda_{\forall}(V, \mathbb{V})$ if $t, u \in \Lambda_{\forall}(V, \mathbb{V})$
-      \item[abstraction] $\lam{x:A}t$ if $x \in V$, $A$ is a type, and $t \in \Lambda_{\forall}(V, \mathbb{V})$
-      \item[type abstraction] $\lam{X}t$ is in $\Lambda_{\forall}(V, \mathbb{V})$ if $X$ is in $\mathbb{V}$ and $t$ is in $\Lambda_{\forall}(V, \mathbb{V})$
-      \item[type application] $t\;A$ is in $\Lambda_{\forall}(V, \mathbb{V})$ if $t$ is in $\Lambda_{\forall}(V, \mathbb{V})$ and $A$ is a type.
+      \item[variable] $x \in \Lambda_{\forall}(V,\mathbb{V})$ if $x \in V$;
+      \item[application] $t@u \in \Lambda_{\forall}(V,\mathbb{V})$ if
+        $t,u \in \Lambda_{\forall}(V,\mathbb{V})$;
+      \item[abstraction] $\lam{x:A}t \in \Lambda_{\forall}(V,\mathbb{V})$ if
+        $x \in V$, $A$ is a type, and $t \in \Lambda_{\forall}(V,\mathbb{V})$;
+      \item[type abstraction] $\lam{X}t \in \Lambda_{\forall}(V,\mathbb{V})$ if
+        $X \in \mathbb{V}$ and $t \in \Lambda_{\forall}(V,\mathbb{V})$;
+      \item[type application] $t\;A \in \Lambda_{\forall}(V,\mathbb{V})$ if
+        $t \in \Lambda_{\forall}(V,\mathbb{V})$ and $A$ is a type.
     \end{description}
   \end{definition}
-  
 
   \vfill
 
@@ -677,54 +681,63 @@
   Types rule out bad programs, but polymorphic types can also rule out many
   seemingly possible behaviours.
 
-  In fact, types can be used to tell what functions are \emph{definable} or what equations a term should satisfy with respect to a given type.
+  In fact, types can be used to tell which functions are definable, and which
+  equations a term should satisfy at a given type.
 
+  \vfill
 
   For example, what can a closed term of each type do?
   \begin{enumerate}
-    \item $\forall X. X$
-    \item $\forall X.\, X \to X$
-    \item $\forall X Y.\, X \to Y \to X$
-    \item $\forall X.\, X \to \nat$
+    \item $\forall X.\,X$
+    \item $\forall X.\,X \to X$
+    \item $\forall X.\,\forall Y.\,X \to Y \to X$
+    \item $\forall X.\,X \to \nat$
   \end{enumerate}
 
   \vfill
 
   The informal answer is: a polymorphic program must act uniformly in the
-  unknown type.
-  Let's start with functions definable in simply typed $\lambda$-calculus first.
+  unknown type.  We first look at functions definable in simply typed
+  $\lambda$-calculus.
 \end{frame}
 
-\begin{frame}[allowframebreaks]{$\lambda$-Definability in simply typed $\lambda$-calculus}
-  \begin{idea}
-    Each term $\Gamma \vdash t : A$ can be interpreted as a \emph{set-theoretic} function $f$ to $\Brackets{A}$, a designated interpretation of $A$, from $\Brackets{\Gamma} = \prod_{x : A \in \Gamma} \Brackets{A}$.
-  \end{idea}
+\begin{frame}[allowframebreaks]{$\lambda$-definability in simply typed $\lambda$-calculus}
+  Each term $\Gamma \vdash t : A$ can be interpreted as a
+  set-theoretic function
+  \[
+    \Brackets{t} : \Brackets{\Gamma} \to \Brackets{A}.
+  \]
 
-  Assign a set $O_X$ to each $X \in \mathbb{V}$ and then extend the interpretation to all types:
+  Assign a set $O_X$ to each type variable $X \in \mathbb{V}$, then extend it to all types:
   \begin{align*}
-    \Brackets{X}       & = O_X     \\
-    \Brackets{A \to B} & = \Brackets{A} \to \Brackets{B}
+    \Brackets{X}       & = O_X, \\
+    \Brackets{A \to B} & = \Brackets{A} \to \Brackets{B},
   \end{align*}
-  as well as contexts $\Gamma$:
+  and to contexts:
   \begin{align*}
-    \Brackets{\cdot}         & = \{*\} \\
+    \Brackets{\cdot}         & = \{*\}, \\
     \Brackets{\Gamma, x : A} & = \Brackets{\Gamma} \times \Brackets{A}.
   \end{align*}
 
-  Each term $\Gamma \vdash t : A$ is interpreted as a set-theoretic function
-  \[
-    \Brackets{t}\colon \Brackets{\Gamma} \to \Brackets{A}
-  \]
-  defined inductively (modulo $\alpha$-equivalence) by
+  \framebreak
+  The interpretation of terms is defined inductively, modulo $\alpha$-equivalence:
   \begin{align*}
-    \Brackets{\Gamma \vdash x_i : A}(\rho) & = \rho(i) \\
-    \Brackets{\Gamma \vdash t\; u : B}(\rho) & = \Brackets{\Gamma \vdash t : A \to B}(\rho)\left(\Brackets{\Gamma \vdash u : A}(\rho)\right) \\
-    \Brackets{\Gamma \vdash \lam{x}t : A \to B}(\rho) & = \left( v \mapsto \Brackets{\Gamma, x : A \vdash t}(\rho , v) \right)
+    \Brackets{\Gamma \vdash x_i : A}(\rho)
+      & = \rho(i), \\
+    \Brackets{\Gamma \vdash t\;u : B}(\rho)
+      & = \Brackets{\Gamma \vdash t : A \to B}(\rho)
+          \left(\Brackets{\Gamma \vdash u : A}(\rho)\right), \\
+    \Brackets{\Gamma \vdash \lam{x}t : A \to B}(\rho)
+      & = \left(v \mapsto \Brackets{\Gamma, x : A \vdash t : B}(\rho,v)\right).
   \end{align*}
-  where $\rho \in \Brackets{\Gamma}$ is called an \emph{environment}.
-  N.B.\ For $\Brackets{\cdot \vdash t : A}(*)$ we simply write $\Brackets{t}$.
+  Here $\rho \in \Brackets{\Gamma}$ is called an \emph{environment}.
+  For $\Brackets{\cdot \vdash t : A}(*)$, we simply write $\Brackets{t}$.
+
   \begin{definition}
-    A set-theoretic function $f\colon X \to Y$ is \alert{$\lambda$-definable} w.r.t.\ some interpretation if there is a closed term $t : A \to B$ such that $f = \Brackets{t}$.
+    A set-theoretic function
+    $f : \Brackets{A} \to \Brackets{B}$ is \alert{$\lambda$-definable} at type
+    $A \to B$ if there is a closed term $t : A \to B$ such that
+    $f = \Brackets{t}$.
   \end{definition}
 \end{frame}
 
@@ -741,6 +754,7 @@
     \item constant false: $a \mapsto \bff$;
     \item negation: $\btt \mapsto \bff$ and $\bff \mapsto \btt$.
   \end{enumerate}
+
   \vfill
 
   The question is not whether these set-theoretic functions exist.  They do.
@@ -750,145 +764,178 @@
 
 \begin{frame}{Logical relation}
   \begin{idea}
-    If $v_1$ and $v_2$ are related, $\Brackets{t}(v_1)$ and $\Brackets{t}(v_2)$ should also be related.
+    If $v_1$ and $v_2$ are related, then a definable function must send them to
+    related outputs.
   \end{idea}
-  A family $\{R^A \subseteq \Brackets{A} \times \Brackets{A} \}_{A : \type}$ of binary relations is \alert{logical} if 
+
+  A family $\{R^A \subseteq \Brackets{A} \times \Brackets{A}\}_{A : \type}$
+  of binary relations is \alert{logical} if
   \[
-    R^{A \to B}(f_1, f_2) \quad\text{iff}\quad \forall x_1 x_2.\, R^{A}(x_1, x_2) \implies R^{B}(f_1(x_1), f_2(x_2)).
+    R^{A \to B}(f_1,f_2)
+    \quad\text{iff}\quad
+    \forall x_1\,x_2.\,
+      R^{A}(x_1,x_2) \implies R^{B}(f_1(x_1),f_2(x_2)).
   \]
 
   N.B.\ A logical relation is determined by $R^X$ for type variables $X$.
+
   \begin{exercise*}
-    What is $R^{X \to X}$, if \dots
+    What is $R^{X \to X}$ if \dots
     \begin{enumerate}
       \item $R^X = \emptyset$?
       \item $R^X = O_X \times O_X$?
-      \item $R^X = \{(\btt, \bff)\}$?
+      \item $R^X = \{(\btt,\bff)\}$?
     \end{enumerate}
   \end{exercise*}
 \end{frame}
 
 \begin{frame}{The fundamental theorem of logical relations}
   \begin{theorem}[Fundamental Theorem of Logical Relations]\label{thm:fundamental_thm}
-    Let $\{R^A\}_{A : \type}$ be a logical relation.
-    Then, 
+    Let $\{R^A\}_{A : \type}$ be a logical relation.  For every typing
+    derivation $\Gamma \vdash t : A$ and every pair of environments
+    $\rho_1,\rho_2 \in \Brackets{\Gamma}$ that are pointwise related, we have
     \[
-      R^A(\Brackets{\Gamma \vdash t : A}(\rho_1), \Brackets{\Gamma \vdash t : A}(\rho_2))
+      R^A(\Brackets{\Gamma \vdash t : A}(\rho_1),
+          \Brackets{\Gamma \vdash t : A}(\rho_2)).
     \]
-    for every $\Gamma \vdash t : A$ and environments $\rho_1, \rho_2 \in \Brackets{\Gamma}$ satisfying $R^{A_i}(\rho_1(i), \rho_2(i))$ for every $x_i : A_i \in \Gamma$.
+    Pointwise related means that $R^{A_i}(\rho_1(i),\rho_2(i))$ for every
+    $x_i : A_i \in \Gamma$.
   \end{theorem}
+
   \begin{proof}[Proof sketch]
     By induction on the typing derivation of $\Gamma \vdash t : A$.
-%    \footnotesize
-%
-%    For example, consider $\Gamma \vdash t\;u : B$.
-%    Then, we have $\Gamma \vdash t : A \to B$ and $\Gamma \vdash u : A$ for some $A$.
-%    By the induction hypothesis,
-%    \[
-%      (\Brackets{\Gamma \vdash u : A}(\rho_1), \Brackets{\Gamma \vdash u : A}(\rho_2))
-%      \;\text{and}\;
-%      (\Brackets{\vdash t : A \to B}(\rho_1), \Brackets{\vdash t : A \to B}(\rho_2))
-%    \]
-%    are related by $R^A$ and $R^{A \to B}$, respectively.
-%    By definition, $\Brackets{\vdash t : A \to B}(\rho_1)(\Brackets{\Gamma \vdash u : A}(\rho_1))$ and $\Brackets{\vdash t : A \to B}(\rho_2)(\Brackets{\Gamma \vdash u : A}(\rho_2))$ are related by $R^B$.
-%    Hence, \eqref{eq:fundamental_thm} holds for $\Gamma \vdash t\;u : B$.
   \end{proof}
-  In particular, $R^A(\Brackets{t}, \Brackets{t})$ for any closed term $t$ of type $A$. 
+
+  In particular, $R^A(\Brackets{t},\Brackets{t})$ for any closed term $t$ of
+  type $A$.
 \end{frame}
 
-\begin{frame}{Definability, Revisited}
-  Consider $O_X = \{\btt, \bff\}$ and the logical relation $\{R^A\}_{A}$ determined by
+\begin{frame}{Definability, revisited}
+  Consider $O_X = \{\btt,\bff\}$ and the logical relation determined by
   \[
-    R^{X} = \{(\bff, \btt)\}.
+    R^{X} = \{(\bff,\btt)\}.
   \]
 
   \begin{proof}
-    Suppose that the constant function $f(x) = \btt$ is $\lambda$-definable,
-    then $R^{X \to X}(\Brackets{t}, \Brackets{t})$ by the fundamental theorem.
-    
+    Suppose that the constant true function $c_{\btt}(x)=\btt$ is
+    $\lambda$-definable.  Then there is a closed term $t : X \to X$ with
+    $\Brackets{t}=c_{\btt}$.
 
-    By definition of being logical $R^{X}(\Brackets{t}(\bff),
-    \Brackets{t}(\btt))$, i.e.\ $R^{X}(\btt, \btt)$---a contradiction.
-
-    That is, $f(x) = \btt$ is not $\lambda$-definable.
+    By the fundamental theorem,
+    \[
+      R^{X \to X}(\Brackets{t},\Brackets{t}).
+    \]
+    Since $R^X(\bff,\btt)$, the arrow clause gives
+    \[
+      R^X(\Brackets{t}(\bff),\Brackets{t}(\btt)).
+    \]
+    But $\Brackets{t}$ is constant true, so this says
+    $R^X(\btt,\btt)$, a contradiction.
   \end{proof}
 \end{frame}
 
 \begin{frame}{Exercises}
-    \begin{enumerate}
-      \item Show that the constant function $f(x) = \bff$ is not $\lambda$-definable.
-      \item Show that the negation function $\neg$ is not $\lambda$-definable.
-    \end{enumerate}
-  
+  \begin{enumerate}
+    \item Show that the constant function $f(x) = \bff$ is not $\lambda$-definable.
+    \item Show that the negation function $\neg$ is not $\lambda$-definable.
+  \end{enumerate}
 \end{frame}
 
-
 \begin{frame}{No set-theoretic model for polymorphic $\lambda$-calculus}
-  We would like to apply the same approach of arguing $\lambda$-definability to polymorphic $\lambda$-calculus, but it is apparently circular: 
+  We would like to apply the same approach to polymorphic $\lambda$-calculus,
+  but the impredicative universal type makes the naive set-theoretic account
+  circular:
   \begin{enumerate}
-    \item the universal quantification  $\forall X. A$ is \alert{impredicative} and
-    \item $\Brackets{\forall X. A}$ should depend on $\Brackets{A \subst{B}{X}}$ for any $B : \type$,
-    \item including $B = \forall X. A$.
+    \item the universal quantification $\forall X.\,A$ is \alert{impredicative};
+    \item $\Brackets{\forall X.\,A}$ should depend on
+      $\Brackets{A\subst{B}{X}}$ for every $B : \type$;
+    \item this includes the case $B = \forall X.\,A$ itself.
   \end{enumerate}
 
-  In fact, there is no set-theoretic interpretation for polymorphic $\lambda$-calculus \cite{Reynolds1984} in classical set theory, due to the \emph{cardinality issue}.
+  In fact, Reynolds showed that polymorphism is not set-theoretic in classical
+  set theory, due to a cardinality obstruction~\cite{Reynolds1984}.
 
-  Thus, we have to consider \emph{other models} rather than sets, some constructive set theory~\cite{Pitts1987}, or a weaker but predicative version of parametric polymorphism~\cite{Leivant1991}.
+  Thus one has to use other models, constructive set theory~\cite{Pitts1987},
+  or weaker predicative versions of parametric polymorphism~\cite{Leivant1991}.
 \end{frame}
 
 \begin{frame}{Parametricity in polymorphic $\lambda$-calculus}
-  Following Girard's \emph{reducibility candidate}~\cite{Girard1989}, assume a set $\mathcal{U}$ of \alert{relation candidates} in some model.
-  A family of $\{ R_{\Phi}^{A} \}_{\Delta \vdash A}$ is logical if
+  Following Girard's \emph{reducibility candidates}~\cite{Girard1989}, assume a
+  set $\mathcal{U}$ of \alert{relation candidates} in some model.
+  A family $\{R_{\Phi}^{A}\}_{\Delta \vdash A}$ is logical if
   \begin{align*}
-    R^{X}_{\Phi}(x_1, x_2)        & \quad\text{iff} \quad\Phi(X)(x_1, x_2)  \\
-    R^{A \to B}_{\Phi}(f_1, f_2)  & \quad \text{iff} \quad \forall x_1 x_2.\, R^{A}_{\Phi}(x_1, x_2) \implies R^{B}_{\Phi}(f_1(x_1), f_2(x_2)) \\
-    R^{\forall X.\, A}_{\Phi}(x_1, x_2) & \quad\text{iff}\quad \alert{\forall U \in \mathcal{U}.\, R^{A}_{\Phi; X \mapsto U}(x_1, x_2)}
+    R^{X}_{\Phi}(x_1,x_2)
+      & \quad\text{iff}\quad \Phi(X)(x_1,x_2), \\
+    R^{A \to B}_{\Phi}(f_1,f_2)
+      & \quad\text{iff}\quad
+      \forall x_1\,x_2.\,
+        R^{A}_{\Phi}(x_1,x_2) \implies
+        R^{B}_{\Phi}(f_1(x_1),f_2(x_2)), \\
+    R^{\forall X.\,A}_{\Phi}(p_1,p_2)
+      & \quad\text{iff}\quad
+      \alert{\forall U \in \mathcal{U}.\,
+        R^{A}_{\Phi; X \mapsto U}(p_1(U),p_2(U))}.
   \end{align*}
-  where $\Phi\colon \Delta \to \mathcal{U}$ is a map and $\Phi; X \mapsto U$ means a map s.t.\ $Y$ is mapped to $U$ if $Y = X$ or $\Phi(Y)$ otherwise.
+  Here $\Phi\colon \Delta \to \mathcal{U}$ maps type variables to relation
+  candidates, and $\Phi;X \mapsto U$ maps $X$ to $U$ and maps every other
+  variable $Y$ to $\Phi(Y)$.
 
-  If $\Delta$ is empty, then the subscript $\Phi$ in $R^A_{\Phi}$ is omitted, i.e.\ $R^A$ instead.
+  If $\Delta$ is empty, the subscript $\Phi$ in $R^A_{\Phi}$ is omitted.
   \begin{theorem}
-    The fundamental theorem holds for logical relations i.e.\ $R^A(\Brackets{t}, \Brackets{t})$ holds for any closed term $t$ of type $A$ in polymorphic $\lambda$-calculus. 
+    The fundamental theorem holds for these logical relations.  In particular,
+    $R^A(\Brackets{t},\Brackets{t})$ holds for every closed polymorphic term
+    $t : A$.
   \end{theorem}
-  
 \end{frame}
 
-\begin{frame}{Examples: $\forall X.\, X$}
-  The type $\forall X.\, X$ is not inhabited.
+\begin{frame}{Example: $\forall X.\,X$}
+  The type $\forall X.\,X$ is not inhabited.
 
-  Suppose that $\vdash t : \forall X.\, X$.
+  Suppose that $\vdash t : \forall X.\,X$.
   Then, by the fundamental theorem,
   \[
-    R^{\forall X.\, X}(\Brackets{t}, \Brackets{t}).
+    R^{\forall X.\,X}(\Brackets{t},\Brackets{t}).
   \]
-  By definition, $R^{\forall X.\, X}(\Brackets{t}, \Brackets{t})$ if and only if
+  By the definition of the relation at a universal type, this means
   \[
-    \forall U \in \mathcal{U}.\, R^X_{X \mapsto U}(\Brackets{t}, \Brackets{t})
-    \quad\text{or equivalently,}\quad
-    \forall U \in \mathcal{U}.\, U(\Brackets{t}, \Brackets{t})
+    \forall U \in \mathcal{U}.\,
+      R^X_{X \mapsto U}(\Brackets{t}(U),\Brackets{t}(U)),
   \]
-  Choosing $U$ to be the empty relation $\emptyset$,
+  or equivalently,
   \[
-    (\Brackets{t}, \Brackets{t}) \in \emptyset,
+    \forall U \in \mathcal{U}.\,
+      U(\Brackets{t}(U),\Brackets{t}(U)).
   \]
-  a contradiction.
-  Hence, there is \emph{no} closed term of type $\forall X.\, X$.
+  Choosing $U$ to be the empty relation gives
+  \[
+    (\Brackets{t}(U),\Brackets{t}(U)) \in \emptyset,
+  \]
+  a contradiction.  Hence there is no closed term of type $\forall X.\,X$.
 \end{frame}
 
-\begin{frame}{Theorems for Free}
-  Consider the case that $R^X$ is instantiated as $\{\,(x, f(x)) \mid x \in A \,\}$ of some $f\colon A \to B$ and apply the fundamental theorem to derive, e.g.,
-  \begin{itemize}
-    \item the following equation for any $t : \forall X.\, \List(X) \to \List(X)$:
-      \[
-        \xymatrix{
-          \Brackets{\List(A)} \ar[r]^{\Brackets{t}_A} \ar[d]_{\mathtt{map}\;f} & \Brackets{\List(A)} \ar[d]^{\mathtt{map}\;f} \\
-          \Brackets{\List(B)} \ar[r]_{\Brackets{t}_B }& \Brackets{\List(B)}
-        }
-      \]
-  \end{itemize}
-  N.B.\ The equation is derived in the working model, not necessarily implying $=_{\beta}$ between $\lambda$-terms.
+\begin{frame}{Theorems for free}
+  Instantiate the relation candidate for $X$ with the graph relation
+  \[
+    R^X = \{(a,f(a)) \mid a \in \Brackets{A}\}
+  \]
+  for some function $f\colon \Brackets{A} \to \Brackets{B}$.
 
-  The fundamental theorem is well known for this specialised form, dubbed as \emph{free theorems}~\cite{Wadler1989}. 
+  Applying the fundamental theorem yields, for any
+  $t : \forall X.\,\List(X) \to \List(X)$, the commutative diagram
+  \[
+    \xymatrix{
+      \Brackets{\List(A)} \ar[r]^{\Brackets{t}_A} \ar[d]_{\mathtt{map}\;f}
+        & \Brackets{\List(A)} \ar[d]^{\mathtt{map}\;f} \\
+      \Brackets{\List(B)} \ar[r]_{\Brackets{t}_B}
+        & \Brackets{\List(B)}
+    }
+  \]
+
+  N.B.\ The equation is derived in the working model, so it does not necessarily
+  imply $=_{\beta}$ between $\lambda$-terms.
+
+  This specialised form of the fundamental theorem is known as a
+  \emph{free theorem}~\cite{Wadler1989}.
 \end{frame}
 
 \begin{frame}{Summary}
@@ -915,7 +962,7 @@
   \setbeamerfont{bibliography entry location}{size=\footnotesize}
   \setbeamerfont{bibliography entry note}{size=\footnotesize}
   \bibliographystyle{apalike}
-  \bibliography{ref} 
+  \bibliography{ref}
 \end{frame}
 
 \end{document}
