@@ -802,20 +802,23 @@
     R^{X} = \{(\bff, \btt)\}.
   \]
 
-  \begin{enumerate}
-    \item Suppose that the constant function $f(x) = \btt$ is $\lambda$-definable, then $R^{X \to X}(\Brackets{t}, \Brackets{t})$ by the fundamental theorem.
-      By definition of being logical $R^{X}(\Brackets{t}(\bff), \Brackets{t}(\btt))$, i.e.\ $R^{X}(\btt, \btt)$---a contradiction.
-      That is, $f(x) = \btt$ is not $\lambda$-definable.
-  \end{enumerate}
+  \begin{proof}
+    Suppose that the constant function $f(x) = \btt$ is $\lambda$-definable,
+    then $R^{X \to X}(\Brackets{t}, \Brackets{t})$ by the fundamental theorem.
+    
+
+    By definition of being logical $R^{X}(\Brackets{t}(\bff),
+    \Brackets{t}(\btt))$, i.e.\ $R^{X}(\btt, \btt)$---a contradiction.
+
+    That is, $f(x) = \btt$ is not $\lambda$-definable.
+  \end{proof}
 \end{frame}
 
-\begin{frame}
-  \begin{exercise*}
+\begin{frame}{Exercises}
     \begin{enumerate}
       \item Show that the constant function $f(x) = \bff$ is not $\lambda$-definable.
       \item Show that the negation function $\neg$ is not $\lambda$-definable.
     \end{enumerate}
-  \end{exercise*}
   
 \end{frame}
 
@@ -896,7 +899,7 @@
       and Church encodings.
     \item Type safety and strong normalisation still hold.
     \item Parametricity says that polymorphic programs preserve relations, which
-      gives equations ``for free'' from types.
+      gives equations `for free' from types.
   \end{enumerate}
 
   \vfill
